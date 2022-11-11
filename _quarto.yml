@@ -2,12 +2,26 @@ project:
   type: website
 
 website:
-  title: "introduction_to_MLE_MLM"
+  title: "Introduction to MLE and MLM"
   navbar:
-    left:
-      - href: index.qmd
-        text: Home
-      - about.qmd
+    right:
+      - text: "Home"
+        href: index.qmd
+      - text: "Contents"
+        href: contents/index.qmd
+        
+  sidebar: 
+    - title: "Contents"    
+      style: "docked"
+      contents: 
+        - section: "Introduction"
+          contents:
+            - contents/index.qmd
+        - section: "Binary responses"
+          contents:
+            - contents/binary_intro_binary.qmd
+            - contents/binary_marginal_effects.qmd
+            - contents/binary_substantive_effects.qmd
 
 format:
   html:

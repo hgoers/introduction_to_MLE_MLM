@@ -1,0 +1,189 @@
+---
+title: "Introduction to Binary Response Modelling"
+editor: source
+execute:
+  message: false
+  warning: false
+---
+
+## Set up
+
+This section uses the following packages: 
+
+```{r, include = FALSE}
+library(scales)
+library(broom)
+```
+
+```{r}
+library(tidyverse)
+library(gtsummary)
+```
+
+## Introduction
+
+We often want to better understand binary outcomes in political science.
+
+Let's start with simulated data to illustrate the theory. Let's create some data: 
+
+```{r}
+df <- tibble(x = runif(1000, 0, 10)) |> 
+  mutate(y = if_else(x < 5, 
+                     sample(0:1, 1000, replace = T, prob = c(0.95, 0.05)),
+                     sample(0:1, 1000, replace = T, prob = c(0.05, 0.95))))
+
+head(df)
+```
+
+Now, let's plot the relationship between our binary dependent variable, `y`, and our independent variable of interest, `x`.
+
+```{r}
+ggplot(df, aes(x = x, y = y)) + 
+  geom_point(alpha = 0.5) + 
+  theme_minimal()
+```
+
+There seems to be a pretty clear relationship between `y` and `x` (because we created the data that way). When `x` is less than 5, you are very likely (in fact 95 percent likely) to get a `y` of 0. But how do we formally measure this?
+
+When working with binary outcomes, we want to understand the probability that you will get an outcome (for example, the country went to war) for any given value of your independent variable(s). From there, you can make an informed guess as to the outcome for given values of $X$. For example, where the predicted probability of success is greater than 50 percent, you can predict that $y = 1$.
+
+## Linear Probability Model
+
+Let's start off simple. Let's draw a straight line between these two clusters and see what we get.
+
+```{r}
+ggplot(df, aes(x = x, y = y)) + 
+  geom_point(alpha = 0.5) + 
+  geom_smooth(method = "lm", se = F) + 
+  theme_minimal()
+```
+
+This is our usual linear model:
+
+```{r}
+m_lpr <- lm(y ~ x, data = df)
+
+tbl_regression(m_lpr, intercept = T)
+```
+
+Our estimation of $y_i$ can (and often does) take on values other than 0 or 1. This is because we can interpret the coefficients of this model as differences in the probability of success ($y_i = 1$). 
+
+We can see that increasing $x$ by one unit increases the probability that $y = 1$ by `r tidy(m_lpr) |> filter(term == "x") |> pull(estimate) |> percent(accuracy = 0.1)`.
+
+### Issues with LPM
+
+We run into difficulties using LPM for prediction. First, our model can predict probabilities of success less than 0 and greater than 1. Second, and relatedly, we lose information treating these discrete outcomes (0 or 1) as continuous.
+
+Importantly, our theory may suggest a non-linear relationship between changes in $x$ and the probability of success in $y$. If this is the case, we should not use a linear model for this relationship. 
+
+## Latent Variable Approach
+
+We can only observe one of two outcomes: $y = 0$ (failure) or $y = 1$ (success). The linear model provided above does not account for this very well. How can we improve this model? The **latent variable approach** assumes a continuous relationship exists between our observed outcome ($y_i$) and our independent variables ($x_i$). This continuous relationship is driven by a continuous, unobserved outcome: $z_i$.
+
+$$
+z_i = X_i\beta + \epsilon_i
+$$
+
+This set up is familiar to us. Critically, though, we need to understand the shape of that independent error term, $\epsilon_i$. This defines the shape of the continuous relationship that takes us from $y = 0$ to $y = 1$. We have two common options to pick from: logistic or probit.
+
+### Logistic Regression
+
+The inverse logistic function suits our needs well. First, it is bounded between outcomes of 0 and 1. Second, it allows for a varying impact of a change in $x$ on $y$.   
+
+Formally, the inverse logistic function is: 
+
+$$
+logit^-1(x) = \frac{e^x}{1 + e^x}
+$$
+
+Let's look at the shape of the inverse logistic function: 
+
+```{r}
+tibble(x = seq(-10, 10, by = 0.5)) |> 
+  mutate(y = plogis(x)) |> 
+  ggplot(aes(x = x, y = y)) + 
+  geom_line() + 
+  theme_minimal()
+```
+
+> The function `plogis()` gives you the inverse log of a number. For example, `plogis(1)` returns `r plogis(1)`. 
+
+#### The model
+
+Let's fit a logistic regression line against our data: 
+
+```{r}
+ggplot(df, aes(x = x, y = y)) + 
+  geom_point(alpha = 0.5) + 
+  geom_smooth(method = "glm", se = F, method.args = list(family = binomial(link = "logit"))) + 
+  theme_minimal()
+```
+
+Our model maps the relationship between our outcome ($y$) and our independent variable ($x$). We can interpret it as mapping the probability that $y = 1$ for a given value of $x$, otherwise written as $Pr(y = 1|x)$.
+
+We can fit this model as such: 
+
+```{r}
+m_lr <- glm(y ~ x, data = df, family = binomial(link = "logit"))
+
+tbl_regression(m_lr, intercept = T)
+```
+
+We will explore how to interpret these coefficients and uncertainty in the next section. 
+
+### Probit Regression
+
+An alternative approach is probit regression. This model is also bounded between outcomes of 0 and 1 and allows for a varying impact of a change in $x$ on $y$. The only real difference between the logistic and probit regression models are the ways they model the error term in our latent variable $z_i$. Probit replaces the logistic distribution with the normal distribution. 
+
+Formally, the probit model is: 
+
+$$
+Pr(y_i = 1) = \phi(X_i\beta)
+$$
+
+Let's look at the shape of the probit function: 
+
+```{r}
+tibble(x = seq(-10, 10, by = 0.5)) |> 
+  mutate(y = pnorm(x)) |> 
+  ggplot(aes(x = x, y = y)) + 
+  geom_line() + 
+  theme_minimal()
+```
+
+> The function `pnorm()` gives you the corresponding value for the normal cumulative distribution function. For example, `pnorm(1.96)` returns `r pnorm(1.96)` (think confidence intervals!). 
+
+#### The model
+
+Let's fit a probit regression line against our data: 
+
+```{r}
+ggplot(df, aes(x = x, y = y)) + 
+  geom_point(alpha = 0.5) + 
+  geom_smooth(method = "glm", se = F, method.args = list(family = binomial(link = "logit"))) + 
+  theme_minimal()
+```
+
+Quickly, let's compare this probit regression (in red) to our logistic regression (in blue): 
+
+```{r, echo = FALSE}
+ggplot(df, aes(x = x, y = y)) + 
+  geom_point(alpha = 0.5) + 
+  geom_smooth(method = "glm", se = FALSE, colour = "blue", method.args = list(family = binomial(link="logit"))) + 
+  geom_smooth(method = "glm", se = FALSE, colour = "red", method.args = list(family = binomial(link="probit"))) + 
+  theme_minimal()
+```
+
+They both fit very similar models; however, the logistic regression produces fatter tails. 
+
+Our probit model maps the relationship between our outcome ($y$) and our independent variable ($x$). Like the logistic regression, we can interpret it as mapping the probability that $y = 1$ for a given value of $x$, otherwise written as $Pr(y = 1|x)$.
+
+We can fit this model as such: 
+
+```{r}
+m_pr <- glm(y ~ x, data = df, family = binomial(link = "probit"))
+
+tbl_regression(m_pr, intercept = T)
+```
+
+We will explore how to interpret these coefficients and uncertainty in the next section. 
