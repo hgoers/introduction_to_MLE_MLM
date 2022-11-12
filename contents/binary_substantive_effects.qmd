@@ -1,5 +1,6 @@
 ---
 title: "Measuring Substantive Effects on Binary Outcomes"
+page-layout: full
 editor: source
 toc-depth: 5
 execute:
@@ -17,11 +18,10 @@ library(scales)
 
 ```{r}
 library(tidyverse)
-library(rio)
-library(skimr)
-library(sjPlot)
 library(broom)
 library(gtsummary)
+library(skimr)
+library(mvtnorm)
 ```
 
 We will use the dataset we set up in the previous section: 
@@ -32,7 +32,8 @@ voters <- rio::import("/Users/harrietgoers/Documents/GVPT729A/class_sets/data/cp
             close, 
             edu7cat = factor(edu7cat), 
             homeown = factor(homeown, levels = c(0, 1), labels = c("Not homeowner", "Homeowner"))) |> 
-  labelled::set_variable_labels(vote = "Voted", close = "Registration closing", edu7cat = "Education level", homeown = "Homeownership")
+  labelled::set_variable_labels(vote = "Voted", close = "Registration closing", edu7cat = "Education level", homeown = "Homeownership") |> 
+  drop_na()
 
 head(voters)
 ```
@@ -82,7 +83,7 @@ Therefore, to measure the effect of moving from one value of $x$ to another in a
 
 ## Measuring substantive effects
 
-How do we actually measure the effect of a change from $x_{i1}$ to $x_{i2}$? We predict the estimated probability of success at $x_{i1}$ and at $x_{i2}$ and subtract those probabilities from one another to get the difference. However, there are two factors that complicate this process. First, we need to deal with the other variables in our model: what values should they be held at while we change our variable of interest, $x_i$? Second, how do we measure uncertainty surrounding this estimated effect? We will deal with these challenges in turn. 
+How do we actually measure the effect of a change from $x_{i1}$ to $x_{i2}$? We predict the estimated probability of success at $x_{i1}$ and at $x_{i2}$ and subtract those probabilities from one another to get the difference. Simple, right? However, there are two factors that complicate this process. First, we need to deal with the other variables in our model: what values should they be held at while we change our variable of interest, $x_i$? Second, how do we measure uncertainty surrounding this estimated effect? We will deal with these challenges in turn. 
 
 ### What to do with the other independent variables
 
@@ -127,15 +128,15 @@ new_data
 Next, we calculate the predicted probability that an individual will vote, given these values for our independent variables:
 
 ```{r}
-result_0_20 <- augment(m1, newdata = new_data, type.predict = "response")
-result_0_20
+result <- augment(m1, newdata = new_data, type.predict = "response")
+result
 ```
 
 Next, we calculate the difference between these predicted probabilities, noting that the only thing that changed in our model is the value of `close`: 
 
 ```{r}
-result_0_20 <- mutate(result_0_20, diff = (.fitted - lead(.fitted)) * 100)
-result_0_20
+result <- mutate(result, diff = (.fitted - lead(.fitted)) * 100)
+result
 ```
 
 We expect that the probability that an individual will vote increases `r result_0_20 |> filter(close == 0) |> pull(diff) |> round(2)` percentage points when a state's closing date for voter registration moves from 20 days prior to election day to election day. If increasing turnout by `r result_0_20 |> filter(close == 0) |> pull(diff) |> round(2)` percentage points would swing an election in a candidate's favour, this is a substantively significant result.[^1]
@@ -177,24 +178,273 @@ result_0
 Next, calculate the average predicted probability for $close = 20$ and $close = 0$:
 
 ```{r}
-avg_result_20 <- summarise(result_20, avg_20 = mean(.fitted))
-avg_result_20
+result <- result_0 |> 
+  bind_rows(result_20) |> 
+  group_by(close) |> 
+  summarise(.fitted = mean(.fitted)) |> 
+  mutate(diff = (.fitted - lead(.fitted)) * 100)
+
+result
 ```
 
-```{r}
-avg_result_0 <- summarise(result_0, avg_0 = mean(.fitted))
-avg_result_0
-```
-
-Next, calculate the difference between these averages as a percentage:
-
-```{r}
-diff <- (avg_result_0 - avg_result_20) * 100
-diff
-```
-
-We expect that the probability that an individual will vote increases `r round(diff, 2)` percentage points when a state's closing date for voter registration moves from 20 days prior to election day to election day. If this increase in turnout would swing an election in a candidate's favour, this is a substantively significant result.
+We expect that the probability that an individual will vote increases `r result |> filter(close == 0) |> pull(diff) |> round(2)` percentage points when a state's closing date for voter registration moves from 20 days prior to election day to election day. If this increase in turnout would swing an election in a candidate's favour, this is a substantively significant result.
 
 #### Which approach should you use?
 
 You should use the observed values approach. Hanmer and Kalkan (2013) demonstrate using simulated data that the observed values approach consistently produces estimates closer to the population's true probability than the average case approach. This makes sense: you are using more data to produce your estimated effects.  
+
+### Measuring uncertainty when calculating substantive effects
+
+We calculated these estimates using a model that includes error. We need to understand how this uncertainty impacts our estimated substantive effects. How do we get confidence intervals around our estimated effects? 
+
+First, we need to go back to the fundamentals of our logistic or probit regression models. Remember from the first section that the latent variable approach assumes there is some continuous process that gets us from $y = 0$ to $y = 1$ based on some set of independent variables $X$. This latent variable, $z_i$, is modelled as: 
+
+$$
+z_i = \beta_0 + X_i\beta_i + \epsilon_i
+$$
+
+It contains an error term: $\epsilon_i$. What that error looks like depends on whether you use a logistic or probit regression, but they are very similar. That error term applies to both $X_i$ and $\beta_i$. So, we need to generate a series of estimates for both the $X_i$ and $\beta_i$ to generate our confidence intervals. 
+
+Imagine we are trying to estimate the relationship between some binary outcome $y$ and some independent variables $x$ and $z$. We take a representative sample from our population and fit a model against that data. If we were to take a different representative sample from our population and fit the same model to that data, we will probably get slightly different estimates for our $\beta$s. This is because of the random error inherent in observational modelling. The idea behind logistic and probit regression is that if we were to do this many, many, many times (say, take 1,000 different representative samples from our population and use that data to fit 1,000 models) we would get a set of $\beta$ estimates that follow a normal (if you're using a probit model) or inverse logistic (if you're using a logistic model) distribution. Your original estimated $\beta$ will be within this distribution.  
+
+We can use this assumption to generate our confidence intervals. We just need to simulate fitting these 1,000 different models.  
+
+> It is critical that your sample is representative of your population. We are not simulating drawing 1,000 different samples. Rather, we are taking our one model fitted against our one sample and drawing estimates around those $\beta$s. 
+
+1.    Simulate fitting 1,000 different models by drawing 1,000 different $\beta_i$ around your estimated $\beta_i$ following your (logistic or probit) model's distribution.
+
+2.    Predict the probability of success for $x_{i1}$ and $x_{i2}$ using these 1,000 different model estimates.
+
+3.    Calculate the difference between those predictions. 
+
+4.    Calculate the lower and upper confidence intervals and the mean of those differences. 
+
+Let's illustrate this by looking at our question above. 
+
+#### Logistic regression
+
+Recall our logistic regression model from above:
+
+```{r}
+tbl_regression(m1, intercept = T, exponentiate = T)
+```
+
+Let's collect those coefficients using `broom::tidy()`: 
+
+```{r}
+coefs <- tidy(m1) |> pull(estimate)
+coefs
+```
+
+Next, simulate fitting 1,000 different models using these estimates as our center-point using `mvtnorm::rmvnorm()`:
+
+> TODO: Learn more about the sigma. 
+
+```{r}
+coefs_sim <- rmvnorm(n = 1000, mean = coefs, sigma = vcov(m1)) |> 
+  as_tibble() |> 
+  set_names(tidy(m1) |> mutate(term = paste0(term, "_beta")) |> pull(term))
+
+head(coefs_sim)
+```
+
+Let's look at the distribution of these simulated $\beta$s for one of our variables: `close`:
+
+```{r}
+ggplot(coefs_sim, aes(x = close_beta)) + 
+  geom_histogram() + 
+  geom_vline(xintercept = tidy(m1) |> filter(term == "close") |> pull(estimate)) + 
+  theme_minimal()
+```
+
+As expected, this draw follows the inverse logit distribution and centered around our estimated $\beta_{close}$ (highlighted by the black line).
+
+Next, we need to predict the probability that an individual will vote when $close = 20$ and when $close = 0$ using these 1,000 different model estimates. To do this, we need to convert our categorical variables into dummy variables so that we can fit the correct $\beta$s to them: 
+
+```{r}
+trans_data <- voters |> 
+  transmute(
+    edu7cat2 = if_else(edu7cat == 2, 1, 0),
+    edu7cat3 = if_else(edu7cat == 3, 1, 0),
+    edu7cat4 = if_else(edu7cat == 4, 1, 0),
+    edu7cat5 = if_else(edu7cat == 5, 1, 0),
+    edu7cat6 = if_else(edu7cat == 6, 1, 0),
+    edu7cat7 = if_else(edu7cat == 7, 1, 0),
+    homeown = as.numeric(homeown) - 1
+  )
+
+head(trans_data)
+```
+
+Now, we include our `close` variable, set to 0 and 20 for each of these `r nrow(voters) |> comma()` observations. We should get a dataset of length `r comma(nrow(voters) * 2)`: one set of observations for $close = 20$ and one set for $close = 0$.
+
+```{r}
+new_data <- trans_data |> 
+  mutate(close = 0) |> 
+  bind_rows(mutate(trans_data, close = 20)) |> 
+  group_by(close) |> 
+  mutate(id = row_number()) |> 
+  ungroup()
+
+nrow(new_data)
+```
+
+Next, we need to join our datasets together, so we can calculate our predicted probability for each observation for each simulated model coefficient. We should get a dataframe with a length of 2 x 1,000 x `r nrow(voters) |> comma()` (number of different variables of interest x number of models x number of observations).
+
+```{r}
+sim_data <- coefs_sim |> 
+  mutate(sim_round = row_number()) |> 
+  full_join(new_data, by = character())
+
+nrow(sim_data)
+```
+
+We can now estimate our logistic regression model using the 1,000 different estimated $\beta$s for all `r nrow(voters) |> comma()` different observations. You need to first fit the linear model, then find the inverse logit of those results using `plogis()`.
+
+```{r}
+results <- sim_data |> 
+  mutate(
+    .fitted = `(Intercept)_beta` +
+      close_beta * close +
+      edu7cat2_beta * edu7cat2 +
+      edu7cat3_beta * edu7cat3 +
+      edu7cat4_beta * edu7cat4 +
+      edu7cat5_beta * edu7cat5 +
+      edu7cat6_beta * edu7cat6 +
+      edu7cat7_beta * edu7cat7 +
+      homeownHomeowner_beta * homeown,
+    .fitted = plogis(.fitted)
+  ) |> 
+  arrange(sim_round, id, close)
+
+head(results)
+```
+
+We then calculate the difference between the predicted probabilities for each observation when $close = 0$ and $close = 20$:
+
+```{r}
+results |>
+  group_by(sim_round, id) |> 
+  mutate(diff = (.fitted - lead(.fitted)) * 100) |> 
+  drop_na(diff) |> 
+  ungroup() |> 
+  summarise(`Lower bound` = quantile(diff, 0.025),
+            `Mean` = quantile(diff, 0.5),
+            `Upper bound` = quantile(diff, 0.975))
+```
+
+Because this confidence interval crosses through 0, we cannot reject the null hypothesis that this substantive effect is caused by random error. 
+
+#### Probit regression
+
+First, let's fit our probit model: 
+
+```{r}
+m2 <- glm(vote ~ close + edu7cat + homeown, data = voters, family = binomial(link = "probit"))
+
+tbl_regression(m2, intercept = T)
+```
+
+Let's collect those coefficients using `broom::tidy()`: 
+
+```{r}
+coefs <- tidy(m2) |> pull(estimate)
+coefs
+```
+
+Next, simulate fitting 1,000 different models using these estimates as our center-point using `mvtnorm::rmvnorm()`:
+
+```{r}
+coefs_sim <- rmvnorm(n = 1000, mean = coefs, sigma = vcov(m2)) |> 
+  as_tibble() |> 
+  set_names(tidy(m2) |> mutate(term = paste0(term, "_beta")) |> pull(term))
+
+head(coefs_sim)
+```
+
+Let's look at the distribution of these simulated $\beta$s for one of our variables: `close`:
+
+```{r}
+ggplot(coefs_sim, aes(x = close_beta)) + 
+  geom_histogram() + 
+  geom_vline(xintercept = tidy(m2) |> filter(term == "close") |> pull(estimate)) + 
+  theme_minimal()
+```
+
+As expected, this draw is normally distributed and centered around our estimated $\beta_{close}$.
+
+Next, we need to predict the probability that an individual will vote when $close = 20$ and when $close = 0$ using these 1,000 different model estimates. To do this, we need to convert our categorical variables into dummy variables so that we can fit the correct $\beta$s to them: 
+
+```{r}
+trans_data <- voters |> 
+  transmute(
+    edu7cat2 = if_else(edu7cat == 2, 1, 0),
+    edu7cat3 = if_else(edu7cat == 3, 1, 0),
+    edu7cat4 = if_else(edu7cat == 4, 1, 0),
+    edu7cat5 = if_else(edu7cat == 5, 1, 0),
+    edu7cat6 = if_else(edu7cat == 6, 1, 0),
+    edu7cat7 = if_else(edu7cat == 7, 1, 0),
+    homeown = as.numeric(homeown) - 1
+  )
+
+head(trans_data)
+```
+
+Now, we include our `close` variable, set to 0 and 20 for each of these `r nrow(voters) |> comma()` observations. We should get a dataset of length `r comma(nrow(voters) * 2)`: one set of observations for $close = 20$ and one set for $close = 0$.
+
+```{r}
+new_data <- trans_data |> 
+  mutate(close = 0) |> 
+  bind_rows(mutate(trans_data, close = 20)) |> 
+  group_by(close) |> 
+  mutate(id = row_number()) |> 
+  ungroup()
+
+nrow(new_data)
+```
+
+Next, we need to join our datasets together, so we can calculate our predicted probability for each observation for each simulated model coefficients. We should get a dataframe with a length of 2 x 1,000 x `r nrow(voters) |> comma()` (number of different variables of interest x number of models x number of observations).
+
+```{r}
+sim_data <- coefs_sim |> 
+  mutate(sim_round = row_number()) |> 
+  full_join(new_data, by = character())
+
+nrow(sim_data)
+```
+
+We can now estimate our probit model using the 1,000 different estimated $\beta$s for all `r nrow(voters) |> comma()` different observations. You need to first fit the linear model, then find the probit of those results using `pnorm()`.
+
+```{r}
+results <- sim_data |> 
+  mutate(
+    .fitted = `(Intercept)_beta` +
+      close_beta * close +
+      edu7cat2_beta * edu7cat2 +
+      edu7cat3_beta * edu7cat3 +
+      edu7cat4_beta * edu7cat4 +
+      edu7cat5_beta * edu7cat5 +
+      edu7cat6_beta * edu7cat6 +
+      edu7cat7_beta * edu7cat7 +
+      homeownHomeowner_beta * homeown,
+    .fitted = pnorm(.fitted)
+  ) |> 
+  arrange(sim_round, id, close)
+
+head(results)
+```
+
+We then calculate the difference between the predicted probabilities for each observation when $close = 0$ and $close = 20$:
+
+```{r}
+results |>
+  group_by(sim_round, id) |> 
+  mutate(diff = (.fitted - lead(.fitted)) * 100) |> 
+  drop_na(diff) |> 
+  ungroup() |> 
+  summarise(`Lower bound` = quantile(diff, 0.025),
+            `Mean` = quantile(diff, 0.5),
+            `Upper bound` = quantile(diff, 0.975))
+```
+
+Because this confidence interval crosses through 0, we cannot reject the null hypothesis that this substantive effect is caused by random error. 

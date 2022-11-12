@@ -1,4 +1,6 @@
 ---
-title: "Introduction to Maximum Likelihood Estimation and Multi-level Modelling"
+title: "Introduction to Maximum Likelihood Estimation"
+sidebar: false
+page-layout: full
 ---
 

@@ -1,5 +1,6 @@
 ---
 title: "Introduction to Binary Response Modelling"
+page-layout: full
 editor: source
 execute:
   message: false
@@ -45,7 +46,7 @@ ggplot(df, aes(x = x, y = y)) +
 
 There seems to be a pretty clear relationship between `y` and `x` (because we created the data that way). When `x` is less than 5, you are very likely (in fact 95 percent likely) to get a `y` of 0. But how do we formally measure this?
 
-When working with binary outcomes, we want to understand the probability that you will get an outcome (for example, the country went to war) for any given value of your independent variable(s). From there, you can make an informed guess as to the outcome for given values of $X$. For example, where the predicted probability of success is greater than 50 percent, you can predict that $y = 1$.
+When working with binary outcomes, we want to understand the probability that you will get an outcome for any given value of your independent variable(s). From there, you can make an informed guess as to the outcome for given values of $X$. For example, where the predicted probability of success is greater than 50 percent, you can predict that $y = 1$.
 
 ## Linear Probability Model
 
@@ -66,9 +67,7 @@ m_lpr <- lm(y ~ x, data = df)
 tbl_regression(m_lpr, intercept = T)
 ```
 
-Our estimation of $y_i$ can (and often does) take on values other than 0 or 1. This is because we can interpret the coefficients of this model as differences in the probability of success ($y_i = 1$). 
-
-We can see that increasing $x$ by one unit increases the probability that $y = 1$ by `r tidy(m_lpr) |> filter(term == "x") |> pull(estimate) |> percent(accuracy = 0.1)`.
+Our estimation of $y_i$ can (and often does) take on values other than 0 or 1. This is because we can interpret the coefficients of this model as differences in the probability of success ($y_i = 1$). We can see that increasing $x$ by one unit increases the probability that $y = 1$ by `r tidy(m_lpr) |> filter(term == "x") |> pull(estimate) |> percent(accuracy = 0.1)`.
 
 ### Issues with LPM
 
@@ -78,7 +77,7 @@ Importantly, our theory may suggest a non-linear relationship between changes in
 
 ## Latent Variable Approach
 
-We can only observe one of two outcomes: $y = 0$ (failure) or $y = 1$ (success). The linear model provided above does not account for this very well. How can we improve this model? The **latent variable approach** assumes a continuous relationship exists between our observed outcome ($y_i$) and our independent variables ($x_i$). This continuous relationship is driven by a continuous, unobserved outcome: $z_i$.
+We can only observe one of two outcomes: $y = 0$ (failure) or $y = 1$ (success). The linear model provided above does not account for this very well. How can we improve this model? The **latent variable approach** assumes a continuous relationship exists between our observed outcome ($y_i$) and our independent variables ($x_i$). This continuous relationship is driven by an unobserved outcome: $z_i$.
 
 $$
 z_i = X_i\beta + \epsilon_i
@@ -133,12 +132,12 @@ We will explore how to interpret these coefficients and uncertainty in the next 
 
 ### Probit Regression
 
-An alternative approach is probit regression. This model is also bounded between outcomes of 0 and 1 and allows for a varying impact of a change in $x$ on $y$. The only real difference between the logistic and probit regression models are the ways they model the error term in our latent variable $z_i$. Probit replaces the logistic distribution with the normal distribution. 
+An alternative approach is probit regression. This model is also bounded between outcomes of 0 and 1 and allows for a varying impact of a change in $x$ on $y$. The only real difference between the logistic and probit regression models are the ways they model the error term, $\epsilon_i$, in our latent variable $z_i$. Probit replaces the logistic distribution with the normal distribution. 
 
 Formally, the probit model is: 
 
 $$
-Pr(y_i = 1) = \phi(X_i\beta)
+Pr(y_i = 1|X_i) = \Phi(X_i\beta)
 $$
 
 Let's look at the shape of the probit function: 

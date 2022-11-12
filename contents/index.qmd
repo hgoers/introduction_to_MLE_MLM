@@ -1,3 +1,4 @@
 ---
 title: "Course Introduction"
+page-layout: full
 ---

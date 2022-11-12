@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Introduction to MLE and MLM - Measuring Substantive Effects on Binary Outcomes</title>
+<title>Introduction to MLE - Measuring Substantive Effects on Binary Outcomes</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -129,7 +129,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <nav class="navbar navbar-expand-lg navbar-dark ">
       <div class="navbar-container container-fluid">
       <a class="navbar-brand" href="../index.html">
-    <span class="navbar-title">Introduction to MLE and MLM</span>
+    <span class="navbar-title">Introduction to MLE</span>
   </a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
@@ -157,7 +157,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   </nav>
 </header>
 <!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
 <!-- sidebar -->
   <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto">
     <div class="sidebar-menu-container"> 
@@ -221,12 +221,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <li><a href="#observed-value-approach" id="toc-observed-value-approach" class="nav-link" data-scroll-target="#observed-value-approach">Observed value approach</a></li>
   <li><a href="#which-approach-should-you-use" id="toc-which-approach-should-you-use" class="nav-link" data-scroll-target="#which-approach-should-you-use">Which approach should you use?</a></li>
   </ul></li>
+  <li><a href="#measuring-uncertainty-when-calculating-substantive-effects" id="toc-measuring-uncertainty-when-calculating-substantive-effects" class="nav-link" data-scroll-target="#measuring-uncertainty-when-calculating-substantive-effects">Measuring uncertainty when calculating substantive effects</a>
+  <ul class="collapse">
+  <li><a href="#logistic-regression" id="toc-logistic-regression" class="nav-link" data-scroll-target="#logistic-regression">Logistic regression</a></li>
+  <li><a href="#probit-regression" id="toc-probit-regression" class="nav-link" data-scroll-target="#probit-regression">Probit regression</a></li>
+  </ul></li>
   </ul></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
+<main class="content column-body" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
@@ -249,11 +254,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>This section uses the following packages:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rio)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(skimr)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sjPlot)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom)</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gtsummary)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gtsummary)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(skimr)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mvtnorm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>We will use the dataset we set up in the previous section:</p>
 <div class="cell">
@@ -277,12 +281,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p><img src="binary_substantive_effects_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>Moving from <span class="math inline">\(x = 2\)</span> (highlighted in light blue) to <span class="math inline">\(x = 3\)</span> (highlighted in dark blue) increases the probability of success by 0.057, from 0.027 to 0.084. Moving <em>the same interval</em> of one unit from <span class="math inline">\(x = 4\)</span> (highlighted in pink) to <span class="math inline">\(x = 5\)</span> (highlighted in red) increases the probability of success by 0.267, from 0.231 to 0.498. That’s a 4.706 times increase in the effect of a one unit change in <span class="math inline">\(x\)</span>.</p>
+<p>Moving from <span class="math inline">\(x = 2\)</span> (highlighted in light blue) to <span class="math inline">\(x = 3\)</span> (highlighted in dark blue) increases the probability of success by 0.059, from 0.029 to 0.088. Moving <em>the same interval</em> of one unit from <span class="math inline">\(x = 4\)</span> (highlighted in pink) to <span class="math inline">\(x = 5\)</span> (highlighted in red) increases the probability of success by 0.264, from 0.238 to 0.502. That’s a 4.455 times increase in the effect of a one unit change in <span class="math inline">\(x\)</span>.</p>
 <p>Therefore, to measure the effect of moving from one value of <span class="math inline">\(x\)</span> to another in a non-linear model, we need to know which values of <span class="math inline">\(x\)</span> we are moving between. This should be theoretically driven: what is an interesting interval for the phenomenon you are measuring?</p>
 </section>
 <section id="measuring-substantive-effects" class="level2">
 <h2 class="anchored" data-anchor-id="measuring-substantive-effects">Measuring substantive effects</h2>
-<p>How do we actually measure the effect of a change from <span class="math inline">\(x_{i1}\)</span> to <span class="math inline">\(x_{i2}\)</span>? We predict the estimated probability of success at <span class="math inline">\(x_{i1}\)</span> and at <span class="math inline">\(x_{i2}\)</span> and subtract those probabilities from one another to get the difference. However, there are two factors that complicate this process. First, we need to deal with the other variables in our model: what values should they be held at while we change our variable of interest, <span class="math inline">\(x_i\)</span>? Second, how do we measure uncertainty surrounding this estimated effect? We will deal with these challenges in turn.</p>
+<p>How do we actually measure the effect of a change from <span class="math inline">\(x_{i1}\)</span> to <span class="math inline">\(x_{i2}\)</span>? We predict the estimated probability of success at <span class="math inline">\(x_{i1}\)</span> and at <span class="math inline">\(x_{i2}\)</span> and subtract those probabilities from one another to get the difference. Simple, right? However, there are two factors that complicate this process. First, we need to deal with the other variables in our model: what values should they be held at while we change our variable of interest, <span class="math inline">\(x_i\)</span>? Second, how do we measure uncertainty surrounding this estimated effect? We will deal with these challenges in turn.</p>
 <section id="what-to-do-with-the-other-independent-variables" class="level3">
 <h3 class="anchored" data-anchor-id="what-to-do-with-the-other-independent-variables">What to do with the other independent variables</h3>
 <p>There are two dominant approaches to solving this challenge: the average case approach and the observed value approach.</p>
@@ -304,12 +308,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl_regression</span>(m1, <span class="at">intercept =</span> T, <span class="at">exponentiate =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
-<div id="eamgfurcjx" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="artgtmntua" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#eamgfurcjx .gt_table {
+#artgtmntua .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -334,7 +338,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   border-left-color: #D3D3D3;
 }
 
-#eamgfurcjx .gt_heading {
+#artgtmntua .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -346,7 +350,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   border-right-color: #D3D3D3;
 }
 
-#eamgfurcjx .gt_title {
+#artgtmntua .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -358,7 +362,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   border-bottom-width: 0;
 }
 
-#eamgfurcjx .gt_subtitle {
+#artgtmntua .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -370,13 +374,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   border-top-width: 0;
 }
 
-#eamgfurcjx .gt_bottom_border {
+#artgtmntua .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#eamgfurcjx .gt_col_headings {
+#artgtmntua .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -391,7 +395,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   border-right-color: #D3D3D3;
 }
 
-#eamgfurcjx .gt_col_heading {
+#artgtmntua .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -411,7 +415,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   overflow-x: hidden;
 }
 
-#eamgfurcjx .gt_column_spanner_outer {
+#artgtmntua .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -423,15 +427,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   padding-right: 4px;
 }
 
-#eamgfurcjx .gt_column_spanner_outer:first-child {
+#artgtmntua .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#eamgfurcjx .gt_column_spanner_outer:last-child {
+#artgtmntua .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#eamgfurcjx .gt_column_spanner {
+#artgtmntua .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -443,7 +447,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   width: 100%;
 }
 
-#eamgfurcjx .gt_group_heading {
+#artgtmntua .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -468,7 +472,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   vertical-align: middle;
 }
 
-#eamgfurcjx .gt_empty_group_heading {
+#artgtmntua .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -483,15 +487,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   vertical-align: middle;
 }
 
-#eamgfurcjx .gt_from_md > :first-child {
+#artgtmntua .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#eamgfurcjx .gt_from_md > :last-child {
+#artgtmntua .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#eamgfurcjx .gt_row {
+#artgtmntua .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -510,7 +514,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   overflow-x: hidden;
 }
 
-#eamgfurcjx .gt_stub {
+#artgtmntua .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -523,7 +527,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   padding-right: 5px;
 }
 
-#eamgfurcjx .gt_stub_row_group {
+#artgtmntua .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -537,11 +541,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   vertical-align: top;
 }
 
-#eamgfurcjx .gt_row_group_first td {
+#artgtmntua .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#eamgfurcjx .gt_summary_row {
+#artgtmntua .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -551,16 +555,16 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   padding-right: 5px;
 }
 
-#eamgfurcjx .gt_first_summary_row {
+#artgtmntua .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#eamgfurcjx .gt_first_summary_row.thick {
+#artgtmntua .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#eamgfurcjx .gt_last_summary_row {
+#artgtmntua .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -570,7 +574,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   border-bottom-color: #D3D3D3;
 }
 
-#eamgfurcjx .gt_grand_summary_row {
+#artgtmntua .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -580,7 +584,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   padding-right: 5px;
 }
 
-#eamgfurcjx .gt_first_grand_summary_row {
+#artgtmntua .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -590,11 +594,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   border-top-color: #D3D3D3;
 }
 
-#eamgfurcjx .gt_striped {
+#artgtmntua .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#eamgfurcjx .gt_table_body {
+#artgtmntua .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -603,7 +607,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   border-bottom-color: #D3D3D3;
 }
 
-#eamgfurcjx .gt_footnotes {
+#artgtmntua .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -617,7 +621,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   border-right-color: #D3D3D3;
 }
 
-#eamgfurcjx .gt_footnote {
+#artgtmntua .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-left: 4px;
@@ -626,7 +630,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   padding-right: 5px;
 }
 
-#eamgfurcjx .gt_sourcenotes {
+#artgtmntua .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -640,7 +644,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   border-right-color: #D3D3D3;
 }
 
-#eamgfurcjx .gt_sourcenote {
+#artgtmntua .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -648,64 +652,64 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   padding-right: 5px;
 }
 
-#eamgfurcjx .gt_left {
+#artgtmntua .gt_left {
   text-align: left;
 }
 
-#eamgfurcjx .gt_center {
+#artgtmntua .gt_center {
   text-align: center;
 }
 
-#eamgfurcjx .gt_right {
+#artgtmntua .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#eamgfurcjx .gt_font_normal {
+#artgtmntua .gt_font_normal {
   font-weight: normal;
 }
 
-#eamgfurcjx .gt_font_bold {
+#artgtmntua .gt_font_bold {
   font-weight: bold;
 }
 
-#eamgfurcjx .gt_font_italic {
+#artgtmntua .gt_font_italic {
   font-style: italic;
 }
 
-#eamgfurcjx .gt_super {
+#artgtmntua .gt_super {
   font-size: 65%;
 }
 
-#eamgfurcjx .gt_footnote_marks {
+#artgtmntua .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 75%;
   vertical-align: 0.4em;
 }
 
-#eamgfurcjx .gt_asterisk {
+#artgtmntua .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#eamgfurcjx .gt_indent_1 {
+#artgtmntua .gt_indent_1 {
   text-indent: 5px;
 }
 
-#eamgfurcjx .gt_indent_2 {
+#artgtmntua .gt_indent_2 {
   text-indent: 10px;
 }
 
-#eamgfurcjx .gt_indent_3 {
+#artgtmntua .gt_indent_3 {
   text-indent: 15px;
 }
 
-#eamgfurcjx .gt_indent_4 {
+#artgtmntua .gt_indent_4 {
   text-indent: 20px;
 }
 
-#eamgfurcjx .gt_indent_5 {
+#artgtmntua .gt_indent_5 {
   text-indent: 25px;
 }
 </style>
@@ -825,7 +829,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 </div>
 <p>We expect that the probability that an individual will vote increases 2.77 percentage points when a state’s closing date for voter registration moves from 20 days prior to election day to election day. If increasing turnout by 2.77 percentage points would swing an election in a candidate’s favour, this is a substantively significant result.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
-<p>However, we have a bit of a problem. Is this really a generalisable result? Haven’t we just estimated the effect of this change in registration day closure for a homeowner with an education level of 4? This is the problem with the average case approach: we are discarding an enormous amount of rich data about our sample which is potentially compromising the generalisability of our estimates. In fact, sometimes our average case isn’t even in our dataset, which means that we are making out-of-sample predictions.</p>
+<p>However, we have a bit of a problem. Is this really a generalisable result? Haven’t we just estimated the effect of this change in registration day closure for a homeowner with an education level of 4? This is the problem with the average case approach: we are discarding an enormous amount of rich data from our sample which is potentially compromising the generalisability of our estimates. In fact, sometimes our average case isn’t even in our dataset, which means that we are making out-of-sample predictions.</p>
 </section>
 <section id="observed-value-approach" class="level4">
 <h4 class="anchored" data-anchor-id="observed-value-approach">Observed value approach</h4>
@@ -843,7 +847,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>result_20 <span class="ot">&lt;-</span> <span class="fu">augment</span>(m1, <span class="at">newdata =</span> <span class="fu">mutate</span>(voters, <span class="at">close =</span> <span class="dv">20</span>), <span class="at">type.predict =</span> <span class="st">"response"</span>)</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>result_20</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 2,446 × 5
+<pre><code># A tibble: 2,188 × 5
    vote         close edu7cat homeown       .fitted
    &lt;fct&gt;        &lt;dbl&gt; &lt;fct&gt;   &lt;fct&gt;           &lt;dbl&gt;
  1 Voted           20 6       Homeowner       0.861
@@ -856,7 +860,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
  8 Voted           20 6       Homeowner       0.861
  9 Voted           20 2       Homeowner       0.590
 10 Did not vote    20 5       Homeowner       0.758
-# … with 2,436 more rows</code></pre>
+# … with 2,178 more rows</code></pre>
 </div>
 </div>
 <p>Next, find the predicted probability of an individual voting when <span class="math inline">\(close = 0\)</span>:</p>
@@ -864,7 +868,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>result_0 <span class="ot">&lt;-</span> <span class="fu">augment</span>(m1, <span class="at">newdata =</span> <span class="fu">mutate</span>(voters, <span class="at">close =</span> <span class="dv">0</span>), <span class="at">type.predict =</span> <span class="st">"response"</span>)</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>result_0</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 2,446 × 5
+<pre><code># A tibble: 2,188 × 5
    vote         close edu7cat homeown       .fitted
    &lt;fct&gt;        &lt;dbl&gt; &lt;fct&gt;   &lt;fct&gt;           &lt;dbl&gt;
  1 Voted            0 6       Homeowner       0.875
@@ -877,44 +881,1318 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
  8 Voted            0 6       Homeowner       0.875
  9 Voted            0 2       Homeowner       0.618
 10 Did not vote     0 5       Homeowner       0.779
-# … with 2,436 more rows</code></pre>
+# … with 2,178 more rows</code></pre>
 </div>
 </div>
 <p>Next, calculate the average predicted probability for <span class="math inline">\(close = 20\)</span> and <span class="math inline">\(close = 0\)</span>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>avg_result_20 <span class="ot">&lt;-</span> <span class="fu">summarise</span>(result_20, <span class="at">avg_20 =</span> <span class="fu">mean</span>(.fitted))</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>avg_result_20</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> result_0 <span class="sc">|&gt;</span> </span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(result_20) <span class="sc">|&gt;</span> </span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(close) <span class="sc">|&gt;</span> </span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">.fitted =</span> <span class="fu">mean</span>(.fitted)) <span class="sc">|&gt;</span> </span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">diff =</span> (.fitted <span class="sc">-</span> <span class="fu">lead</span>(.fitted)) <span class="sc">*</span> <span class="dv">100</span>)</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>result</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 1 × 1
-  avg_20
-   &lt;dbl&gt;
-1  0.664</code></pre>
+<pre><code># A tibble: 2 × 3
+  close .fitted  diff
+  &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;
+1     0   0.688  2.28
+2    20   0.666 NA   </code></pre>
 </div>
 </div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>avg_result_0 <span class="ot">&lt;-</span> <span class="fu">summarise</span>(result_0, <span class="at">avg_0 =</span> <span class="fu">mean</span>(.fitted))</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>avg_result_0</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 1 × 1
-  avg_0
-  &lt;dbl&gt;
-1 0.686</code></pre>
-</div>
-</div>
-<p>Next, calculate the difference between these averages as a percentage:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>diff <span class="ot">&lt;-</span> (avg_result_0 <span class="sc">-</span> avg_result_20) <span class="sc">*</span> <span class="dv">100</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>diff</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>     avg_0
-1 2.289573</code></pre>
-</div>
-</div>
-<p>We expect that the probability that an individual will vote increases 2.29 percentage points when a state’s closing date for voter registration moves from 20 days prior to election day to election day. If this increase in turnout would swing an election in a candidate’s favour, this is a substantively significant result.</p>
+<p>We expect that the probability that an individual will vote increases 2.28 percentage points when a state’s closing date for voter registration moves from 20 days prior to election day to election day. If this increase in turnout would swing an election in a candidate’s favour, this is a substantively significant result.</p>
 </section>
 <section id="which-approach-should-you-use" class="level4">
 <h4 class="anchored" data-anchor-id="which-approach-should-you-use">Which approach should you use?</h4>
 <p>You should use the observed values approach. Hanmer and Kalkan (2013) demonstrate using simulated data that the observed values approach consistently produces estimates closer to the population’s true probability than the average case approach. This makes sense: you are using more data to produce your estimated effects.</p>
+</section>
+</section>
+<section id="measuring-uncertainty-when-calculating-substantive-effects" class="level3">
+<h3 class="anchored" data-anchor-id="measuring-uncertainty-when-calculating-substantive-effects">Measuring uncertainty when calculating substantive effects</h3>
+<p>We calculated these estimates using a model that includes error. We need to understand how this uncertainty impacts our estimated substantive effects. How do we get confidence intervals around our estimated effects?</p>
+<p>First, we need to go back to the fundamentals of our logistic or probit regression models. Remember from the first section that the latent variable approach assumes there is some continuous process that gets us from <span class="math inline">\(y = 0\)</span> to <span class="math inline">\(y = 1\)</span> based on some set of independent variables <span class="math inline">\(X\)</span>. This latent variable, <span class="math inline">\(z_i\)</span>, is modelled as:</p>
+<p><span class="math display">\[
+z_i = \beta_0 + X_i\beta_i + \epsilon_i
+\]</span></p>
+<p>It contains an error term: <span class="math inline">\(\epsilon_i\)</span>. What that error looks like depends on whether you use a logistic or probit regression, but they are very similar. That error term applies to both <span class="math inline">\(X_i\)</span> and <span class="math inline">\(\beta_i\)</span>. So, we need to generate a series of estimates for both the <span class="math inline">\(X_i\)</span> and <span class="math inline">\(\beta_i\)</span> to generate our confidence intervals.</p>
+<p>Imagine we are trying to estimate the relationship between some binary outcome <span class="math inline">\(y\)</span> and some independent variables <span class="math inline">\(x\)</span> and <span class="math inline">\(z\)</span>. We take a representative sample from our population and fit a model against that data. If we were to take a different representative sample from our population and fit the same model to that data, we would likely slightly different estimates for our <span class="math inline">\(\beta\)</span>s. This is because of the random error inherent in observational modelling. The idea behind logistic and probit regression is that if we were to do this many, many, many times (say, take 1,000 different representative samples from our population and use that data to fit 1,000 models) we would get a set of <span class="math inline">\(\beta\)</span> estimates that follow a normal (if you’re using a probit model) or logistic (if you’re using a logistic model) distribution. Your original estimated <span class="math inline">\(\beta\)</span> should be roughly close to the mean (or center) of this distribution.</p>
+<p>We can use this assumption to generate our confidence intervals. We just need to simulate fitting these 1,000 different models.</p>
+<blockquote class="blockquote">
+<p>It is critical that your sample is representative of your population. We are not simulating drawing 1,000 different samples. Rather, we are taking our one model fitted against our one sample and drawing estimates around those <span class="math inline">\(\beta\)</span>s.</p>
+</blockquote>
+<ol type="1">
+<li><p>Simulate fitting 1,000 different models by drawing 1,000 different <span class="math inline">\(\beta_i\)</span> around your fitted <span class="math inline">\(\beta_i\)</span> following your model’s distribution (logistic or probit).</p></li>
+<li><p>Predict the probability of success for <span class="math inline">\(x_{i1}\)</span> and <span class="math inline">\(x_{i2}\)</span> using these 1,000 different model estimates.</p></li>
+<li><p>Calculate the difference between those predictions.</p></li>
+<li><p>Calculate the lower and upper confidence intervals and the mean of those differences.</p></li>
+</ol>
+<p>Let’s illustrate this by looking at our question above.</p>
+<section id="logistic-regression" class="level4">
+<h4 class="anchored" data-anchor-id="logistic-regression">Logistic regression</h4>
+<p>Recall our logistic regression model from above:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl_regression</span>(m1, <span class="at">intercept =</span> T, <span class="at">exponentiate =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div id="zxcyijrzfd" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#zxcyijrzfd .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#zxcyijrzfd .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#zxcyijrzfd .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#zxcyijrzfd .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#zxcyijrzfd .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#zxcyijrzfd .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#zxcyijrzfd .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#zxcyijrzfd .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#zxcyijrzfd .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#zxcyijrzfd .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#zxcyijrzfd .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#zxcyijrzfd .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#zxcyijrzfd .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#zxcyijrzfd .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#zxcyijrzfd .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#zxcyijrzfd .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#zxcyijrzfd .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#zxcyijrzfd .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#zxcyijrzfd .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#zxcyijrzfd .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#zxcyijrzfd .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#zxcyijrzfd .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#zxcyijrzfd .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#zxcyijrzfd .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#zxcyijrzfd .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#zxcyijrzfd .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#zxcyijrzfd .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#zxcyijrzfd .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#zxcyijrzfd .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-left: 4px;
+  padding-right: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#zxcyijrzfd .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#zxcyijrzfd .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#zxcyijrzfd .gt_left {
+  text-align: left;
+}
+
+#zxcyijrzfd .gt_center {
+  text-align: center;
+}
+
+#zxcyijrzfd .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#zxcyijrzfd .gt_font_normal {
+  font-weight: normal;
+}
+
+#zxcyijrzfd .gt_font_bold {
+  font-weight: bold;
+}
+
+#zxcyijrzfd .gt_font_italic {
+  font-style: italic;
+}
+
+#zxcyijrzfd .gt_super {
+  font-size: 65%;
+}
+
+#zxcyijrzfd .gt_footnote_marks {
+  font-style: italic;
+  font-weight: normal;
+  font-size: 75%;
+  vertical-align: 0.4em;
+}
+
+#zxcyijrzfd .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#zxcyijrzfd .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#zxcyijrzfd .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#zxcyijrzfd .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#zxcyijrzfd .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#zxcyijrzfd .gt_indent_5 {
+  text-indent: 25px;
+}
+</style>
+<table class="gt_table">
+  
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col"><strong>Characteristic</strong></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col"><strong>OR</strong><sup class="gt_footnote_marks">1</sup></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col"><strong>95% CI</strong><sup class="gt_footnote_marks">1</sup></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col"><strong>p-value</strong></th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td class="gt_row gt_left">(Intercept)</td>
+<td class="gt_row gt_center">0.45</td>
+<td class="gt_row gt_center">0.11, 1.56</td>
+<td class="gt_row gt_center">0.2</td></tr>
+    <tr><td class="gt_row gt_left">Registration closing</td>
+<td class="gt_row gt_center">0.99</td>
+<td class="gt_row gt_center">0.98, 1.00</td>
+<td class="gt_row gt_center">0.2</td></tr>
+    <tr><td class="gt_row gt_left">Education level</td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">1</td>
+<td class="gt_row gt_center">—</td>
+<td class="gt_row gt_center">—</td>
+<td class="gt_row gt_center"></td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">2</td>
+<td class="gt_row gt_center">1.59</td>
+<td class="gt_row gt_center">0.43, 6.60</td>
+<td class="gt_row gt_center">0.5</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">3</td>
+<td class="gt_row gt_center">1.24</td>
+<td class="gt_row gt_center">0.35, 4.96</td>
+<td class="gt_row gt_center">0.7</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">4</td>
+<td class="gt_row gt_center">1.66</td>
+<td class="gt_row gt_center">0.48, 6.54</td>
+<td class="gt_row gt_center">0.4</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">5</td>
+<td class="gt_row gt_center">3.46</td>
+<td class="gt_row gt_center">1.00, 13.6</td>
+<td class="gt_row gt_center">0.055</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">6</td>
+<td class="gt_row gt_center">6.86</td>
+<td class="gt_row gt_center">1.95, 27.4</td>
+<td class="gt_row gt_center">0.003</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">7</td>
+<td class="gt_row gt_center">9.13</td>
+<td class="gt_row gt_center">2.49, 38.0</td>
+<td class="gt_row gt_center">0.001</td></tr>
+    <tr><td class="gt_row gt_left">Homeownership</td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Not homeowner</td>
+<td class="gt_row gt_center">—</td>
+<td class="gt_row gt_center">—</td>
+<td class="gt_row gt_center"></td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Homeowner</td>
+<td class="gt_row gt_center">2.28</td>
+<td class="gt_row gt_center">1.85, 2.83</td>
+<td class="gt_row gt_center">&lt;0.001</td></tr>
+  </tbody>
+  
+  <tfoot class="gt_footnotes">
+    <tr>
+      <td class="gt_footnote" colspan="4"><sup class="gt_footnote_marks">1</sup> OR = Odds Ratio, CI = Confidence Interval</td>
+    </tr>
+  </tfoot>
+</table>
+</div>
+</div>
+</div>
+<p>Let’s collect those coefficients using <code>broom::tidy()</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>coefs <span class="ot">&lt;-</span> <span class="fu">tidy</span>(m1) <span class="sc">|&gt;</span> <span class="fu">pull</span>(estimate)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>coefs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] -0.80698206 -0.00585002  0.46146385  0.21142686  0.50831506  1.24130230
+[7]  1.92500744  2.21140696  0.82613712</code></pre>
+</div>
+</div>
+<p>Next, simulate fitting 1,000 different models using these estimates as our center-point using <code>mvtnorm::rmvnorm()</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>coefs_sim <span class="ot">&lt;-</span> <span class="fu">rmvnorm</span>(<span class="at">n =</span> <span class="dv">1000</span>, <span class="at">mean =</span> coefs, <span class="at">sigma =</span> <span class="fu">vcov</span>(m1)) <span class="sc">|&gt;</span> </span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_names</span>(<span class="fu">tidy</span>(m1) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">term =</span> <span class="fu">paste0</span>(term, <span class="st">"_beta"</span>)) <span class="sc">|&gt;</span> <span class="fu">pull</span>(term))</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(coefs_sim)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 9
+  (Intercept…¹ close_…² edu7ca…³ edu7c…⁴ edu7c…⁵ edu7c…⁶ edu7c…⁷ edu7c…⁸ homeo…⁹
+         &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+1      -0.626  -0.0110   0.210    0.0819  0.691    1.41    1.74     1.90   0.712
+2      -0.0645 -0.00557 -0.246   -0.675  -0.484    0.326   0.923    1.76   0.961
+3      -0.933  -0.00721  0.625    0.306   0.974    1.71    2.20     2.47   0.544
+4      -0.583  -0.00209  0.190   -0.194   0.0255   0.807   1.62     1.83   0.930
+5      -1.22   -0.00772  0.763    0.808   1.13     1.72    2.57     2.46   0.683
+6      -0.740   0.00228  0.00456 -0.108   0.227    0.858   1.66     1.89   0.836
+# … with abbreviated variable names ¹​`(Intercept)_beta`, ²​close_beta,
+#   ³​edu7cat2_beta, ⁴​edu7cat3_beta, ⁵​edu7cat4_beta, ⁶​edu7cat5_beta,
+#   ⁷​edu7cat6_beta, ⁸​edu7cat7_beta, ⁹​homeownHomeowner_beta</code></pre>
+</div>
+</div>
+<p>Let’s look at the distribution of these simulated <span class="math inline">\(\beta\)</span>s for one of our variables: <code>close</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(coefs_sim, <span class="fu">aes</span>(<span class="at">x =</span> close_beta)) <span class="sc">+</span> </span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>() <span class="sc">+</span> </span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="fu">tidy</span>(m1) <span class="sc">|&gt;</span> <span class="fu">filter</span>(term <span class="sc">==</span> <span class="st">"close"</span>) <span class="sc">|&gt;</span> <span class="fu">pull</span>(estimate)) <span class="sc">+</span> </span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="binary_substantive_effects_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>As expected, this draw is normally distributed and centered around our estimated <span class="math inline">\(\beta_{close}\)</span>.</p>
+<p>Next, we need to predict the probability that an individual will vote when <span class="math inline">\(close = 20\)</span> and when <span class="math inline">\(close = 0\)</span> using these 1,000 different model estimates. To do this, we need to convert our categorical variables into dummy variables so that we can fit the correct <span class="math inline">\(\beta\)</span>s to them:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>trans_data <span class="ot">&lt;-</span> voters <span class="sc">|&gt;</span> </span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">edu7cat2 =</span> <span class="fu">if_else</span>(edu7cat <span class="sc">==</span> <span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">0</span>),</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">edu7cat3 =</span> <span class="fu">if_else</span>(edu7cat <span class="sc">==</span> <span class="dv">3</span>, <span class="dv">1</span>, <span class="dv">0</span>),</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">edu7cat4 =</span> <span class="fu">if_else</span>(edu7cat <span class="sc">==</span> <span class="dv">4</span>, <span class="dv">1</span>, <span class="dv">0</span>),</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">edu7cat5 =</span> <span class="fu">if_else</span>(edu7cat <span class="sc">==</span> <span class="dv">5</span>, <span class="dv">1</span>, <span class="dv">0</span>),</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">edu7cat6 =</span> <span class="fu">if_else</span>(edu7cat <span class="sc">==</span> <span class="dv">6</span>, <span class="dv">1</span>, <span class="dv">0</span>),</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">edu7cat7 =</span> <span class="fu">if_else</span>(edu7cat <span class="sc">==</span> <span class="dv">7</span>, <span class="dv">1</span>, <span class="dv">0</span>),</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">homeown =</span> <span class="fu">as.numeric</span>(homeown) <span class="sc">-</span> <span class="dv">1</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(trans_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  edu7cat2 edu7cat3 edu7cat4 edu7cat5 edu7cat6 edu7cat7 homeown
+1        0        0        0        0        1        0       1
+2        0        0        0        0        1        0       1
+3        0        0        1        0        0        0       1
+4        0        0        0        1        0        0       1
+5        0        0        0        0        0        1       0
+6        0        0        0        1        0        0       0</code></pre>
+</div>
+</div>
+<p>Now, we include our <code>close</code> variable, set to 0 and 20 for each of these 2,188 observations. We should get a dataset of length 4,376: one set of observations for <span class="math inline">\(close = 20\)</span> and one set for <span class="math inline">\(close = 0\)</span>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>new_data <span class="ot">&lt;-</span> trans_data <span class="sc">|&gt;</span> </span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">close =</span> <span class="dv">0</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(<span class="fu">mutate</span>(trans_data, <span class="at">close =</span> <span class="dv">20</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(close) <span class="sc">|&gt;</span> </span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">id =</span> <span class="fu">row_number</span>()) <span class="sc">|&gt;</span> </span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(new_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 4376</code></pre>
+</div>
+</div>
+<p>Next, we need to join our datasets together, so we can calculate our predicted probability for each observation for each simulated model coefficients. We should get a dataframe with a length of 2 x 1,000 x 2,188 (number of different variables of interest x number of models x number of observations).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>sim_data <span class="ot">&lt;-</span> coefs_sim <span class="sc">|&gt;</span> </span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sim_round =</span> <span class="fu">row_number</span>()) <span class="sc">|&gt;</span> </span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(new_data, <span class="at">by =</span> <span class="fu">character</span>())</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(sim_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 4376000</code></pre>
+</div>
+</div>
+<p>We can now estimate our logistic regression model using the 1,000 different estimated <span class="math inline">\(\beta\)</span>s for all 2,188 different observations. You need to first fit the linear model, then find the inverse logit of those results using <code>plogis()</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> sim_data <span class="sc">|&gt;</span> </span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">.fitted =</span> <span class="st">`</span><span class="at">(Intercept)_beta</span><span class="st">`</span> <span class="sc">+</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>      close_beta <span class="sc">*</span> close <span class="sc">+</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>      edu7cat2_beta <span class="sc">*</span> edu7cat2 <span class="sc">+</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>      edu7cat3_beta <span class="sc">*</span> edu7cat3 <span class="sc">+</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>      edu7cat4_beta <span class="sc">*</span> edu7cat4 <span class="sc">+</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>      edu7cat5_beta <span class="sc">*</span> edu7cat5 <span class="sc">+</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>      edu7cat6_beta <span class="sc">*</span> edu7cat6 <span class="sc">+</span></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>      edu7cat7_beta <span class="sc">*</span> edu7cat7 <span class="sc">+</span></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>      homeownHomeowner_beta <span class="sc">*</span> homeown,</span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">.fitted =</span> <span class="fu">plogis</span>(.fitted)</span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(sim_round, id, close)</span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(results)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 20
+  (Intercept)_…¹ close…² edu7c…³ edu7c…⁴ edu7c…⁵ edu7c…⁶ edu7c…⁷ edu7c…⁸ homeo…⁹
+           &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+1         -0.626 -0.0110   0.210  0.0819   0.691    1.41    1.74    1.90   0.712
+2         -0.626 -0.0110   0.210  0.0819   0.691    1.41    1.74    1.90   0.712
+3         -0.626 -0.0110   0.210  0.0819   0.691    1.41    1.74    1.90   0.712
+4         -0.626 -0.0110   0.210  0.0819   0.691    1.41    1.74    1.90   0.712
+5         -0.626 -0.0110   0.210  0.0819   0.691    1.41    1.74    1.90   0.712
+6         -0.626 -0.0110   0.210  0.0819   0.691    1.41    1.74    1.90   0.712
+# … with 11 more variables: sim_round &lt;int&gt;, edu7cat2 &lt;dbl&gt;, edu7cat3 &lt;dbl&gt;,
+#   edu7cat4 &lt;dbl&gt;, edu7cat5 &lt;dbl&gt;, edu7cat6 &lt;dbl&gt;, edu7cat7 &lt;dbl&gt;,
+#   homeown &lt;dbl&gt;, close &lt;dbl&gt;, id &lt;int&gt;, .fitted &lt;dbl&gt;, and abbreviated
+#   variable names ¹​`(Intercept)_beta`, ²​close_beta, ³​edu7cat2_beta,
+#   ⁴​edu7cat3_beta, ⁵​edu7cat4_beta, ⁶​edu7cat5_beta, ⁷​edu7cat6_beta,
+#   ⁸​edu7cat7_beta, ⁹​homeownHomeowner_beta</code></pre>
+</div>
+</div>
+<p>We then calculate the difference between the predicted probabilities for each observation when <span class="math inline">\(close = 0\)</span> and <span class="math inline">\(close = 20\)</span>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>results <span class="sc">|&gt;</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(sim_round, id) <span class="sc">|&gt;</span> </span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">diff =</span> (.fitted <span class="sc">-</span> <span class="fu">lead</span>(.fitted)) <span class="sc">*</span> <span class="dv">100</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>(diff) <span class="sc">|&gt;</span> </span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="st">`</span><span class="at">Lower bound</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">quantile</span>(diff, <span class="fl">0.025</span>),</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>            <span class="st">`</span><span class="at">Mean</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">quantile</span>(diff, <span class="fl">0.5</span>),</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>            <span class="st">`</span><span class="at">Upper bound</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">quantile</span>(diff, <span class="fl">0.975</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 3
+  `Lower bound`  Mean `Upper bound`
+          &lt;dbl&gt; &lt;dbl&gt;         &lt;dbl&gt;
+1         -1.46  2.12          6.58</code></pre>
+</div>
+</div>
+<p>Because this confidence interval crosses through 0, we cannot reject the null hypothesis that this substantive effect is caused by random error.</p>
+</section>
+<section id="probit-regression" class="level4">
+<h4 class="anchored" data-anchor-id="probit-regression">Probit regression</h4>
+<p>First, let’s fit our probit model:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>m2 <span class="ot">&lt;-</span> <span class="fu">glm</span>(vote <span class="sc">~</span> close <span class="sc">+</span> edu7cat <span class="sc">+</span> homeown, <span class="at">data =</span> voters, <span class="at">family =</span> <span class="fu">binomial</span>(<span class="at">link =</span> <span class="st">"probit"</span>))</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl_regression</span>(m2, <span class="at">intercept =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div id="midvwfrdqg" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#midvwfrdqg .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#midvwfrdqg .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#midvwfrdqg .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#midvwfrdqg .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#midvwfrdqg .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#midvwfrdqg .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#midvwfrdqg .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#midvwfrdqg .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#midvwfrdqg .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#midvwfrdqg .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#midvwfrdqg .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#midvwfrdqg .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#midvwfrdqg .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#midvwfrdqg .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#midvwfrdqg .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#midvwfrdqg .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#midvwfrdqg .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#midvwfrdqg .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#midvwfrdqg .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#midvwfrdqg .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#midvwfrdqg .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#midvwfrdqg .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#midvwfrdqg .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#midvwfrdqg .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#midvwfrdqg .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#midvwfrdqg .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#midvwfrdqg .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#midvwfrdqg .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#midvwfrdqg .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-left: 4px;
+  padding-right: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#midvwfrdqg .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#midvwfrdqg .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#midvwfrdqg .gt_left {
+  text-align: left;
+}
+
+#midvwfrdqg .gt_center {
+  text-align: center;
+}
+
+#midvwfrdqg .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#midvwfrdqg .gt_font_normal {
+  font-weight: normal;
+}
+
+#midvwfrdqg .gt_font_bold {
+  font-weight: bold;
+}
+
+#midvwfrdqg .gt_font_italic {
+  font-style: italic;
+}
+
+#midvwfrdqg .gt_super {
+  font-size: 65%;
+}
+
+#midvwfrdqg .gt_footnote_marks {
+  font-style: italic;
+  font-weight: normal;
+  font-size: 75%;
+  vertical-align: 0.4em;
+}
+
+#midvwfrdqg .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#midvwfrdqg .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#midvwfrdqg .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#midvwfrdqg .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#midvwfrdqg .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#midvwfrdqg .gt_indent_5 {
+  text-indent: 25px;
+}
+</style>
+<table class="gt_table">
+  
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col"><strong>Characteristic</strong></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col"><strong>Beta</strong></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col"><strong>95% CI</strong><sup class="gt_footnote_marks">1</sup></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col"><strong>p-value</strong></th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td class="gt_row gt_left">(Intercept)</td>
+<td class="gt_row gt_center">-0.49</td>
+<td class="gt_row gt_center">-1.3, 0.28</td>
+<td class="gt_row gt_center">0.2</td></tr>
+    <tr><td class="gt_row gt_left">Registration closing</td>
+<td class="gt_row gt_center">0.00</td>
+<td class="gt_row gt_center">-0.01, 0.00</td>
+<td class="gt_row gt_center">0.2</td></tr>
+    <tr><td class="gt_row gt_left">Education level</td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">1</td>
+<td class="gt_row gt_center">—</td>
+<td class="gt_row gt_center">—</td>
+<td class="gt_row gt_center"></td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">2</td>
+<td class="gt_row gt_center">0.28</td>
+<td class="gt_row gt_center">-0.52, 1.1</td>
+<td class="gt_row gt_center">0.5</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">3</td>
+<td class="gt_row gt_center">0.13</td>
+<td class="gt_row gt_center">-0.64, 0.93</td>
+<td class="gt_row gt_center">0.7</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">4</td>
+<td class="gt_row gt_center">0.31</td>
+<td class="gt_row gt_center">-0.44, 1.1</td>
+<td class="gt_row gt_center">0.4</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">5</td>
+<td class="gt_row gt_center">0.76</td>
+<td class="gt_row gt_center">0.00, 1.5</td>
+<td class="gt_row gt_center">0.054</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">6</td>
+<td class="gt_row gt_center">1.2</td>
+<td class="gt_row gt_center">0.39, 1.9</td>
+<td class="gt_row gt_center">0.004</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">7</td>
+<td class="gt_row gt_center">1.3</td>
+<td class="gt_row gt_center">0.52, 2.1</td>
+<td class="gt_row gt_center">0.001</td></tr>
+    <tr><td class="gt_row gt_left">Homeownership</td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Not homeowner</td>
+<td class="gt_row gt_center">—</td>
+<td class="gt_row gt_center">—</td>
+<td class="gt_row gt_center"></td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Homeowner</td>
+<td class="gt_row gt_center">0.50</td>
+<td class="gt_row gt_center">0.37, 0.63</td>
+<td class="gt_row gt_center">&lt;0.001</td></tr>
+  </tbody>
+  
+  <tfoot class="gt_footnotes">
+    <tr>
+      <td class="gt_footnote" colspan="4"><sup class="gt_footnote_marks">1</sup> CI = Confidence Interval</td>
+    </tr>
+  </tfoot>
+</table>
+</div>
+</div>
+</div>
+<p>Let’s collect those coefficients using <code>broom::tidy()</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>coefs <span class="ot">&lt;-</span> <span class="fu">tidy</span>(m2) <span class="sc">|&gt;</span> <span class="fu">pull</span>(estimate)</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>coefs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] -0.489578055 -0.003628296  0.283498003  0.128636563  0.314455793
+[6]  0.761436748  1.153567104  1.308027905  0.501008446</code></pre>
+</div>
+</div>
+<p>Next, simulate fitting 1,000 different models using these estimates as our center-point using <code>mvtnorm::rmvnorm()</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>coefs_sim <span class="ot">&lt;-</span> <span class="fu">rmvnorm</span>(<span class="at">n =</span> <span class="dv">1000</span>, <span class="at">mean =</span> coefs, <span class="at">sigma =</span> <span class="fu">vcov</span>(m2)) <span class="sc">|&gt;</span> </span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_names</span>(<span class="fu">tidy</span>(m2) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">term =</span> <span class="fu">paste0</span>(term, <span class="st">"_beta"</span>)) <span class="sc">|&gt;</span> <span class="fu">pull</span>(term))</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(coefs_sim)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 9
+  (Intercept)…¹ close_…² edu7c…³ edu7c…⁴ edu7c…⁵ edu7c…⁶ edu7c…⁷ edu7c…⁸ homeo…⁹
+          &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+1        -0.906 -0.00692   0.822   0.527   0.766   1.16    1.66    1.78    0.558
+2        -1.04  -0.00493   0.875   0.712   0.915   1.36    1.85    1.87    0.477
+3        -0.931  0.00308   0.639   0.411   0.562   1.05    1.42    1.51    0.516
+4        -0.733 -0.00506   0.479   0.487   0.657   0.935   1.55    1.71    0.511
+5        -1.04  -0.00539   0.669   0.454   0.807   1.23    1.62    1.75    0.607
+6         0.183 -0.00836  -0.353  -0.510  -0.213   0.230   0.662   0.728   0.461
+# … with abbreviated variable names ¹​`(Intercept)_beta`, ²​close_beta,
+#   ³​edu7cat2_beta, ⁴​edu7cat3_beta, ⁵​edu7cat4_beta, ⁶​edu7cat5_beta,
+#   ⁷​edu7cat6_beta, ⁸​edu7cat7_beta, ⁹​homeownHomeowner_beta</code></pre>
+</div>
+</div>
+<p>Let’s look at the distribution of these simulated <span class="math inline">\(\beta\)</span>s for one of our variables: <code>close</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(coefs_sim, <span class="fu">aes</span>(<span class="at">x =</span> close_beta)) <span class="sc">+</span> </span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>() <span class="sc">+</span> </span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="fu">tidy</span>(m2) <span class="sc">|&gt;</span> <span class="fu">filter</span>(term <span class="sc">==</span> <span class="st">"close"</span>) <span class="sc">|&gt;</span> <span class="fu">pull</span>(estimate)) <span class="sc">+</span> </span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="binary_substantive_effects_files/figure-html/unnamed-chunk-26-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>As expected, this draw is normally distributed and centered around our estimated <span class="math inline">\(\beta_{close}\)</span>.</p>
+<p>Next, we need to predict the probability that an individual will vote when <span class="math inline">\(close = 20\)</span> and when <span class="math inline">\(close = 0\)</span> using these 1,000 different model estimates. To do this, we need to convert our categorical variables into dummy variables so that we can fit the correct <span class="math inline">\(\beta\)</span>s to them:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>trans_data <span class="ot">&lt;-</span> voters <span class="sc">|&gt;</span> </span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">edu7cat2 =</span> <span class="fu">if_else</span>(edu7cat <span class="sc">==</span> <span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">0</span>),</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">edu7cat3 =</span> <span class="fu">if_else</span>(edu7cat <span class="sc">==</span> <span class="dv">3</span>, <span class="dv">1</span>, <span class="dv">0</span>),</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">edu7cat4 =</span> <span class="fu">if_else</span>(edu7cat <span class="sc">==</span> <span class="dv">4</span>, <span class="dv">1</span>, <span class="dv">0</span>),</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">edu7cat5 =</span> <span class="fu">if_else</span>(edu7cat <span class="sc">==</span> <span class="dv">5</span>, <span class="dv">1</span>, <span class="dv">0</span>),</span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">edu7cat6 =</span> <span class="fu">if_else</span>(edu7cat <span class="sc">==</span> <span class="dv">6</span>, <span class="dv">1</span>, <span class="dv">0</span>),</span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">edu7cat7 =</span> <span class="fu">if_else</span>(edu7cat <span class="sc">==</span> <span class="dv">7</span>, <span class="dv">1</span>, <span class="dv">0</span>),</span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">homeown =</span> <span class="fu">as.numeric</span>(homeown) <span class="sc">-</span> <span class="dv">1</span></span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(trans_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  edu7cat2 edu7cat3 edu7cat4 edu7cat5 edu7cat6 edu7cat7 homeown
+1        0        0        0        0        1        0       1
+2        0        0        0        0        1        0       1
+3        0        0        1        0        0        0       1
+4        0        0        0        1        0        0       1
+5        0        0        0        0        0        1       0
+6        0        0        0        1        0        0       0</code></pre>
+</div>
+</div>
+<p>Now, we include our <code>close</code> variable, set to 0 and 20 for each of these 2,188 observations. We should get a dataset of length 4,376: one set of observations for <span class="math inline">\(close = 20\)</span> and one set for <span class="math inline">\(close = 0\)</span>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>new_data <span class="ot">&lt;-</span> trans_data <span class="sc">|&gt;</span> </span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">close =</span> <span class="dv">0</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(<span class="fu">mutate</span>(trans_data, <span class="at">close =</span> <span class="dv">20</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(close) <span class="sc">|&gt;</span> </span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">id =</span> <span class="fu">row_number</span>()) <span class="sc">|&gt;</span> </span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(new_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 4376</code></pre>
+</div>
+</div>
+<p>Next, we need to join our datasets together, so we can calculate our predicted probability for each observation for each simulated model coefficients. We should get a dataframe with a length of 2 x 1,000 x 2,188 (number of different variables of interest x number of models x number of observations).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>sim_data <span class="ot">&lt;-</span> coefs_sim <span class="sc">|&gt;</span> </span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sim_round =</span> <span class="fu">row_number</span>()) <span class="sc">|&gt;</span> </span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(new_data, <span class="at">by =</span> <span class="fu">character</span>())</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(sim_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 4376000</code></pre>
+</div>
+</div>
+<p>We can now estimate our probit model using the 1,000 different estimated <span class="math inline">\(\beta\)</span>s for all 2,188 different observations. You need to first fit the linear model, then find the probit of those results using <code>pnorm()</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> sim_data <span class="sc">|&gt;</span> </span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">.fitted =</span> <span class="st">`</span><span class="at">(Intercept)_beta</span><span class="st">`</span> <span class="sc">+</span></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>      close_beta <span class="sc">*</span> close <span class="sc">+</span></span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>      edu7cat2_beta <span class="sc">*</span> edu7cat2 <span class="sc">+</span></span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>      edu7cat3_beta <span class="sc">*</span> edu7cat3 <span class="sc">+</span></span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>      edu7cat4_beta <span class="sc">*</span> edu7cat4 <span class="sc">+</span></span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a>      edu7cat5_beta <span class="sc">*</span> edu7cat5 <span class="sc">+</span></span>
+<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a>      edu7cat6_beta <span class="sc">*</span> edu7cat6 <span class="sc">+</span></span>
+<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a>      edu7cat7_beta <span class="sc">*</span> edu7cat7 <span class="sc">+</span></span>
+<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a>      homeownHomeowner_beta <span class="sc">*</span> homeown,</span>
+<span id="cb44-12"><a href="#cb44-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">.fitted =</span> <span class="fu">pnorm</span>(.fitted)</span>
+<span id="cb44-13"><a href="#cb44-13" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb44-14"><a href="#cb44-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(sim_round, id, close)</span>
+<span id="cb44-15"><a href="#cb44-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-16"><a href="#cb44-16" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(results)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 20
+  (Intercept)…¹ close_…² edu7c…³ edu7c…⁴ edu7c…⁵ edu7c…⁶ edu7c…⁷ edu7c…⁸ homeo…⁹
+          &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+1        -0.906 -0.00692   0.822   0.527   0.766    1.16    1.66    1.78   0.558
+2        -0.906 -0.00692   0.822   0.527   0.766    1.16    1.66    1.78   0.558
+3        -0.906 -0.00692   0.822   0.527   0.766    1.16    1.66    1.78   0.558
+4        -0.906 -0.00692   0.822   0.527   0.766    1.16    1.66    1.78   0.558
+5        -0.906 -0.00692   0.822   0.527   0.766    1.16    1.66    1.78   0.558
+6        -0.906 -0.00692   0.822   0.527   0.766    1.16    1.66    1.78   0.558
+# … with 11 more variables: sim_round &lt;int&gt;, edu7cat2 &lt;dbl&gt;, edu7cat3 &lt;dbl&gt;,
+#   edu7cat4 &lt;dbl&gt;, edu7cat5 &lt;dbl&gt;, edu7cat6 &lt;dbl&gt;, edu7cat7 &lt;dbl&gt;,
+#   homeown &lt;dbl&gt;, close &lt;dbl&gt;, id &lt;int&gt;, .fitted &lt;dbl&gt;, and abbreviated
+#   variable names ¹​`(Intercept)_beta`, ²​close_beta, ³​edu7cat2_beta,
+#   ⁴​edu7cat3_beta, ⁵​edu7cat4_beta, ⁶​edu7cat5_beta, ⁷​edu7cat6_beta,
+#   ⁸​edu7cat7_beta, ⁹​homeownHomeowner_beta</code></pre>
+</div>
+</div>
+<p>We then calculate the difference between the predicted probabilities for each observation when <span class="math inline">\(close = 0\)</span> and <span class="math inline">\(close = 20\)</span>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>results <span class="sc">|&gt;</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(sim_round, id) <span class="sc">|&gt;</span> </span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">diff =</span> (.fitted <span class="sc">-</span> <span class="fu">lead</span>(.fitted)) <span class="sc">*</span> <span class="dv">100</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>(diff) <span class="sc">|&gt;</span> </span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="st">`</span><span class="at">Lower bound</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">quantile</span>(diff, <span class="fl">0.025</span>),</span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>            <span class="st">`</span><span class="at">Mean</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">quantile</span>(diff, <span class="fl">0.5</span>),</span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a>            <span class="st">`</span><span class="at">Upper bound</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">quantile</span>(diff, <span class="fl">0.975</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 3
+  `Lower bound`  Mean `Upper bound`
+          &lt;dbl&gt; &lt;dbl&gt;         &lt;dbl&gt;
+1         -1.45  2.16          6.40</code></pre>
+</div>
+</div>
+<p>Because this confidence interval crosses through 0, we cannot reject the null hypothesis that this substantive effect is caused by random error.</p>
 
 
 </section>
