@@ -133,14 +133,6 @@ You can also interpret the coefficient in terms of its odds ratio. If the probab
 
 This is particularly useful for comparing the probability of success and failure for a given value of $x_i$. When the odds ratio is 1, the odds of success are the same as the odds of failure ($\frac{0.5}{0.5} = 1$). When the odds ratio is greater than 1, the odds of success are greater than the odds of failure (for example, $\frac{0.8}{0.2} = 4$). 
 
-```{r}
-tibble(p = seq(0.001, 0.999, by = 0.001)) |> 
-  mutate(odds = p / (1 - p)) |> 
-  ggplot(aes(x = p, y = odds)) + 
-  geom_line() + 
-  theme_minimal()
-```
-
 To get the odds ratio from the coefficients presented above, we exponentiate them: 
 
 $$
@@ -149,7 +141,7 @@ $$
 
 > Exponentiation is the opposite operation to log transformation. So, to get from the log odds ratio presented in the table above to the odds ratio, we simply need to get rid of the log (leaving the odds ratio).
 
-The coefficient for `homeown`, $\beta_{homeown}$ is the log odds ratio between homeowners and non-homeowners. To get the odds ratio for homeowners, we exponentiate that log odds ratio:
+The coefficient for `homeown`, $\beta_{homeown}$, is the log odds ratio between homeowners and non-homeowners. To get the odds ratio for homeowners, we exponentiate that log odds ratio:
 
 $$
 e^{\beta_{homeown}} = e^{0.83} = 2.29
