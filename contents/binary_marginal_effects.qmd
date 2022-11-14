@@ -98,7 +98,7 @@ tbl_regression(m1, intercept = T)
 Or: 
 
 $$
-Pr(voted) = logit^{-1}(0.81 - 0.01 * close + 0.46 * edu7cat2 + 0.21 * edu7cat3 + 0.51 * edu7cat4 + 1.2 * edu7cat5 + 1.9 * edu7cat6 + 2.2 * edu7cat7 + 0.83 * homeowner)
+Pr(voted) = logit^{-1}(0.81 - 0.01 * close + 0.46 * edu7cat2 + 0.21 * edu7cat3 + 0.51 * edu7cat4 + \\ 1.2 * edu7cat5 + 1.9 * edu7cat6 + 2.2 * edu7cat7 + 0.83 * homeowner)
 $$
 
 ### Interpreting the coefficients
