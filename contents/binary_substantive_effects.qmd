@@ -187,7 +187,9 @@ result <- result_0 |>
 result
 ```
 
-We expect that the probability that an individual will vote increases `r result |> filter(close == 0) |> pull(diff) |> round(2)` percentage points when a state's closing date for voter registration moves from 20 days prior to election day to election day. If this increase in turnout would swing an election in a candidate's favour, this is a substantively significant result.
+We expect that the probability that an individual will vote increases `r result |> filter(close == 0) |> pull(diff) |> round(2)` percentage points when a state's closing date for voter registration moves from 20 days prior to election day to election day. If this increase in turnout would swing an election in a candidate's favour, this is a substantively significant result.[^1]
+
+[^1]: This is only one interpretation of substantive significance. This should be theoretically (or policy) driven.
 
 #### Which approach should you use?
 

@@ -92,7 +92,7 @@ The inverse logistic function suits our needs well. First, it is bounded between
 Formally, the inverse logistic function is: 
 
 $$
-logit^-1(x) = \frac{e^x}{1 + e^x}
+Pr(Y = 1 | X) = logit^-1(X) = \frac{e^X}{1 + e^X}
 $$
 
 Let's look at the shape of the inverse logistic function: 
@@ -137,7 +137,7 @@ An alternative approach is probit regression. This model is also bounded between
 Formally, the probit model is: 
 
 $$
-Pr(y_i = 1|X_i) = \Phi(X_i\beta)
+Pr(Y = 1|X) = \Phi(X\beta)
 $$
 
 Let's look at the shape of the probit function: 

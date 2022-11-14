@@ -24,6 +24,7 @@ library(skimr)
 library(sjPlot)
 library(broom)
 library(gtsummary)
+library(janitor)
 ```
 
 Let's explore marginal and substantive effects using real-world data. How is a person's decision to vote influenced by the closing date of registration to vote in US elections? Suppose we hypothesize that the further from election day registration closes, the less likely an individual is to vote. We also believe that there are other socio-economic factors that influence a person's decision to vote for which we need to control. These are their level of education, and whether they are a homeowner.   
@@ -94,67 +95,87 @@ m1 <- glm(vote ~ close + edu7cat + homeown, data = voters, family = binomial(lin
 tbl_regression(m1, intercept = T)
 ```
 
+Or: 
+
+$$
+Pr(voted) = logit^{-1}(0.81 - 0.01 * close + 0.46 * edu7cat2 + 0.21 * edu7cat3 + 0.51 * edu7cat4 + 1.2 * edu7cat5 + 1.9 * edu7cat6 + 2.2 * edu7cat7 + 0.83 * homeowner)
+$$
+
 ### Interpreting the coefficients
 
 These coefficients are difficult to interpret because the model is non-linear. With linear regression, we can interpret the coefficient of $x_i$ to be the effect of a one unit change in $x_i$ on the expected value of $y$. This effect is the same for every value of $x_i$. 
 
-With non-linear logistic regression, we need to transform our coefficients to meaningfully interpret them. Remember, our model estimates the probability of success as:
+With non-linear logistic regression, we need to choose where we want to evaluate a change in $x_i$ on $y$. We also need to transform our coefficients to make them more interpretable. We will discuss that shortly. 
 
-$$
-Pr(Y_i = 1 | X_i) = logit^{-1}(X_i\beta)
-$$
-
-The coefficients presented above are therefore log odds ratios. We can interpret their statistical significance and their sign. For example, we know that our independent variable of interest, `close`, is not statistically significant ($p = `r tidy(m1) |> filter(term == "close") |> pull(p.value) |> round(3)`$). We also know that its effect on an individual's decision to vote is negative: as days before an election the date of voter registration closes increases, the likelihood that an individual will vote decreases. However, we cannot meaningfully discuss this coefficient (`r tidy(m1) |> filter(term == "close") |> pull(estimate) |> round(2)`) without first transforming it. 
+The coefficients presented above are log odds ratios. We can interpret their statistical significance and their sign. For example, we know that our independent variable of interest, `close`, is not statistically significant ($p = `r tidy(m1) |> filter(term == "close") |> pull(p.value) |> round(3)`$). We also know that its effect on an individual's decision to vote is negative: as days before an election the date of voter registration closes increases, the likelihood that an individual will vote decreases. We also know that a one day increase in the number of days prior to election day registration closes in a state is associated with a negative difference of `r tidy(m1) |> filter(term == "close") |> pull(estimate) |> round(2)` in the logit probability of voting. What do we mean by logit probability? Good question: this is not a very familiar way of thinking about probabilities. Let's transform this value into something more interpretable. 
 
 #### Predicted probabilities
 
 We can use the inverse logit function to discover the predicted probability that an individual will vote for a given set of predictors. 
 
 $$
-Pr(y = 1 | X_i) = \frac{e^{\beta_i}}{1 + e^{\beta_i}}
+Pr(Y = 1 | X_i) = \frac{e^{X\beta}}{1 + e^{X\beta}}
 $$
+
+Holding all other values at their modes ($edu7cat = 4$ and $homeown = 1$), the probability that an individual will vote when $close = 20$ is: 
+
+$$
+Pr(Y = 1 | close = 20) = \frac{e^{\beta_0 - \beta_{close} * 20 + \beta_{edu7cat4} * 1 + \beta_{homeown} * 1}}{1 + e^{\beta_0 - \beta_{close} * 20 + \beta_{edu7cat4} * 1 + \beta_{homeown} * 1}} = \frac{e^{-0.81 - 0.01 * 20 + 0.51 + 0.83}}{1 + e^{-0.81 - 0.01 * 20 + 0.51 + 0.83}} = \frac{e^{0.33}}{1 + e^{0.33}} = 0.582
+$$
+
+> Remember, `edu7cat` is a categorical variable. We need to convert this variable into a series of dummy variables. 
+
+Therefore, a person with an education level 4 who owns a home and lives in a state in which registration closes 20 days prior to election day is 58.2 percent likely to vote.
 
 #### Odds ratios
 
-You can interpret the coefficient in terms of its odds ratio. If the probability of success of an outcome is $p$ and, therefore, the probability of failure is  $1-p$, the the odds of success is $\frac{p}{1-p}$. Now, dividing two odds by each other gives you the odds ratio. For example, if two outcomes have the odds $\frac{p_1}{1-p_1}$ and $\frac{p_2}{1-p_2}$, then these outcomes have an odds ratio of $\frac{\frac{p_1}{1-p_1}}{\frac{p_2}{1-p_2}}$.
+You can also interpret the coefficient in terms of its odds ratio. If the probability of success of an outcome is $p$ (calculated using the function above) and, therefore, the probability of failure is  $1-p$, the the odds of success is $\frac{p}{1-p}$. Now, dividing two odds by each other gives you their odds ratio. For example, if two outcomes have the odds $\frac{p_1}{1-p_1}$ and $\frac{p_2}{1-p_2}$, then these outcomes have an odds ratio of $\frac{\frac{p_1}{1-p_1}}{\frac{p_2}{1-p_2}}$.
 
 This is particularly useful for comparing the probability of success and failure for a given value of $x_i$. When the odds ratio is 1, the odds of success are the same as the odds of failure ($\frac{0.5}{0.5} = 1$). When the odds ratio is greater than 1, the odds of success are greater than the odds of failure (for example, $\frac{0.8}{0.2} = 4$). 
+
+```{r}
+tibble(p = seq(0.001, 0.999, by = 0.001)) |> 
+  mutate(odds = p / (1 - p)) |> 
+  ggplot(aes(x = p, y = odds)) + 
+  geom_line() + 
+  theme_minimal()
+```
 
 To get the odds ratio from the coefficients presented above, we exponentiate them: 
 
 $$
-e^\beta
+e^{X\beta}
 $$
 
 > Exponentiation is the opposite operation to log transformation. So, to get from the log odds ratio presented in the table above to the odds ratio, we simply need to get rid of the log (leaving the odds ratio).
 
-For home ownership: 
+The coefficient for `homeown`, $\beta_{homeown}$ is the log odds ratio between homeowners and non-homeowners. To get the odds ratio for homeowners, we exponentiate that log odds ratio:
 
 $$
-e^\beta = e^{0.83} = 2.29
+e^{\beta_{homeown}} = e^{0.83} = 2.29
 $$
 
 This means that a homeowner is 2.29 times more likely to vote than a non-homeowner (our reference category), holding all other variables a fixed values.
 
+> To get the exponential of a number in R, use `exp()`. 
+
 For education level 5: 
 
 $$
-e^\beta = e^{1.2} = 3.32
+e^{\beta_{edu7cat5}} = e^{1.2} = 3.32
 $$
 
 This means that a person with a level of education in category 5 is 3.32 times more likely to vote than someone with a level of education in category 1 (our reference category), holding all other variables a fixed values. You can calculate this for any education level. The interpretation should always be in reference to your reference category. 
 
-Continuous variables are trickier to interpret. For `close`:
+For `close`: 
 
 $$
-e^\beta = e^{-0.006} = 0.994
+e^{\beta_{close}} = e^{-0.01} = 0.99
 $$
 
-This means that a one unit increase in close (increasing the days before the election that registration closes by one day), decreases the odds of voting by a factor of 0.994, holding all other variables a fixed values. 
+Holding `homeown` and `edu7cat` at fixed values, we will see a 1 percentage point decrease ($1 - 0.99$) in the probability that an individual will vote for every one day increase in the days before an election registration closes. 
 
-> TODO: Check this. 
-
-> To get the exponential of a number in R, use `exp()`. 
+##### Calculating the odds ratio
 
 Happily, `gtsummary::tbl_regression()` can easily present these results for us: 
 
@@ -178,10 +199,14 @@ plot_model(m1, sort.est = T, show.values = T, value.offset = .3)
 
 As usual, the intercept should be interpreted as the expected value when all independent variables are set to 0. 
 
+$$
+Pr(Y = 1 | X) = log(\frac{p}{1 - p}) = -0.81
+$$
+
 This is simple to interpret in terms of the probability of success. Remember:
 
 $$
-Pr(y = 1 | X_i) = \frac{e^{\beta_i}}{1 + e^{\beta_i}}
+Pr(Y = 1 | X) = \frac{e^{X\beta}}{1 + e^{X\beta}}
 $$
 
 Therefore, for our voter model: 
