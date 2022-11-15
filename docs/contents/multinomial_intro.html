@@ -15,6 +15,69 @@ span.underline{text-decoration: underline;}
 div.column{display: inline-block; vertical-align: top; width: 50%;}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
 
@@ -167,7 +230,14 @@ ul.task-list{list-style: none;}
   <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction">Introduction</a></li>
   <li><a href="#multinomial-logit-regression" id="toc-multinomial-logit-regression" class="nav-link" data-scroll-target="#multinomial-logit-regression">Multinomial logit regression</a>
   <ul class="collapse">
+  <li><a href="#assumptions" id="toc-assumptions" class="nav-link" data-scroll-target="#assumptions">Assumptions</a>
+  <ul class="collapse">
   <li><a href="#independence-of-irrelevant-alternatives-assumption" id="toc-independence-of-irrelevant-alternatives-assumption" class="nav-link" data-scroll-target="#independence-of-irrelevant-alternatives-assumption">Independence of Irrelevant Alternatives assumption</a></li>
+  <li><a href="#categorical-outcome" id="toc-categorical-outcome" class="nav-link" data-scroll-target="#categorical-outcome">Categorical outcome</a></li>
+  <li><a href="#the-log-odds-of-the-outcome-and-independent-variable-have-a-linear-relationship" id="toc-the-log-odds-of-the-outcome-and-independent-variable-have-a-linear-relationship" class="nav-link" data-scroll-target="#the-log-odds-of-the-outcome-and-independent-variable-have-a-linear-relationship">The log-odds of the outcome and independent variable have a linear relationship</a></li>
+  <li><a href="#independent-errors" id="toc-independent-errors" class="nav-link" data-scroll-target="#independent-errors">Independent errors</a></li>
+  <li><a href="#no-nearing-multicolinearity" id="toc-no-nearing-multicolinearity" class="nav-link" data-scroll-target="#no-nearing-multicolinearity">No (nearing) multicolinearity</a></li>
+  </ul></li>
   <li><a href="#the-model" id="toc-the-model" class="nav-link" data-scroll-target="#the-model">The model</a></li>
   </ul></li>
   <li><a href="#multinomial-probit" id="toc-multinomial-probit" class="nav-link" data-scroll-target="#multinomial-probit">Multinomial probit</a>
@@ -198,17 +268,227 @@ ul.task-list{list-style: none;}
 
 <section id="set-up" class="level2">
 <h2 class="anchored" data-anchor-id="set-up">Set up</h2>
+<p>This section uses the following packages:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(janitor)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(skimr)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(nnet)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
 <section id="introduction" class="level2">
 <h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
-<p>In political science, we are often interested in knowing the how individuals choose between different options. For example, what is the probability that an individual will vote for a specific candidate in an election? If our individuals have more than two candidates from which to choose, we can take advantage of multinomial modelling.</p>
-<p>Multinomial logit and probit models are an extension of the binary latent variable models we discussed in the previous section. Rather than modelling the choice made between two options - success or failure, vote or not vote - we can efficiently model the choice between many different options, for example: strongly favour, weakly favour, weakly dislike, strongly dislike.</p>
+<p>In political science, we are often interested in measuring the probability of success for more than two outcomes. For example, we may want to know the probability that an individual will vote for a specific candidate in an election. If our individuals have more than two candidates from which to choose, we can take advantage of multinomial modelling.</p>
+<p>Multinomial models are linear regression models that measure the probability of success across outcomes with more than two options. As with binary outcomes, we can choose between two common approaches to these models: logit and probit regression. Multinomial logit and probit models are an extension of the binary latent variable models we discussed in the previous section. Rather than modelling the choice made between two options - success or failure, vote or not vote - we can efficiently model the choice between many different options, for example: strongly favour, weakly favour, weakly dislike, strongly dislike.</p>
 <p>Unlike previously, the choice between a multinomial logit model and a multinomial probit model is not trivial. This difference centres on the Independence of Irrelevant Alternatives (IIA) assumption. We will discuss this shortly.</p>
 </section>
 <section id="multinomial-logit-regression" class="level2">
 <h2 class="anchored" data-anchor-id="multinomial-logit-regression">Multinomial logit regression</h2>
-<section id="independence-of-irrelevant-alternatives-assumption" class="level3">
-<h3 class="anchored" data-anchor-id="independence-of-irrelevant-alternatives-assumption">Independence of Irrelevant Alternatives assumption</h3>
+<p>In a binomial logistic regression, we measure the probability that our outcome, <span class="math inline">\(y\)</span>, will take on one of two options: usually <span class="math inline">\(y = 0\)</span> or <span class="math inline">\(y = 1\)</span>. For multinomial logit regression, we model the probability that our outcome, <span class="math inline">\(y\)</span>, will take on one of more than two options. You need to select a baseline category from which you will compare your probability of success for all other categories.</p>
+<blockquote class="blockquote">
+<p>A multinomial model is genuinely an extension of binomial logistic regression. We could fit a series of binomial logistic regression models and get the same outcome.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
+</blockquote>
+<p>Recall that a binary logistic regression is modelled as such:</p>
+<p><span class="math display">\[
+Pr(Y = 1 | X) = logit^{-1}(X) = \frac{e^X}{1 + e^X}
+\]</span></p>
+<p>For multinomial logistic regression, our outcome is no longer the log odds of success against failure. Instead, we are measuring the log odds of the probability of one category over the probability of a base category. This is called the <strong>relative log odds ratio</strong>.</p>
+<p>Let’s explore this by looking at the level of support university students had for the Iraq war.</p>
+<p>First, let’s load and clean our data:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>student_survey <span class="ot">&lt;-</span> rio<span class="sc">::</span><span class="fu">import</span>(<span class="st">"/Users/harrietgoers/Downloads/student vote GVPT 729a.dta"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(warsup, female, pid) <span class="sc">|&gt;</span> </span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>()</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(student_survey)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  warsup female pid
+1      3      1   2
+2      2      1   7
+3      1      0   4
+4      1      1   7
+5      1      0   5
+6      1      1   7</code></pre>
+</div>
+</div>
+<p>Let’s look at our dataset:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">skim</span>(student_survey)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped">
+<caption>Data summary</caption>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Name</td>
+<td style="text-align: left;">student_survey</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Number of rows</td>
+<td style="text-align: left;">1154</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Number of columns</td>
+<td style="text-align: left;">3</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">_______________________</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Column type frequency:</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">numeric</td>
+<td style="text-align: left;">3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">________________________</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Group variables</td>
+<td style="text-align: left;">None</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: numeric</strong></p>
+<table class="table table-sm table-striped">
+<colgroup>
+<col style="width: 18%">
+<col style="width: 13%">
+<col style="width: 18%">
+<col style="width: 6%">
+<col style="width: 6%">
+<col style="width: 4%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 6%">
+<col style="width: 8%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">skim_variable</th>
+<th style="text-align: right;">n_missing</th>
+<th style="text-align: right;">complete_rate</th>
+<th style="text-align: right;">mean</th>
+<th style="text-align: right;">sd</th>
+<th style="text-align: right;">p0</th>
+<th style="text-align: right;">p25</th>
+<th style="text-align: right;">p50</th>
+<th style="text-align: right;">p75</th>
+<th style="text-align: right;">p100</th>
+<th style="text-align: left;">hist</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">warsup</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">2.62</td>
+<td style="text-align: right;">1.17</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: left;">▆▆▁▅▇</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">female</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.56</td>
+<td style="text-align: right;">0.50</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">▆▁▁▁▇</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">pid</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">3.81</td>
+<td style="text-align: right;">2.24</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: left;">▇▃▂▂▇</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Our outcome variable can take on one of four options: strong opposition, weak opposition, weak support, and strong support for the war. Let’s pick strong support as our baseline category. We now need to calculate three equations that model the relative log odds ratio that an individual will express strong opposition, weak opposition, or weak support for the war relative to the probability that they will express strong support for the war:</p>
+<p><span class="math display">\[
+Pr(y = strong\_opposition | X) = log(\frac{Pr(y = strong\_opposition)}{Pr(y = strong\_support)})
+\]</span></p>
+<p><span class="math display">\[
+Pr(y = weak\_opposition | X) = log(\frac{Pr(y = weak\_opposition)}{Pr(y = strong\_support)})
+\]</span></p>
+<p><span class="math display">\[
+Pr(y = weak\_support | X) = log(\frac{Pr(y = weak\_support)}{Pr(y = strong\_support)})
+\]</span></p>
+<p>And the crosstab to see if anything jumps out at us:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tabyl</span>(student_survey, warsup, pid, female)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>$`0`
+ warsup  1  2  3  4  5  6  7
+      1  2  5  2  9 18 34 80
+      2  7 14 12 11 19 30 18
+      3 24 34 24  5  5  6  2
+      4 48 24 44 13 10  3  2
+
+$`1`
+ warsup   1  2  3  4  5  6  7
+      1   7  6  6  7 11 26 59
+      2  10 20 15 10 17 41 51
+      3  41 32 24  4 16  8  3
+      4 105 57 37 22  5  6  3</code></pre>
+</div>
+</div>
+<p>Next, let’s fit our model:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>m1 <span class="ot">&lt;-</span> <span class="fu">multinom</span>(warsup <span class="sc">~</span> <span class="dv">1</span> <span class="sc">|</span> female <span class="sc">+</span> pid, <span class="at">data =</span> student_survey)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># weights:  12 (6 variable)
+initial  value 1599.783693 
+final  value 1579.234583 
+converged</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(m1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Call:
+multinom(formula = warsup ~ 1 | female + pid, data = student_survey)
+
+Coefficients:
+   (Intercept) 1 | female + pidTRUE
+2  0.005484432          0.005484432
+3 -0.088228200         -0.088228200
+4  0.165867081          0.165867081
+
+Std. Errors:
+  (Intercept) 1 | female + pidTRUE
+2  0.04275756           0.04275756
+3  0.04489553           0.04489553
+4  0.03973346           0.03973346
+
+Residual Deviance: 3158.469 
+AIC: 3164.469 </code></pre>
+</div>
+</div>
+<section id="assumptions" class="level3">
+<h3 class="anchored" data-anchor-id="assumptions">Assumptions</h3>
+<section id="independence-of-irrelevant-alternatives-assumption" class="level4">
+<h4 class="anchored" data-anchor-id="independence-of-irrelevant-alternatives-assumption">Independence of Irrelevant Alternatives assumption</h4>
 <p>Multinomial logit assumes that the relative probability of existing choices is not affected by changes to the choice set. For example, if you remove a choice from your model, that choice’s probability of success will be distributed evenly among the remaining choices. Their relative contribution to the probability of success remains the same. This is a very strong assumption.</p>
 <p>For example, I am choosing between four candidates for the Democratic primary. The probability that I will vote for each is defined by my preferences for their policy platforms. They are as below:</p>
 <p><span class="math display">\[
@@ -234,6 +514,23 @@ Pr(cand\_2) = \frac{3}{5}
 Pr(cand\_4) = \frac{1}{5}
 \]</span></p>
 <p>Because the probability of success depends on the candidate, I should use a multinomial logistic regression to model my preferences across these choices.</p>
+</section>
+<section id="categorical-outcome" class="level4">
+<h4 class="anchored" data-anchor-id="categorical-outcome">Categorical outcome</h4>
+<p>Like binary logistic regression, this model assumes that the outcome variable is categorical. This outcome can be either ordered or unordered; however, other models are better at estimating ordered outcomes.</p>
+</section>
+<section id="the-log-odds-of-the-outcome-and-independent-variable-have-a-linear-relationship" class="level4">
+<h4 class="anchored" data-anchor-id="the-log-odds-of-the-outcome-and-independent-variable-have-a-linear-relationship">The log-odds of the outcome and independent variable have a linear relationship</h4>
+<p>Like binary logistic regression, this model assumes that the relationship between the log odds of the outcome variable and any continous independent variables is linear. In other words, our latent variable, <span class="math inline">\(z_i\)</span>, must follow linear conventions (all <span class="math inline">\(\beta\)</span>s must be linear).</p>
+</section>
+<section id="independent-errors" class="level4">
+<h4 class="anchored" data-anchor-id="independent-errors">Independent errors</h4>
+<p>All observations should be independent of each other. There should not be any structural clustering. For example, if your data includes measures from the same individual over time, your errors are not independent of each other (they are clustered by individual).</p>
+</section>
+<section id="no-nearing-multicolinearity" class="level4">
+<h4 class="anchored" data-anchor-id="no-nearing-multicolinearity">No (nearing) multicolinearity</h4>
+<p>This is a standard warning in linear regression modelling. You should never include perfectly colinear variables in your model. If some of your variables are nearing perfect colinearity, you should exclude some or provide a good theoretical justification for including them in your model.</p>
+</section>
 </section>
 <section id="the-model" class="level3">
 <h3 class="anchored" data-anchor-id="the-model">The model</h3>
@@ -279,7 +576,13 @@ Pr(car) = \frac{3}{6}
 </section>
 </section>
 
-</main> <!-- /main -->
+
+<div id="quarto-appendix" class="default"><section class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1" role="doc-endnote"><p>Almost the same outcome. Multinomial regression is more efficient. Our errors will be slightly different to those we would obtain if we fit multiple binary regressions.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {

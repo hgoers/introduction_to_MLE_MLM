@@ -10,17 +10,88 @@ execute:
 
 ## Set up
 
+This section uses the following packages: 
+
+```{r}
+library(tidyverse)
+library(janitor)
+library(skimr)
+library(nnet)
+```
+
 ## Introduction
 
-In political science, we are often interested in knowing the how individuals choose between different options. For example, what is the probability that an individual will vote for a specific candidate in an election? If our individuals have more than two candidates from which to choose, we can take advantage of multinomial modelling. 
+In political science, we are often interested in measuring the probability of success for more than two outcomes. For example, we may want to know the probability that an individual will vote for a specific candidate in an election. If our individuals have more than two candidates from which to choose, we can take advantage of multinomial modelling. 
 
-Multinomial logit and probit models are an extension of the binary latent variable models we discussed in the previous section. Rather than modelling the choice made between two options - success or failure, vote or not vote - we can efficiently model the choice between many different options, for example: strongly favour, weakly favour, weakly dislike, strongly dislike. 
+Multinomial models are linear regression models that measure the probability of success across outcomes with more than two options. As with binary outcomes, we can choose between two common approaches to these models: logit and probit regression. Multinomial logit and probit models are an extension of the binary latent variable models we discussed in the previous section. Rather than modelling the choice made between two options - success or failure, vote or not vote - we can efficiently model the choice between many different options, for example: strongly favour, weakly favour, weakly dislike, strongly dislike. 
 
 Unlike previously, the choice between a multinomial logit model and a multinomial probit model is not trivial. This difference centres on the Independence of Irrelevant Alternatives (IIA) assumption. We will discuss this shortly. 
 
 ## Multinomial logit regression
 
-### Independence of Irrelevant Alternatives assumption
+In a binomial logistic regression, we measure the probability that our outcome, $y$, will take on one of two options: usually $y = 0$ or $y = 1$. For multinomial logit regression, we model the probability that our outcome, $y$, will take on one of more than two options. You need to select a baseline category from which you will compare your probability of success for all other categories.
+
+> A multinomial model is genuinely an extension of binomial logistic regression. We could fit a series of binomial logistic regression models and get the same outcome.[^1]
+
+[^1]: Almost the same outcome. Multinomial regression is more efficient. Our errors will be slightly different to those we would obtain if we fit multiple binary regressions. 
+
+Recall that a binary logistic regression is modelled as such:
+
+$$
+Pr(Y = 1 | X) = logit^{-1}(X) = \frac{e^X}{1 + e^X}
+$$
+
+For multinomial logistic regression, our outcome is no longer the log odds of success against failure. Instead, we are measuring the log odds of the probability of one category over the probability of a base category. This is called the **relative log odds ratio**.
+
+Let's explore this by looking at the level of support university students had for the Iraq war. 
+
+First, let's load and clean our data:
+
+```{r}
+student_survey <- rio::import("/Users/harrietgoers/Downloads/student vote GVPT 729a.dta") |> 
+  select(warsup, female, pid) |> 
+  drop_na()
+
+head(student_survey)
+```
+
+Let's look at our dataset: 
+
+```{r}
+skim(student_survey)
+```
+
+Our outcome variable can take on one of four options: strong opposition, weak opposition, weak support, and strong support for the war. Let's pick strong support as our baseline category. We now need to calculate three equations that model the relative log odds ratio that an individual will express strong opposition, weak opposition, or weak support for the war relative to the probability that they will express strong support for the war: 
+
+$$
+Pr(y = strong\_opposition | X) = log(\frac{Pr(y = strong\_opposition)}{Pr(y = strong\_support)})
+$$
+
+$$
+Pr(y = weak\_opposition | X) = log(\frac{Pr(y = weak\_opposition)}{Pr(y = strong\_support)})
+$$
+
+$$
+Pr(y = weak\_support | X) = log(\frac{Pr(y = weak\_support)}{Pr(y = strong\_support)})
+$$
+
+And the crosstab to see if anything jumps out at us:
+
+```{r}
+tabyl(student_survey, warsup, pid, female)
+```
+
+Next, let's fit our model: 
+
+```{r}
+m1 <- multinom(warsup ~ 1 | female + pid, data = student_survey)
+
+summary(m1)
+```
+
+### Assumptions
+
+#### Independence of Irrelevant Alternatives assumption
 
 Multinomial logit assumes that the relative probability of existing choices is not affected by changes to the choice set. For example, if you remove a choice from your model, that choice's probability of success will be distributed evenly among the remaining choices. Their relative contribution to the probability of success remains the same. This is a very strong assumption. 
 
@@ -57,6 +128,22 @@ Pr(cand\_4) = \frac{1}{5}
 $$
 
 Because the probability of success depends on the candidate, I should use a multinomial logistic regression to model my preferences across these choices. 
+
+#### Categorical outcome
+
+Like binary logistic regression, this model assumes that the outcome variable is categorical. This outcome can be either ordered or unordered; however, other models are better at estimating ordered outcomes. 
+
+#### The log-odds of the outcome and independent variable have a linear relationship
+
+Like binary logistic regression, this model assumes that the relationship between the log odds of the outcome variable and any continous independent variables is linear. In other words, our latent variable, $z_i$, must follow linear conventions (all $\beta$s must be linear). 
+
+#### Independent errors
+
+All observations should be independent of each other. There should not be any structural clustering. For example, if your data includes measures from the same individual over time, your errors are not independent of each other (they are clustered by individual).
+
+#### No (nearing) multicolinearity
+
+This is a standard warning in linear regression modelling. You should never include perfectly colinear variables in your model. If some of your variables are nearing perfect colinearity, you should exclude some or provide a good theoretical justification for including them in your model.  
 
 ### The model
 
