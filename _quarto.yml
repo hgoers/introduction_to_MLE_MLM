@@ -23,6 +23,9 @@ website:
             - contents/binary_intro_binary.qmd
             - contents/binary_marginal_effects.qmd
             - contents/binary_substantive_effects.qmd
+        - section: "Multinomial models"
+          contents: 
+            - contents/multinomial_intro.qmd
 
 format:
   html:

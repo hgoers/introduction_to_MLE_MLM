@@ -29,8 +29,6 @@ library(janitor)
 
 Let's explore marginal and substantive effects using real-world data. How is a person's decision to vote influenced by the closing date of registration to vote in US elections? Suppose we hypothesize that the further from election day registration closes, the less likely an individual is to vote. We also believe that there are other socio-economic factors that influence a person's decision to vote for which we need to control. These are their level of education, and whether they are a homeowner.   
 
-Let's explore our data. First, we need to load it in. I will use `rio::import()`.
-
 ```{r, include = FALSE}
 # Simulation data used to illustrate theory
 df <- tibble(x = runif(1000, 0, 10)) |> 
@@ -39,8 +37,10 @@ df <- tibble(x = runif(1000, 0, 10)) |>
                      sample(0:1, 1000, replace = T, prob = c(0.05, 0.95))))
 ```
 
+Let's explore our data. First, we need to load it in. I will use `rio::import()`.
+
 ```{r}
-voters_raw <- rio::import("/Users/harrietgoers/Documents/GVPT729A/class_sets/data/cps00for729a.dta")
+voters_raw <- import("/Users/harrietgoers/Documents/GVPT729A/class_sets/data/cps00for729a.dta")
 ```
 
 Next, we need to clean this data up: 
@@ -95,12 +95,6 @@ m1 <- glm(vote ~ close + edu7cat + homeown, data = voters, family = binomial(lin
 tbl_regression(m1, intercept = T)
 ```
 
-Or: 
-
-$$
-Pr(voted) = logit^{-1}(0.81 - 0.01 * close + 0.46 * edu7cat2 + 0.21 * edu7cat3 + 0.51 * edu7cat4 + \\ 1.2 * edu7cat5 + 1.9 * edu7cat6 + 2.2 * edu7cat7 + 0.83 * homeowner)
-$$
-
 ### Interpreting the coefficients
 
 These coefficients are difficult to interpret because the model is non-linear. With linear regression, we can interpret the coefficient of $x_i$ to be the effect of a one unit change in $x_i$ on the expected value of $y$. This effect is the same for every value of $x_i$. 
@@ -114,7 +108,7 @@ The coefficients presented above are log odds ratios. We can interpret their sta
 We can use the inverse logit function to discover the predicted probability that an individual will vote for a given set of predictors. 
 
 $$
-Pr(Y = 1 | X_i) = \frac{e^{X\beta}}{1 + e^{X\beta}}
+Pr(Y = 1 | X) = \frac{e^{X\beta}}{1 + e^{X\beta}}
 $$
 
 Holding all other values at their modes ($edu7cat = 4$ and $homeown = 1$), the probability that an individual will vote when $close = 20$ is: 

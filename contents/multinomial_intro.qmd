@@ -1,0 +1,112 @@
+---
+title: "Introduction to Multinomial Models"
+page-layout: full
+editor: source
+toc-depth: 5
+execute:
+  message: false
+  warning: false
+---
+
+## Set up
+
+## Introduction
+
+In political science, we are often interested in knowing the how individuals choose between different options. For example, what is the probability that an individual will vote for a specific candidate in an election? If our individuals have more than two candidates from which to choose, we can take advantage of multinomial modelling. 
+
+Multinomial logit and probit models are an extension of the binary latent variable models we discussed in the previous section. Rather than modelling the choice made between two options - success or failure, vote or not vote - we can efficiently model the choice between many different options, for example: strongly favour, weakly favour, weakly dislike, strongly dislike. 
+
+Unlike previously, the choice between a multinomial logit model and a multinomial probit model is not trivial. This difference centres on the Independence of Irrelevant Alternatives (IIA) assumption. We will discuss this shortly. 
+
+## Multinomial logit regression
+
+### Independence of Irrelevant Alternatives assumption
+
+Multinomial logit assumes that the relative probability of existing choices is not affected by changes to the choice set. For example, if you remove a choice from your model, that choice's probability of success will be distributed evenly among the remaining choices. Their relative contribution to the probability of success remains the same. This is a very strong assumption. 
+
+For example, I am choosing between four candidates for the Democratic primary. The probability that I will vote for each is defined by my preferences for their policy platforms. They are as below: 
+
+$$
+Pr(cand\_1) = \frac{1}{10}
+$$
+
+$$
+Pr(cand\_2) = \frac{1}{2}
+$$
+
+$$
+Pr(cand\_3) = \frac{3}{10}
+$$
+
+$$
+Pr(cand\_4) = \frac{1}{10}
+$$
+
+Candidate 3 drops out of the race. They were a rather centerist candidate among Democrats, so their supporters do not flow to one specific candidate among those left. I follow this general trend and the probability that I would vote for that candidate distributes itself eveningly among the remaining candidates. Each gets a third of Candidate 3's probability: $\frac{1}{10}$. The new distribution of the probability that I will vote for the candidates is as follows: 
+
+$$
+Pr(cand\_1) = \frac{1}{5}
+$$
+
+$$
+Pr(cand\_2) = \frac{3}{5}
+$$
+
+$$
+Pr(cand\_4) = \frac{1}{5}
+$$
+
+Because the probability of success depends on the candidate, I should use a multinomial logistic regression to model my preferences across these choices. 
+
+### The model
+
+Formally, we define the probability of success for each choice as: 
+
+$$
+Pr(y_i = m | x_i) = \frac{e^{x_i\beta(m)}}{\sum^{J}_{j = 1}e^{x_i\beta(j)}}
+$$
+
+Where $m$ is the option you have set to the baseline and $j$ is all other options. 
+
+## Multinomial probit
+
+The process for defining the probability of success for more than two options remains similar to the multinomial logistic regression except that the multinomial probit model allows the errors across choices to be correlated. This means that our assumption that adding or removing choices does not disturb the balance of probabilities of success between the remaining choices does not need to hold. This makes multinomial probit regression a better choice for exploring choice entry and exit.
+
+### A more flexible model
+
+To illustrate, let's consider which type of transport people take to work in the morning. Suppose people can choose between riding a red bus, a train, or driving a car to work. The probabilities are:
+
+$$
+Pr(red bus) = \frac{1}{6}
+$$
+
+$$
+Pr(train) = \frac{2}{6}
+$$
+
+$$
+Pr(car) = \frac{3}{6}
+$$
+
+Therefore, the odds of taking a red bus to train are $\frac{\frac{1}{6}}{\frac{2}{6}} = \frac{1}{2}$. Now, let's add the option of taking a blue bus. Will people split evenly across the blue bus, red bus, train, or car? Unlikely: their transport decision is probably not influenced by the colour of their options. Rather, people will likely be split between the red and blue bus, with people who take the train or drive their car unaffected. 
+
+Therefore, the probabilities change: 
+
+$$
+Pr(red bus) = \frac{1}{12}
+$$
+
+$$
+Pr(blue bus) = \frac{1}{12}
+$$
+
+$$
+Pr(train) = \frac{2}{6}
+$$
+
+$$
+Pr(car) = \frac{3}{6}
+$$
+
+Therefore, the odds of taking a red bus to train are now $\frac{\frac{1}{12}}{\frac{2}{6}} \ne \frac{1}{2}$. This violates the IIA assumption. We should not, therefore, use multilevel logit to model this relationship. 
+

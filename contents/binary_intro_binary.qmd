@@ -67,7 +67,7 @@ m_lpr <- lm(y ~ x, data = df)
 tbl_regression(m_lpr, intercept = T)
 ```
 
-Our estimation of $y_i$ can (and often does) take on values other than 0 or 1. This is because we can interpret the coefficients of this model as differences in the probability of success ($y_i = 1$). We can see that increasing $x$ by one unit increases the probability that $y = 1$ by `r tidy(m_lpr) |> filter(term == "x") |> pull(estimate) |> percent(accuracy = 0.1)`.
+Our estimation of $y_i$ can (and often does) take on values other than 0 or 1. This is because we can interpret the coefficients of this model as differences in the probability of success ($y = 1$). We can see that increasing $x$ by one unit increases the probability that $y = 1$ by `r tidy(m_lpr) |> filter(term == "x") |> pull(estimate) |> percent(accuracy = 0.1)`.
 
 ### Issues with LPM
 
@@ -92,7 +92,7 @@ The inverse logistic function suits our needs well. First, it is bounded between
 Formally, the inverse logistic function is: 
 
 $$
-Pr(Y = 1 | X) = logit^-1(X) = \frac{e^X}{1 + e^X}
+Pr(Y = 1 | X) = logit^{-1}(X) = \frac{e^X}{1 + e^X}
 $$
 
 Let's look at the shape of the inverse logistic function: 
