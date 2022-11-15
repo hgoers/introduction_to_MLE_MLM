@@ -12,11 +12,18 @@ execute:
 
 This section uses the following packages: 
 
+```{r, include = FALSE}
+library(patchwork)
+```
+
 ```{r}
 library(tidyverse)
 library(janitor)
 library(skimr)
 library(nnet)
+library(broom)
+library(gtsummary)
+library(sjPlot)
 ```
 
 ## Introduction
@@ -26,6 +33,24 @@ In political science, we are often interested in measuring the probability of su
 Multinomial models are linear regression models that measure the probability of success across outcomes with more than two options. As with binary outcomes, we can choose between two common approaches to these models: logit and probit regression. Multinomial logit and probit models are an extension of the binary latent variable models we discussed in the previous section. Rather than modelling the choice made between two options - success or failure, vote or not vote - we can efficiently model the choice between many different options, for example: strongly favour, weakly favour, weakly dislike, strongly dislike. 
 
 Unlike previously, the choice between a multinomial logit model and a multinomial probit model is not trivial. This difference centres on the Independence of Irrelevant Alternatives (IIA) assumption. We will discuss this shortly. 
+
+To explore this question, we will look at students' level of support for the Iraq war based on their gender and their party affiliation (measured on a seven-point scale).
+
+Let's load and clean our data:
+
+```{r}
+student_survey <- rio::import("/Users/harrietgoers/Downloads/student vote GVPT 729a.dta") |> 
+  select(warsup, female, pid) |> 
+  drop_na()
+
+head(student_survey)
+```
+
+Let's look at our dataset: 
+
+```{r}
+skim(student_survey)
+```
 
 ## Multinomial logit regression
 
@@ -43,25 +68,7 @@ $$
 
 For multinomial logistic regression, our outcome is no longer the log odds of success against failure. Instead, we are measuring the log odds of the probability of one category over the probability of a base category. This is called the **relative log odds ratio**.
 
-Let's explore this by looking at the level of support university students had for the Iraq war. 
-
-First, let's load and clean our data:
-
-```{r}
-student_survey <- rio::import("/Users/harrietgoers/Downloads/student vote GVPT 729a.dta") |> 
-  select(warsup, female, pid) |> 
-  drop_na()
-
-head(student_survey)
-```
-
-Let's look at our dataset: 
-
-```{r}
-skim(student_survey)
-```
-
-Our outcome variable can take on one of four options: strong opposition, weak opposition, weak support, and strong support for the war. Let's pick strong support as our baseline category. We now need to calculate three equations that model the relative log odds ratio that an individual will express strong opposition, weak opposition, or weak support for the war relative to the probability that they will express strong support for the war: 
+Let's explore this by looking at the level of support university students had for the Iraq war. Our outcome variable can take on one of four options: strong opposition, weak opposition, weak support, and strong support for the war. Let's pick strong support as our baseline category. We now need to calculate three equations that model the relative log odds ratio that an individual will express strong opposition, weak opposition, or weak support for the war relative to the probability that they will express strong support for the war: 
 
 $$
 Pr(y = strong\_opposition | X) = log(\frac{Pr(y = strong\_opposition)}{Pr(y = strong\_support)})
@@ -79,14 +86,6 @@ And the crosstab to see if anything jumps out at us:
 
 ```{r}
 tabyl(student_survey, warsup, pid, female)
-```
-
-Next, let's fit our model: 
-
-```{r}
-m1 <- multinom(warsup ~ 1 | female + pid, data = student_survey)
-
-summary(m1)
 ```
 
 ### Assumptions
@@ -154,6 +153,98 @@ Pr(y_i = m | x_i) = \frac{e^{x_i\beta(m)}}{\sum^{J}_{j = 1}e^{x_i\beta(j)}}
 $$
 
 Where $m$ is the option you have set to the baseline and $j$ is all other options. 
+
+Let's visualise the relationship between support for the war and gender:
+
+```{r}
+p1 <- student_survey |> 
+  filter(warsup == "1" | warsup == "2") |> 
+  ggplot(aes(x = female, y = warsup)) + 
+  geom_point() + 
+  geom_smooth(method = "loess", se = F) + 
+  theme_minimal() + 
+  labs(title = "Somewhat support", 
+       x = NULL)
+
+p2 <- student_survey |> 
+  filter(warsup == "1" | warsup == "3") |> 
+  ggplot(aes(x = female, y = warsup)) + 
+  geom_point() + 
+  geom_smooth(method = "loess", se = F) + 
+  theme_minimal() + 
+  labs(title = "Somewhat oppose", 
+       y = NULL)
+
+p3 <- student_survey |> 
+  filter(warsup == "1" | warsup == "4") |> 
+  ggplot(aes(x = female, y = warsup)) + 
+  geom_point() + 
+  geom_smooth(method = "loess", se = F) + 
+  theme_minimal() + 
+  labs(title = "Strongly oppose", 
+       x = NULL,
+       y = NULL)
+
+p1 | p2 | p3
+```
+
+And for party ID: 
+
+```{r}
+p1 <- student_survey |> 
+  filter(warsup == "1" | warsup == "2") |> 
+  ggplot(aes(x = pid, y = warsup)) + 
+  geom_point() + 
+  geom_smooth(method = "loess", se = F) + 
+  theme_minimal() + 
+  labs(title = "Somewhat support", 
+       x = NULL)
+
+p2 <- student_survey |> 
+  filter(warsup == "1" | warsup == "3") |> 
+  ggplot(aes(x = pid, y = warsup)) + 
+  geom_point() + 
+  geom_smooth(method = "loess", se = F) + 
+  theme_minimal() + 
+  labs(title = "Somewhat oppose", 
+       y = NULL)
+
+p3 <- student_survey |> 
+  filter(warsup == "1" | warsup == "4") |> 
+  ggplot(aes(x = pid, y = warsup)) + 
+  geom_point() + 
+  geom_smooth(method = "loess", se = F) + 
+  theme_minimal() + 
+  labs(title = "Strongly oppose", 
+       x = NULL,
+       y = NULL)
+
+p1 | p2 | p3
+```
+
+We can see here that the relationship between these independent variables and an individual's level of support for the war is different based on the choice at hand. Multinomial modelling allows us to measure this. We are essentially developing a different model for each outcome option: strongly support vs. strong oppose, strongly support vs. weakly oppose, and strongly support vs. weakly support. 
+
+Let's fit our model using `nnet::multinom()` and display the results using `broom::tidy()`:
+
+```{r}
+m1 <- multinom(warsup ~ female + pid, data = student_survey)
+
+tidy(m1)
+```
+
+Here, we can see that the model has produced different coefficients for each of our independent variables for each outcome option. The first column tells us which outcome option we are  modelling: weak support, weak opposition, and strong opposition.
+
+We can more formally present these results using `gtsummary::tbl_regression()`:
+
+```{r}
+tbl_regression(m1, exponentiate = T)
+```
+
+And visualise our results using `sjPlot::plot_model()`: 
+
+```{r}
+plot_model(m1, show.values = T, value.offset = .3)
+```
 
 ## Multinomial probit
 
