@@ -204,7 +204,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">Multinomial models</a>
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">3+ responses</a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -284,34 +284,42 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>In political science, we are often interested in measuring the probability of success for more than two outcomes. For example, we may want to know the probability that an individual will vote for a specific candidate in an election. If our individuals have more than two candidates from which to choose, we can take advantage of multinomial modelling.</p>
 <p>Multinomial models are linear regression models that measure the probability of success across outcomes with more than two options. As with binary outcomes, we can choose between two common approaches to these models: logit and probit regression. Multinomial logit and probit models are an extension of the binary latent variable models we discussed in the previous section. Rather than modelling the choice made between two options - success or failure, vote or not vote - we can efficiently model the choice between many different options, for example: strongly favour, weakly favour, weakly dislike, strongly dislike.</p>
 <p>Unlike previously, the choice between a multinomial logit model and a multinomial probit model is not trivial. This difference centres on the Independence of Irrelevant Alternatives (IIA) assumption. We will discuss this shortly.</p>
-</section>
-<section id="multinomial-logit-regression" class="level2">
-<h2 class="anchored" data-anchor-id="multinomial-logit-regression">Multinomial logit regression</h2>
-<p>In a binomial logistic regression, we measure the probability that our outcome, <span class="math inline">\(y\)</span>, will take on one of two options: usually <span class="math inline">\(y = 0\)</span> or <span class="math inline">\(y = 1\)</span>. For multinomial logit regression, we model the probability that our outcome, <span class="math inline">\(y\)</span>, will take on one of more than two options. You need to select a baseline category from which you will compare your probability of success for all other categories.</p>
-<blockquote class="blockquote">
-<p>A multinomial model is genuinely an extension of binomial logistic regression. We could fit a series of binomial logistic regression models and get the same outcome.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
-</blockquote>
-<p>Recall that a binary logistic regression is modelled as such:</p>
-<p><span class="math display">\[
-Pr(Y = 1 | X) = logit^{-1}(X) = \frac{e^X}{1 + e^X}
-\]</span></p>
-<p>For multinomial logistic regression, our outcome is no longer the log odds of success against failure. Instead, we are measuring the log odds of the probability of one category over the probability of a base category. This is called the <strong>relative log odds ratio</strong>.</p>
-<p>Let’s explore this by looking at the level of support university students had for the Iraq war.</p>
-<p>First, let’s load and clean our data:</p>
+<p>To explore this question, we will look at students’ level of support for the Iraq war based on their gender and their party affiliation (measured on a seven-point scale).</p>
+<p>Let’s load and clean our data:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>student_survey <span class="ot">&lt;-</span> rio<span class="sc">::</span><span class="fu">import</span>(<span class="st">"/Users/harrietgoers/Downloads/student vote GVPT 729a.dta"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(warsup, female, pid) <span class="sc">|&gt;</span> </span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>()</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(student_survey)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(<span class="at">warsup =</span> <span class="fu">factor</span>(warsup, </span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>                            <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>),</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>                            <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Strongly support"</span>,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>                                       <span class="st">"Somewhat support"</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>                                       <span class="st">"Somewhat oppose"</span>,</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>                                       <span class="st">"Strongly oppose"</span>)), </span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">female =</span> <span class="fu">factor</span>(female, </span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>                            <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), </span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>                            <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Not female"</span>, <span class="st">"Female"</span>)), </span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>            <span class="at">pid =</span> <span class="fu">factor</span>(pid,</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>                         <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">7</span>),</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>                         <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Strong democrat"</span>,</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">"Weak democrat"</span>,</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">"Independent democrat"</span>,</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">"Independent"</span>,</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">"Independent republican"</span>,</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">"Weak republican"</span>,</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">"Strong republican"</span>))) <span class="sc">|&gt;</span> </span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  labelled<span class="sc">::</span><span class="fu">set_variable_labels</span>(<span class="at">warsup =</span> <span class="st">"Support for the war"</span>,</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>                                <span class="at">female =</span> <span class="st">"Female"</span>,</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>                                <span class="at">pid =</span> <span class="st">"Party ID"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>()</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(student_survey)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>  warsup female pid
-1      3      1   2
-2      2      1   7
-3      1      0   4
-4      1      1   7
-5      1      0   5
-6      1      1   7</code></pre>
+<pre><code>            warsup     female                    pid
+1  Somewhat oppose     Female          Weak democrat
+2 Somewhat support     Female      Strong republican
+3 Strongly support Not female            Independent
+4 Strongly support     Female      Strong republican
+5 Strongly support Not female Independent republican
+6 Strongly support     Female      Strong republican</code></pre>
 </div>
 </div>
 <p>Let’s look at our dataset:</p>
@@ -342,7 +350,7 @@ Pr(Y = 1 | X) = logit^{-1}(X) = \frac{e^X}{1 + e^X}
 <td style="text-align: left;"></td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">numeric</td>
+<td style="text-align: left;">factor</td>
 <td style="text-align: left;">3</td>
 </tr>
 <tr class="odd">
@@ -355,34 +363,24 @@ Pr(Y = 1 | X) = logit^{-1}(X) = \frac{e^X}{1 + e^X}
 </tr>
 </tbody>
 </table>
-<p><strong>Variable type: numeric</strong></p>
+<p><strong>Variable type: factor</strong></p>
 <table class="table table-sm table-striped">
 <colgroup>
-<col style="width: 18%">
-<col style="width: 13%">
-<col style="width: 18%">
-<col style="width: 6%">
-<col style="width: 6%">
-<col style="width: 4%">
-<col style="width: 5%">
-<col style="width: 5%">
-<col style="width: 5%">
-<col style="width: 6%">
+<col style="width: 14%">
+<col style="width: 10%">
+<col style="width: 14%">
 <col style="width: 8%">
+<col style="width: 9%">
+<col style="width: 41%">
 </colgroup>
 <thead>
 <tr class="header">
 <th style="text-align: left;">skim_variable</th>
 <th style="text-align: right;">n_missing</th>
 <th style="text-align: right;">complete_rate</th>
-<th style="text-align: right;">mean</th>
-<th style="text-align: right;">sd</th>
-<th style="text-align: right;">p0</th>
-<th style="text-align: right;">p25</th>
-<th style="text-align: right;">p50</th>
-<th style="text-align: right;">p75</th>
-<th style="text-align: right;">p100</th>
-<th style="text-align: left;">hist</th>
+<th style="text-align: left;">ordered</th>
+<th style="text-align: right;">n_unique</th>
+<th style="text-align: left;">top_counts</th>
 </tr>
 </thead>
 <tbody>
@@ -390,46 +388,47 @@ Pr(Y = 1 | X) = logit^{-1}(X) = \frac{e^X}{1 + e^X}
 <td style="text-align: left;">warsup</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">2.62</td>
-<td style="text-align: right;">1.17</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">3</td>
+<td style="text-align: left;">FALSE</td>
 <td style="text-align: right;">4</td>
-<td style="text-align: right;">4</td>
-<td style="text-align: left;">▆▆▁▅▇</td>
+<td style="text-align: left;">Str: 379, Som: 275, Str: 272, Som: 228</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">female</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.56</td>
-<td style="text-align: right;">0.50</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: left;">▆▁▁▁▇</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: left;">Fem: 649, Not: 505</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">pid</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">3.81</td>
-<td style="text-align: right;">2.24</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">6</td>
+<td style="text-align: left;">FALSE</td>
 <td style="text-align: right;">7</td>
-<td style="text-align: left;">▇▃▂▂▇</td>
+<td style="text-align: left;">Str: 244, Str: 218, Wea: 192, Ind: 164</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
-<p>Our outcome variable can take on one of four options: strong opposition, weak opposition, weak support, and strong support for the war. Let’s pick strong support as our baseline category. We now need to calculate three equations that model the relative log odds ratio that an individual will express strong opposition, weak opposition, or weak support for the war relative to the probability that they will express strong support for the war:</p>
+</section>
+<section id="multinomial-logit-regression" class="level2">
+<h2 class="anchored" data-anchor-id="multinomial-logit-regression">Multinomial logit regression</h2>
+<p>In a binomial logistic regression, we measure the probability that our outcome, <span class="math inline">\(y\)</span>, will take on one of two options: usually <span class="math inline">\(y = 0\)</span> or <span class="math inline">\(y = 1\)</span>. For multinomial logit regression, we model the probability that our outcome, <span class="math inline">\(y\)</span>, will take on one of more than two options. You need to select a baseline category from which you will compare your probability of success for all other categories.</p>
+<blockquote class="blockquote">
+<p>A multinomial model is genuinely an extension of binomial logistic regression. We could fit a series of binomial logistic regression models and get the same outcome.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
+</blockquote>
+<p>Recall that a binary logistic regression is modelled as such:</p>
+<p><span class="math display">\[
+Pr(Y = 1 | X) = ln(\frac{P}{1-P}) = \beta_0 + \beta_1X_1 + ... = \beta_kX_k
+\]</span></p>
+<p>This provides the log odds ratio of success, or <span class="math inline">\(Y = 1\)</span> for a binary outcome.</p>
+<p>For multinomial logistic regression, our outcome is no longer the log odds of success against failure. Instead, we are measuring the log odds of the probability of one category over the probability of a base category. This is called the <strong>relative log odds ratio</strong>.</p>
+<p><span class="math display">\[
+ln(\frac{P_{category 2}}{P_{category 1}})
+\]</span></p>
+<p>Let’s explore this by looking at the level of support university students had for the Iraq war. Our outcome variable can take on one of four options: strong opposition, weak opposition, weak support, and strong support for the war. Let’s pick strong support as our baseline category. We now need to calculate three equations that model the relative log odds ratio that an individual will express strong opposition, weak opposition, or weak support for the war relative to the probability that they will express strong support for the war:</p>
 <p><span class="math display">\[
 Pr(y = strong\_opposition | X) = log(\frac{Pr(y = strong\_opposition)}{Pr(y = strong\_support)})
 \]</span></p>
@@ -439,25 +438,6 @@ Pr(y = weak\_opposition | X) = log(\frac{Pr(y = weak\_opposition)}{Pr(y = strong
 <p><span class="math display">\[
 Pr(y = weak\_support | X) = log(\frac{Pr(y = weak\_support)}{Pr(y = strong\_support)})
 \]</span></p>
-<p>And the crosstab to see if anything jumps out at us:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tabyl</span>(student_survey, warsup, pid, female)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>$`0`
- warsup  1  2  3  4  5  6  7
-      1  2  5  2  9 18 34 80
-      2  7 14 12 11 19 30 18
-      3 24 34 24  5  5  6  2
-      4 48 24 44 13 10  3  2
-
-$`1`
- warsup   1  2  3  4  5  6  7
-      1   7  6  6  7 11 26 59
-      2  10 20 15 10 17 41 51
-      3  41 32 24  4 16  8  3
-      4 105 57 37 22  5  6  3</code></pre>
-</div>
-</div>
 <section id="assumptions" class="level3">
 <h3 class="anchored" data-anchor-id="assumptions">Assumptions</h3>
 <section id="independence-of-irrelevant-alternatives-assumption" class="level4">
@@ -514,113 +494,117 @@ Pr(y_i = m | x_i) = \frac{e^{x_i\beta(m)}}{\sum^{J}_{j = 1}e^{x_i\beta(j)}}
 <p>Where <span class="math inline">\(m\)</span> is the option you have set to the baseline and <span class="math inline">\(j\)</span> is all other options.</p>
 <p>Let’s visualise the relationship between support for the war and gender:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> student_survey <span class="sc">|&gt;</span> </span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(warsup <span class="sc">==</span> <span class="st">"1"</span> <span class="sc">|</span> warsup <span class="sc">==</span> <span class="st">"2"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> female, <span class="at">y =</span> warsup)) <span class="sc">+</span> </span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"loess"</span>, <span class="at">se =</span> F) <span class="sc">+</span> </span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span> </span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Somewhat support"</span>, </span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="cn">NULL</span>)</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> student_survey <span class="sc">|&gt;</span> </span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(warsup <span class="sc">==</span> <span class="st">"1"</span> <span class="sc">|</span> warsup <span class="sc">==</span> <span class="st">"3"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> female, <span class="at">y =</span> warsup)) <span class="sc">+</span> </span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"loess"</span>, <span class="at">se =</span> F) <span class="sc">+</span> </span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span> </span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Somewhat oppose"</span>, </span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="cn">NULL</span>)</span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>p3 <span class="ot">&lt;-</span> student_survey <span class="sc">|&gt;</span> </span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(warsup <span class="sc">==</span> <span class="st">"1"</span> <span class="sc">|</span> warsup <span class="sc">==</span> <span class="st">"4"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> female, <span class="at">y =</span> warsup)) <span class="sc">+</span> </span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"loess"</span>, <span class="at">se =</span> F) <span class="sc">+</span> </span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span> </span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Strongly oppose"</span>, </span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="cn">NULL</span>,</span>
-<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="cn">NULL</span>)</span>
-<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>p1 <span class="sc">|</span> p2 <span class="sc">|</span> p3</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> student_survey <span class="sc">|&gt;</span> </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(warsup <span class="sc">==</span> <span class="st">"Strongly support"</span> <span class="sc">|</span> warsup <span class="sc">==</span> <span class="st">"Somewhat support"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">as.numeric</span>(female), <span class="at">y =</span> <span class="fu">as.numeric</span>(warsup))) <span class="sc">+</span> </span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"loess"</span>, <span class="at">se =</span> F) <span class="sc">+</span> </span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span> </span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Somewhat support"</span>, </span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="cn">NULL</span>)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> student_survey <span class="sc">|&gt;</span> </span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(warsup <span class="sc">==</span> <span class="st">"Strongly support"</span> <span class="sc">|</span> warsup <span class="sc">==</span> <span class="st">"Somewhat oppose"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">as.numeric</span>(female), <span class="at">y =</span> <span class="fu">as.numeric</span>(warsup))) <span class="sc">+</span> </span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"loess"</span>, <span class="at">se =</span> F) <span class="sc">+</span> </span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span> </span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Somewhat oppose"</span>, </span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="cn">NULL</span>)</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>p3 <span class="ot">&lt;-</span> student_survey <span class="sc">|&gt;</span> </span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(warsup <span class="sc">==</span> <span class="st">"Strongly support"</span> <span class="sc">|</span> warsup <span class="sc">==</span> <span class="st">"Strongly oppose"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">as.numeric</span>(female), <span class="at">y =</span> <span class="fu">as.numeric</span>(warsup))) <span class="sc">+</span> </span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"loess"</span>, <span class="at">se =</span> F) <span class="sc">+</span> </span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span> </span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Strongly oppose"</span>, </span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="cn">NULL</span>,</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="cn">NULL</span>)</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>p1 <span class="sc">|</span> p2 <span class="sc">|</span> p3</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="multinomial_intro_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
+<p><img src="multinomial_intro_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>And for party ID:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> student_survey <span class="sc">|&gt;</span> </span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(warsup <span class="sc">==</span> <span class="st">"1"</span> <span class="sc">|</span> warsup <span class="sc">==</span> <span class="st">"2"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> pid, <span class="at">y =</span> warsup)) <span class="sc">+</span> </span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"loess"</span>, <span class="at">se =</span> F) <span class="sc">+</span> </span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span> </span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Somewhat support"</span>, </span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="cn">NULL</span>)</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> student_survey <span class="sc">|&gt;</span> </span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(warsup <span class="sc">==</span> <span class="st">"1"</span> <span class="sc">|</span> warsup <span class="sc">==</span> <span class="st">"3"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> pid, <span class="at">y =</span> warsup)) <span class="sc">+</span> </span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"loess"</span>, <span class="at">se =</span> F) <span class="sc">+</span> </span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span> </span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Somewhat oppose"</span>, </span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="cn">NULL</span>)</span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>p3 <span class="ot">&lt;-</span> student_survey <span class="sc">|&gt;</span> </span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(warsup <span class="sc">==</span> <span class="st">"1"</span> <span class="sc">|</span> warsup <span class="sc">==</span> <span class="st">"4"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> pid, <span class="at">y =</span> warsup)) <span class="sc">+</span> </span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"loess"</span>, <span class="at">se =</span> F) <span class="sc">+</span> </span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span> </span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Strongly oppose"</span>, </span>
-<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="cn">NULL</span>,</span>
-<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="cn">NULL</span>)</span>
-<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>p1 <span class="sc">|</span> p2 <span class="sc">|</span> p3</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> student_survey <span class="sc">|&gt;</span> </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(warsup <span class="sc">==</span> <span class="st">"Strongly support"</span> <span class="sc">|</span> warsup <span class="sc">==</span> <span class="st">"Somewhat support"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">as.numeric</span>(pid), <span class="at">y =</span> <span class="fu">as.numeric</span>(warsup))) <span class="sc">+</span> </span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"loess"</span>, <span class="at">se =</span> F) <span class="sc">+</span> </span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span> </span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Somewhat support"</span>, </span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="cn">NULL</span>)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> student_survey <span class="sc">|&gt;</span> </span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(warsup <span class="sc">==</span> <span class="st">"Strongly support"</span> <span class="sc">|</span> warsup <span class="sc">==</span> <span class="st">"Somewhat oppose"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">as.numeric</span>(pid), <span class="at">y =</span> <span class="fu">as.numeric</span>(warsup))) <span class="sc">+</span> </span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"loess"</span>, <span class="at">se =</span> F) <span class="sc">+</span> </span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span> </span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Somewhat oppose"</span>, </span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="cn">NULL</span>)</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>p3 <span class="ot">&lt;-</span> student_survey <span class="sc">|&gt;</span> </span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(warsup <span class="sc">==</span> <span class="st">"Strongly support"</span> <span class="sc">|</span> warsup <span class="sc">==</span> <span class="st">"Strongly oppose"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">as.numeric</span>(pid), <span class="at">y =</span> <span class="fu">as.numeric</span>(warsup))) <span class="sc">+</span> </span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"loess"</span>, <span class="at">se =</span> F) <span class="sc">+</span> </span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span> </span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Strongly oppose"</span>, </span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="cn">NULL</span>,</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="cn">NULL</span>)</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>p1 <span class="sc">|</span> p2 <span class="sc">|</span> p3</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="multinomial_intro_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
+<p><img src="multinomial_intro_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>We can see here that the relationship between these independent variables and an individual’s level of support for the war is different based on the choice at hand. Multinomial modelling allows us to measure this. We are essentially developing a different model for each outcome option: strongly support vs.&nbsp;strong oppose, strongly support vs.&nbsp;weakly oppose, and strongly support vs.&nbsp;weakly support.</p>
 <p>Let’s fit our model using <code>nnet::multinom()</code> and display the results using <code>broom::tidy()</code>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>m1 <span class="ot">&lt;-</span> <span class="fu">multinom</span>(warsup <span class="sc">~</span> female <span class="sc">+</span> pid, <span class="at">data =</span> student_survey)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>m1 <span class="ot">&lt;-</span> <span class="fu">multinom</span>(warsup <span class="sc">~</span> female <span class="sc">+</span> pid, <span class="at">data =</span> student_survey)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># weights:  16 (9 variable)
+<pre><code># weights:  36 (24 variable)
 initial  value 1599.783693 
-iter  10 value 1297.942134
-final  value 1258.012405 
+iter  10 value 1269.729784
+iter  20 value 1238.972501
+iter  30 value 1232.894042
+final  value 1232.880028 
 converged</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(m1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(m1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 9 × 6
-  y.level term        estimate std.error statistic  p.value
-  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
-1 2       (Intercept)    1.54     0.319       4.83 1.33e- 6
-2 2       female         0.617    0.178       3.46 5.40e- 4
-3 2       pid           -0.342    0.0538     -6.36 1.98e-10
-4 3       (Intercept)    3.67     0.324      11.3  8.54e-30
-5 3       female         0.382    0.218       1.75 7.93e- 2
-6 3       pid           -0.931    0.0641    -14.5  8.10e-48
-7 4       (Intercept)    4.40     0.316      13.9  5.58e-44
-8 4       female         0.587    0.209       2.81 4.88e- 3
-9 4       pid           -1.07     0.0636    -16.8  1.38e-63</code></pre>
+<pre><code># A tibble: 24 × 6
+   y.level          term                      estimate std.error stati…¹ p.value
+   &lt;chr&gt;            &lt;chr&gt;                        &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+ 1 Somewhat support (Intercept)                  0.239     0.427   0.560 5.76e-1
+ 2 Somewhat support femaleFemale                 0.655     0.181   3.61  3.06e-4
+ 3 Somewhat support pidWeak democrat             0.535     0.540   0.991 3.22e-1
+ 4 Somewhat support pidIndependent democrat      0.691     0.578   1.20  2.32e-1
+ 5 Somewhat support pidIndependent              -0.284     0.531  -0.535 5.93e-1
+ 6 Somewhat support pidIndependent republican   -0.323     0.484  -0.667 5.04e-1
+ 7 Somewhat support pidWeak republican          -0.406     0.450  -0.902 3.67e-1
+ 8 Somewhat support pidStrong republican        -1.30      0.439  -2.97  3.01e-3
+ 9 Somewhat oppose  (Intercept)                  1.70      0.377   4.52  6.30e-6
+10 Somewhat oppose  femaleFemale                 0.468     0.222   2.11  3.49e-2
+# … with 14 more rows, and abbreviated variable name ¹​statistic</code></pre>
 </div>
 </div>
 <p>Here, we can see that the model has produced different coefficients for each of our independent variables for each outcome option. The first column tells us which outcome option we are modelling: weak support, weak opposition, and strong opposition.</p>
 <p>We can more formally present these results using <code>gtsummary::tbl_regression()</code>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl_regression</span>(m1, <span class="at">exponentiate =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl_regression</span>(m1, <span class="at">exponentiate =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
-<div id="hxxuslupaj" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="cwgdjgqivq" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#hxxuslupaj .gt_table {
+#cwgdjgqivq .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -645,7 +629,7 @@ converged</code></pre>
   border-left-color: #D3D3D3;
 }
 
-#hxxuslupaj .gt_heading {
+#cwgdjgqivq .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -657,7 +641,7 @@ converged</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#hxxuslupaj .gt_title {
+#cwgdjgqivq .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -669,7 +653,7 @@ converged</code></pre>
   border-bottom-width: 0;
 }
 
-#hxxuslupaj .gt_subtitle {
+#cwgdjgqivq .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -681,13 +665,13 @@ converged</code></pre>
   border-top-width: 0;
 }
 
-#hxxuslupaj .gt_bottom_border {
+#cwgdjgqivq .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#hxxuslupaj .gt_col_headings {
+#cwgdjgqivq .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -702,7 +686,7 @@ converged</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#hxxuslupaj .gt_col_heading {
+#cwgdjgqivq .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -722,7 +706,7 @@ converged</code></pre>
   overflow-x: hidden;
 }
 
-#hxxuslupaj .gt_column_spanner_outer {
+#cwgdjgqivq .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -734,15 +718,15 @@ converged</code></pre>
   padding-right: 4px;
 }
 
-#hxxuslupaj .gt_column_spanner_outer:first-child {
+#cwgdjgqivq .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#hxxuslupaj .gt_column_spanner_outer:last-child {
+#cwgdjgqivq .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#hxxuslupaj .gt_column_spanner {
+#cwgdjgqivq .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -754,7 +738,7 @@ converged</code></pre>
   width: 100%;
 }
 
-#hxxuslupaj .gt_group_heading {
+#cwgdjgqivq .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -779,7 +763,7 @@ converged</code></pre>
   vertical-align: middle;
 }
 
-#hxxuslupaj .gt_empty_group_heading {
+#cwgdjgqivq .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -794,15 +778,15 @@ converged</code></pre>
   vertical-align: middle;
 }
 
-#hxxuslupaj .gt_from_md > :first-child {
+#cwgdjgqivq .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#hxxuslupaj .gt_from_md > :last-child {
+#cwgdjgqivq .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#hxxuslupaj .gt_row {
+#cwgdjgqivq .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -821,7 +805,7 @@ converged</code></pre>
   overflow-x: hidden;
 }
 
-#hxxuslupaj .gt_stub {
+#cwgdjgqivq .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -834,7 +818,7 @@ converged</code></pre>
   padding-right: 5px;
 }
 
-#hxxuslupaj .gt_stub_row_group {
+#cwgdjgqivq .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -848,11 +832,11 @@ converged</code></pre>
   vertical-align: top;
 }
 
-#hxxuslupaj .gt_row_group_first td {
+#cwgdjgqivq .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#hxxuslupaj .gt_summary_row {
+#cwgdjgqivq .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -862,16 +846,16 @@ converged</code></pre>
   padding-right: 5px;
 }
 
-#hxxuslupaj .gt_first_summary_row {
+#cwgdjgqivq .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#hxxuslupaj .gt_first_summary_row.thick {
+#cwgdjgqivq .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#hxxuslupaj .gt_last_summary_row {
+#cwgdjgqivq .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -881,7 +865,7 @@ converged</code></pre>
   border-bottom-color: #D3D3D3;
 }
 
-#hxxuslupaj .gt_grand_summary_row {
+#cwgdjgqivq .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -891,7 +875,7 @@ converged</code></pre>
   padding-right: 5px;
 }
 
-#hxxuslupaj .gt_first_grand_summary_row {
+#cwgdjgqivq .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -901,11 +885,11 @@ converged</code></pre>
   border-top-color: #D3D3D3;
 }
 
-#hxxuslupaj .gt_striped {
+#cwgdjgqivq .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#hxxuslupaj .gt_table_body {
+#cwgdjgqivq .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -914,7 +898,7 @@ converged</code></pre>
   border-bottom-color: #D3D3D3;
 }
 
-#hxxuslupaj .gt_footnotes {
+#cwgdjgqivq .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -928,7 +912,7 @@ converged</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#hxxuslupaj .gt_footnote {
+#cwgdjgqivq .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-left: 4px;
@@ -937,7 +921,7 @@ converged</code></pre>
   padding-right: 5px;
 }
 
-#hxxuslupaj .gt_sourcenotes {
+#cwgdjgqivq .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -951,7 +935,7 @@ converged</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#hxxuslupaj .gt_sourcenote {
+#cwgdjgqivq .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -959,64 +943,64 @@ converged</code></pre>
   padding-right: 5px;
 }
 
-#hxxuslupaj .gt_left {
+#cwgdjgqivq .gt_left {
   text-align: left;
 }
 
-#hxxuslupaj .gt_center {
+#cwgdjgqivq .gt_center {
   text-align: center;
 }
 
-#hxxuslupaj .gt_right {
+#cwgdjgqivq .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#hxxuslupaj .gt_font_normal {
+#cwgdjgqivq .gt_font_normal {
   font-weight: normal;
 }
 
-#hxxuslupaj .gt_font_bold {
+#cwgdjgqivq .gt_font_bold {
   font-weight: bold;
 }
 
-#hxxuslupaj .gt_font_italic {
+#cwgdjgqivq .gt_font_italic {
   font-style: italic;
 }
 
-#hxxuslupaj .gt_super {
+#cwgdjgqivq .gt_super {
   font-size: 65%;
 }
 
-#hxxuslupaj .gt_footnote_marks {
+#cwgdjgqivq .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 75%;
   vertical-align: 0.4em;
 }
 
-#hxxuslupaj .gt_asterisk {
+#cwgdjgqivq .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#hxxuslupaj .gt_indent_1 {
+#cwgdjgqivq .gt_indent_1 {
   text-indent: 5px;
 }
 
-#hxxuslupaj .gt_indent_2 {
+#cwgdjgqivq .gt_indent_2 {
   text-indent: 10px;
 }
 
-#hxxuslupaj .gt_indent_3 {
+#cwgdjgqivq .gt_indent_3 {
   text-indent: 15px;
 }
 
-#hxxuslupaj .gt_indent_4 {
+#cwgdjgqivq .gt_indent_4 {
   text-indent: 20px;
 }
 
-#hxxuslupaj .gt_indent_5 {
+#cwgdjgqivq .gt_indent_5 {
   text-indent: 25px;
 }
 </style>
@@ -1032,37 +1016,145 @@ converged</code></pre>
   </thead>
   <tbody class="gt_table_body">
     <tr class="gt_group_heading_row">
-      <td colspan="4" class="gt_group_heading">2</td>
+      <td colspan="4" class="gt_group_heading">Somewhat support</td>
     </tr>
-    <tr class="gt_row_group_first"><td class="gt_row gt_left">female</td>
-<td class="gt_row gt_center">1.85</td>
-<td class="gt_row gt_center">1.31, 2.63</td>
+    <tr class="gt_row_group_first"><td class="gt_row gt_left">Female</td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Not female</td>
+<td class="gt_row gt_center">—</td>
+<td class="gt_row gt_center">—</td>
+<td class="gt_row gt_center"></td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Female</td>
+<td class="gt_row gt_center">1.92</td>
+<td class="gt_row gt_center">1.35, 2.75</td>
 <td class="gt_row gt_center">&lt;0.001</td></tr>
-    <tr><td class="gt_row gt_left">Party ID 7 pt scale</td>
-<td class="gt_row gt_center">0.71</td>
-<td class="gt_row gt_center">0.64, 0.79</td>
+    <tr><td class="gt_row gt_left">Party ID</td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Strong democrat</td>
+<td class="gt_row gt_center">—</td>
+<td class="gt_row gt_center">—</td>
+<td class="gt_row gt_center"></td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Weak democrat</td>
+<td class="gt_row gt_center">1.71</td>
+<td class="gt_row gt_center">0.59, 4.92</td>
+<td class="gt_row gt_center">0.3</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Independent democrat</td>
+<td class="gt_row gt_center">2.00</td>
+<td class="gt_row gt_center">0.64, 6.19</td>
+<td class="gt_row gt_center">0.2</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Independent</td>
+<td class="gt_row gt_center">0.75</td>
+<td class="gt_row gt_center">0.27, 2.13</td>
+<td class="gt_row gt_center">0.6</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Independent republican</td>
+<td class="gt_row gt_center">0.72</td>
+<td class="gt_row gt_center">0.28, 1.87</td>
+<td class="gt_row gt_center">0.5</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Weak republican</td>
+<td class="gt_row gt_center">0.67</td>
+<td class="gt_row gt_center">0.28, 1.61</td>
+<td class="gt_row gt_center">0.4</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Strong republican</td>
+<td class="gt_row gt_center">0.27</td>
+<td class="gt_row gt_center">0.11, 0.64</td>
+<td class="gt_row gt_center">0.003</td></tr>
+    <tr class="gt_group_heading_row">
+      <td colspan="4" class="gt_group_heading">Somewhat oppose</td>
+    </tr>
+    <tr class="gt_row_group_first"><td class="gt_row gt_left">Female</td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Not female</td>
+<td class="gt_row gt_center">—</td>
+<td class="gt_row gt_center">—</td>
+<td class="gt_row gt_center"></td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Female</td>
+<td class="gt_row gt_center">1.60</td>
+<td class="gt_row gt_center">1.03, 2.47</td>
+<td class="gt_row gt_center">0.035</td></tr>
+    <tr><td class="gt_row gt_left">Party ID</td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Strong democrat</td>
+<td class="gt_row gt_center">—</td>
+<td class="gt_row gt_center">—</td>
+<td class="gt_row gt_center"></td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Weak democrat</td>
+<td class="gt_row gt_center">0.86</td>
+<td class="gt_row gt_center">0.33, 2.21</td>
+<td class="gt_row gt_center">0.7</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Independent democrat</td>
+<td class="gt_row gt_center">0.90</td>
+<td class="gt_row gt_center">0.32, 2.51</td>
+<td class="gt_row gt_center">0.8</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Independent</td>
+<td class="gt_row gt_center">0.08</td>
+<td class="gt_row gt_center">0.03, 0.24</td>
+<td class="gt_row gt_center">&lt;0.001</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Independent republican</td>
+<td class="gt_row gt_center">0.11</td>
+<td class="gt_row gt_center">0.04, 0.26</td>
+<td class="gt_row gt_center">&lt;0.001</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Weak republican</td>
+<td class="gt_row gt_center">0.03</td>
+<td class="gt_row gt_center">0.01, 0.08</td>
+<td class="gt_row gt_center">&lt;0.001</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Strong republican</td>
+<td class="gt_row gt_center">0.01</td>
+<td class="gt_row gt_center">0.00, 0.02</td>
 <td class="gt_row gt_center">&lt;0.001</td></tr>
     <tr class="gt_group_heading_row">
-      <td colspan="4" class="gt_group_heading">3</td>
+      <td colspan="4" class="gt_group_heading">Strongly oppose</td>
     </tr>
-    <tr class="gt_row_group_first"><td class="gt_row gt_left">female</td>
-<td class="gt_row gt_center">1.46</td>
-<td class="gt_row gt_center">0.96, 2.24</td>
-<td class="gt_row gt_center">0.079</td></tr>
-    <tr><td class="gt_row gt_left">Party ID 7 pt scale</td>
-<td class="gt_row gt_center">0.39</td>
-<td class="gt_row gt_center">0.35, 0.45</td>
+    <tr class="gt_row_group_first"><td class="gt_row gt_left">Female</td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Not female</td>
+<td class="gt_row gt_center">—</td>
+<td class="gt_row gt_center">—</td>
+<td class="gt_row gt_center"></td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Female</td>
+<td class="gt_row gt_center">1.97</td>
+<td class="gt_row gt_center">1.30, 2.98</td>
+<td class="gt_row gt_center">0.001</td></tr>
+    <tr><td class="gt_row gt_left">Party ID</td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Strong democrat</td>
+<td class="gt_row gt_center">—</td>
+<td class="gt_row gt_center">—</td>
+<td class="gt_row gt_center"></td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Weak democrat</td>
+<td class="gt_row gt_center">0.45</td>
+<td class="gt_row gt_center">0.18, 1.14</td>
+<td class="gt_row gt_center">0.092</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Independent democrat</td>
+<td class="gt_row gt_center">0.67</td>
+<td class="gt_row gt_center">0.25, 1.80</td>
+<td class="gt_row gt_center">0.4</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Independent</td>
+<td class="gt_row gt_center">0.14</td>
+<td class="gt_row gt_center">0.06, 0.34</td>
 <td class="gt_row gt_center">&lt;0.001</td></tr>
-    <tr class="gt_group_heading_row">
-      <td colspan="4" class="gt_group_heading">4</td>
-    </tr>
-    <tr class="gt_row_group_first"><td class="gt_row gt_left">female</td>
-<td class="gt_row gt_center">1.80</td>
-<td class="gt_row gt_center">1.20, 2.71</td>
-<td class="gt_row gt_center">0.005</td></tr>
-    <tr><td class="gt_row gt_left">Party ID 7 pt scale</td>
-<td class="gt_row gt_center">0.34</td>
-<td class="gt_row gt_center">0.30, 0.39</td>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Independent republican</td>
+<td class="gt_row gt_center">0.03</td>
+<td class="gt_row gt_center">0.01, 0.08</td>
+<td class="gt_row gt_center">&lt;0.001</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Weak republican</td>
+<td class="gt_row gt_center">0.01</td>
+<td class="gt_row gt_center">0.00, 0.02</td>
+<td class="gt_row gt_center">&lt;0.001</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Strong republican</td>
+<td class="gt_row gt_center">0.00</td>
+<td class="gt_row gt_center">0.00, 0.01</td>
 <td class="gt_row gt_center">&lt;0.001</td></tr>
   </tbody>
   
@@ -1077,11 +1169,12 @@ converged</code></pre>
 </div>
 <p>And visualise our results using <code>sjPlot::plot_model()</code>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_model</span>(m1, <span class="at">show.values =</span> T, <span class="at">value.offset =</span> .<span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_model</span>(m1, <span class="at">show.values =</span> T, <span class="at">value.offset =</span> .<span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="multinomial_intro_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
+<p><img src="multinomial_intro_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
+<p>We will discuss interpreting these coefficients in the next section.</p>
 </section>
 </section>
 <section id="multinomial-probit" class="level2">
@@ -1113,7 +1206,7 @@ Pr(train) = \frac{2}{6}
 <p><span class="math display">\[
 Pr(car) = \frac{3}{6}
 \]</span></p>
-<p>Therefore, the odds of taking a red bus to train are now <span class="math inline">\(\frac{\frac{1}{12}}{\frac{2}{6}} \ne \frac{1}{2}\)</span>. This violates the IIA assumption. We should not, therefore, use multilevel logit to model this relationship.</p>
+<p>Therefore, the odds of taking a red bus to train are now <span class="math inline">\(\frac{\frac{1}{12}}{\frac{2}{6}} \ne \frac{1}{2}\)</span>. This violates the IIA assumption. We should not, therefore, use multinomial logit regression to model this relationship.</p>
 
 
 </section>
@@ -1123,7 +1216,7 @@ Pr(car) = \frac{3}{6}
 <div id="quarto-appendix" class="default"><section class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
 
 <ol>
-<li id="fn1" role="doc-endnote"><p>Almost the same outcome. Multinomial regression is more efficient. Our errors will be slightly different to those we would obtain if we fit multiple binary regressions.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1" role="doc-endnote"><p>Well… almost the same outcome. Multinomial regression is more efficient. Our errors will be slightly different to those we would obtain if we fit multiple binary regressions.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

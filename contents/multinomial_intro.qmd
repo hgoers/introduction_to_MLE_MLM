@@ -78,15 +78,21 @@ In a binomial logistic regression, we measure the probability that our outcome, 
 
 > A multinomial model is genuinely an extension of binomial logistic regression. We could fit a series of binomial logistic regression models and get the same outcome.[^1]
 
-[^1]: Almost the same outcome. Multinomial regression is more efficient. Our errors will be slightly different to those we would obtain if we fit multiple binary regressions. 
+[^1]: Well... almost the same outcome. Multinomial regression is more efficient. Our errors will be slightly different to those we would obtain if we fit multiple binary regressions. 
 
 Recall that a binary logistic regression is modelled as such:
 
 $$
-Pr(Y = 1 | X) = logit^{-1}(X) = \frac{e^X}{1 + e^X}
+Pr(Y = 1 | X) = ln(\frac{P}{1-P}) = \beta_0 + \beta_1X_1 + ... = \beta_kX_k
 $$
 
+This provides the log odds ratio of success, or $Y = 1$ for a binary outcome. 
+
 For multinomial logistic regression, our outcome is no longer the log odds of success against failure. Instead, we are measuring the log odds of the probability of one category over the probability of a base category. This is called the **relative log odds ratio**.
+
+$$
+ln(\frac{P_{category 2}}{P_{category 1}})
+$$
 
 Let's explore this by looking at the level of support university students had for the Iraq war. Our outcome variable can take on one of four options: strong opposition, weak opposition, weak support, and strong support for the war. Let's pick strong support as our baseline category. We now need to calculate three equations that model the relative log odds ratio that an individual will express strong opposition, weak opposition, or weak support for the war relative to the probability that they will express strong support for the war: 
 
@@ -260,6 +266,8 @@ And visualise our results using `sjPlot::plot_model()`:
 plot_model(m1, show.values = T, value.offset = .3)
 ```
 
+We will discuss interpreting these coefficients in the next section. 
+
 ## Multinomial probit
 
 The process for defining the probability of success for more than two options remains similar to the multinomial logistic regression except that the multinomial probit model allows the errors across choices to be correlated. This means that our assumption that adding or removing choices does not disturb the balance of probabilities of success between the remaining choices does not need to hold. This makes multinomial probit regression a better choice for exploring choice entry and exit.
@@ -300,5 +308,4 @@ $$
 Pr(car) = \frac{3}{6}
 $$
 
-Therefore, the odds of taking a red bus to train are now $\frac{\frac{1}{12}}{\frac{2}{6}} \ne \frac{1}{2}$. This violates the IIA assumption. We should not, therefore, use multilevel logit to model this relationship. 
-
+Therefore, the odds of taking a red bus to train are now $\frac{\frac{1}{12}}{\frac{2}{6}} \ne \frac{1}{2}$. This violates the IIA assumption. We should not, therefore, use multinomial logit regression to model this relationship. 

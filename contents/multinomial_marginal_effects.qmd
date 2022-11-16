@@ -1,0 +1,13 @@
+---
+title: "Measuring Marginal Effects on Multiple Outcomes"
+page-layout: full
+editor: source
+toc-depth: 5
+execute:
+  message: false
+  warning: false
+---
+
+## Set up
+
+This section uses the following packages: 
