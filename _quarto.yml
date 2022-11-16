@@ -26,6 +26,7 @@ website:
         - section: "3+ responses"
           contents: 
             - contents/multinomial_intro.qmd
+            - contents/multinomial_marginal_effects.qmd            
 
 format:
   html:
