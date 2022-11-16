@@ -40,7 +40,27 @@ Let's load and clean our data:
 
 ```{r}
 student_survey <- rio::import("/Users/harrietgoers/Downloads/student vote GVPT 729a.dta") |> 
-  select(warsup, female, pid) |> 
+  transmute(warsup = factor(warsup, 
+                            levels = c(1, 2, 3, 4),
+                            labels = c("Strongly support",
+                                       "Somewhat support",
+                                       "Somewhat oppose",
+                                       "Strongly oppose")), 
+            female = factor(female, 
+                            levels = c(0, 1), 
+                            labels = c("Not female", "Female")), 
+            pid = factor(pid,
+                         levels = c(1, 2, 3, 4, 5, 6, 7),
+                         labels = c("Strong democrat",
+                                    "Weak democrat",
+                                    "Independent democrat",
+                                    "Independent",
+                                    "Independent republican",
+                                    "Weak republican",
+                                    "Strong republican"))) |> 
+  labelled::set_variable_labels(warsup = "Support for the war",
+                                female = "Female",
+                                pid = "Party ID") |> 
   drop_na()
 
 head(student_survey)
@@ -81,12 +101,6 @@ $$
 $$
 Pr(y = weak\_support | X) = log(\frac{Pr(y = weak\_support)}{Pr(y = strong\_support)})
 $$
-
-And the crosstab to see if anything jumps out at us:
-
-```{r}
-tabyl(student_survey, warsup, pid, female)
-```
 
 ### Assumptions
 
@@ -158,8 +172,8 @@ Let's visualise the relationship between support for the war and gender:
 
 ```{r}
 p1 <- student_survey |> 
-  filter(warsup == "1" | warsup == "2") |> 
-  ggplot(aes(x = female, y = warsup)) + 
+  filter(warsup == "Strongly support" | warsup == "Somewhat support") |> 
+  ggplot(aes(x = as.numeric(female), y = as.numeric(warsup))) + 
   geom_point() + 
   geom_smooth(method = "loess", se = F) + 
   theme_minimal() + 
@@ -167,8 +181,8 @@ p1 <- student_survey |>
        x = NULL)
 
 p2 <- student_survey |> 
-  filter(warsup == "1" | warsup == "3") |> 
-  ggplot(aes(x = female, y = warsup)) + 
+  filter(warsup == "Strongly support" | warsup == "Somewhat oppose") |> 
+  ggplot(aes(x = as.numeric(female), y = as.numeric(warsup))) + 
   geom_point() + 
   geom_smooth(method = "loess", se = F) + 
   theme_minimal() + 
@@ -176,8 +190,8 @@ p2 <- student_survey |>
        y = NULL)
 
 p3 <- student_survey |> 
-  filter(warsup == "1" | warsup == "4") |> 
-  ggplot(aes(x = female, y = warsup)) + 
+  filter(warsup == "Strongly support" | warsup == "Strongly oppose") |> 
+  ggplot(aes(x = as.numeric(female), y = as.numeric(warsup))) + 
   geom_point() + 
   geom_smooth(method = "loess", se = F) + 
   theme_minimal() + 
@@ -192,8 +206,8 @@ And for party ID:
 
 ```{r}
 p1 <- student_survey |> 
-  filter(warsup == "1" | warsup == "2") |> 
-  ggplot(aes(x = pid, y = warsup)) + 
+  filter(warsup == "Strongly support" | warsup == "Somewhat support") |> 
+  ggplot(aes(x = as.numeric(pid), y = as.numeric(warsup))) + 
   geom_point() + 
   geom_smooth(method = "loess", se = F) + 
   theme_minimal() + 
@@ -201,8 +215,8 @@ p1 <- student_survey |>
        x = NULL)
 
 p2 <- student_survey |> 
-  filter(warsup == "1" | warsup == "3") |> 
-  ggplot(aes(x = pid, y = warsup)) + 
+  filter(warsup == "Strongly support" | warsup == "Somewhat oppose") |> 
+  ggplot(aes(x = as.numeric(pid), y = as.numeric(warsup))) + 
   geom_point() + 
   geom_smooth(method = "loess", se = F) + 
   theme_minimal() + 
@@ -210,8 +224,8 @@ p2 <- student_survey |>
        y = NULL)
 
 p3 <- student_survey |> 
-  filter(warsup == "1" | warsup == "4") |> 
-  ggplot(aes(x = pid, y = warsup)) + 
+  filter(warsup == "Strongly support" | warsup == "Strongly oppose") |> 
+  ggplot(aes(x = as.numeric(pid), y = as.numeric(warsup))) + 
   geom_point() + 
   geom_smooth(method = "loess", se = F) + 
   theme_minimal() + 
