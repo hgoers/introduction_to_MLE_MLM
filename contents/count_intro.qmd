@@ -1,0 +1,73 @@
+---
+title: "Introduction to Count Models"
+editor: source
+---
+
+## Problems with OLS
+
+A count dependent model is non-negative, an integer, and often skewed. OLS does not model this well. 
+
+## Count models
+
+Count models follow the poisson distribution.
+
+Count models are theoretically unbounded.
+
+> If you are measuring a bounded phenomenon and your count model is predicted out of scope results, you may want to use an ordered model instead. This is not a very efficient model for count events: you are throwing away a lot of information. However, you will get more realistic predictions. 
+
+### Poisson Regression Model 
+
+Expected count: 
+
+$$
+\mu_i = E(y_i | x_i) = e^{x_i\beta}
+$$
+
+#### Potential problems
+
+The model is not very good at predicting 0. We will under-predict 0s. 
+
+The model can often only predict events that have already taken place. It will not predict the first instance of an event. 
+
+Overdispersion occurs when the conditional mean is less than the conditional variance. This occurs when: 
+
+-   Assumes events are independent. This is a very (and often too) strong assumption. 
+
+-   There is heterogeneity: the $\mu$ differs across cases.
+
+Overdispersion produces estimates that are consistent and inefficient. The standard errors are biased downwards. It is, therefore, easier to find statistical significance. 
+
+> You have consistent results, as you add more data you will get closer to the true relationship between the dependent and independent variables. 
+
+#### Interpretation
+
+The coefficients give the change in the log of the expected count for a unit change in $x_i$. 
+
+You can also estimate the count of your variable of interest. 
+
+You can also estimate changes in the expected count across a discrete difference in $x_i$. 
+
+### Negative binomial models
+
+This model accounts for overdispersion. It does this by adding a dispersion parameter, $\alpha$, that allows for heterogeneity and non-independence across events. 
+
+> Generally, you should use this model. There will generally be non-independence or heterogeneity across events. 
+
+The expected count is the same as that produced by a poisson regression model. However, the variance differs. 
+#### Interpretation
+
+Similar to Poisson: 
+
+$$
+E(y | x) = e^{X\beta}
+$$
+
+### Zero Inflated Models
+
+This model allows you to explore very rare events. There needs to be a theoretical expectation that some *unknown* types of cases will only produce zeros. It is not sufficient for there to simply be a lot of zeros. It is important that you don't know why these groups can only produce zero. If you know, you should remove them from your dataset. They are a restricted group.
+
+This model explores the probability that you never have a count $> 0$. Estimate a binary model for $P(y = 0)$ and use that to weight your data. 
+
+### Exposure
+
+You need to think about whether exposure differs across cases. Are events more likely to occur in a subset of your data due to some other factor? For example, number of attacks might be greater simply because a group has been around longer. To solve for this, you control for exposure. For example, add `ln(exposure)` and constrain the coefficient to 1. 

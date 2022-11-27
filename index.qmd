@@ -3,4 +3,3 @@ title: "Introduction to Maximum Likelihood Estimation"
 sidebar: false
 page-layout: full
 ---
-

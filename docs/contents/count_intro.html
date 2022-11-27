@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Introduction to MLE - Course Introduction</title>
+<title>Introduction to MLE - Introduction to Count Models</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -54,6 +54,7 @@ ul.task-list{list-style: none;}
   }
 }</script>
 
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <link rel="stylesheet" href="../styles.css">
 </head>
@@ -85,7 +86,7 @@ ul.task-list{list-style: none;}
     </nav>
   <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
     <div class="container-fluid d-flex justify-content-between">
-      <h1 class="quarto-secondary-nav-title">Course Introduction</h1>
+      <h1 class="quarto-secondary-nav-title">Introduction to Count Models</h1>
       <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
         <i class="bi bi-chevron-right"></i>
       </button>
@@ -93,7 +94,7 @@ ul.task-list{list-style: none;}
   </nav>
 </header>
 <!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
   <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto">
     <div class="sidebar-menu-container"> 
@@ -108,7 +109,7 @@ ul.task-list{list-style: none;}
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../contents/index.html" class="sidebar-item-text sidebar-link active">Course Introduction</a>
+  <a href="../contents/index.html" class="sidebar-item-text sidebar-link">Course Introduction</a>
   </div>
 </li>
       </ul>
@@ -171,7 +172,22 @@ ul.task-list{list-style: none;}
       <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../contents/count_intro.html" class="sidebar-item-text sidebar-link">Introduction to Count Models</a>
+  <a href="../contents/count_intro.html" class="sidebar-item-text sidebar-link active">Introduction to Count Models</a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="true">Structural Equation Modelling</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../contents/sem_intro.html" class="sidebar-item-text sidebar-link">Introduction to Structural Equation Modelling</a>
   </div>
 </li>
       </ul>
@@ -181,14 +197,27 @@ ul.task-list{list-style: none;}
 </nav>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
+        <nav id="TOC" role="doc-toc">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#problems-with-ols" id="toc-problems-with-ols" class="nav-link active" data-scroll-target="#problems-with-ols">Problems with OLS</a></li>
+  <li><a href="#count-models" id="toc-count-models" class="nav-link" data-scroll-target="#count-models">Count models</a>
+  <ul class="collapse">
+  <li><a href="#poisson-regression-model" id="toc-poisson-regression-model" class="nav-link" data-scroll-target="#poisson-regression-model">Poisson Regression Model</a></li>
+  <li><a href="#negative-binomial-models" id="toc-negative-binomial-models" class="nav-link" data-scroll-target="#negative-binomial-models">Negative binomial models</a></li>
+  <li><a href="#zero-inflated-models" id="toc-zero-inflated-models" class="nav-link" data-scroll-target="#zero-inflated-models">Zero Inflated Models</a></li>
+  <li><a href="#exposure" id="toc-exposure" class="nav-link" data-scroll-target="#exposure">Exposure</a></li>
+  </ul></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
-<main class="content column-page-right" id="quarto-document-content">
+<main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title d-none d-lg-block">Course Introduction</h1>
+<h1 class="title d-none d-lg-block">Introduction to Count Models</h1>
 </div>
 
 
@@ -202,8 +231,68 @@ ul.task-list{list-style: none;}
 
 </header>
 
+<section id="problems-with-ols" class="level2">
+<h2 class="anchored" data-anchor-id="problems-with-ols">Problems with OLS</h2>
+<p>A count dependent model is non-negative, an integer, and often skewed. OLS does not model this well.</p>
+</section>
+<section id="count-models" class="level2">
+<h2 class="anchored" data-anchor-id="count-models">Count models</h2>
+<p>Count models follow the poisson distribution.</p>
+<p>Count models are theoretically unbounded.</p>
+<blockquote class="blockquote">
+<p>If you are measuring a bounded phenomenon and your count model is predicted out of scope results, you may want to use an ordered model instead. This is not a very efficient model for count events: you are throwing away a lot of information. However, you will get more realistic predictions.</p>
+</blockquote>
+<section id="poisson-regression-model" class="level3">
+<h3 class="anchored" data-anchor-id="poisson-regression-model">Poisson Regression Model</h3>
+<p>Expected count:</p>
+<p><span class="math display">\[
+\mu_i = E(y_i | x_i) = e^{x_i\beta}
+\]</span></p>
+<section id="potential-problems" class="level4">
+<h4 class="anchored" data-anchor-id="potential-problems">Potential problems</h4>
+<p>The model is not very good at predicting 0. We will under-predict 0s.</p>
+<p>The model can often only predict events that have already taken place. It will not predict the first instance of an event.</p>
+<p>Overdispersion occurs when the conditional mean is less than the conditional variance. This occurs when:</p>
+<ul>
+<li><p>Assumes events are independent. This is a very (and often too) strong assumption.</p></li>
+<li><p>There is heterogeneity: the <span class="math inline">\(\mu\)</span> differs across cases.</p></li>
+</ul>
+<p>Overdispersion produces estimates that are consistent and inefficient. The standard errors are biased downwards. It is, therefore, easier to find statistical significance.</p>
+<blockquote class="blockquote">
+<p>You have consistent results, as you add more data you will get closer to the true relationship between the dependent and independent variables.</p>
+</blockquote>
+</section>
+<section id="interpretation" class="level4">
+<h4 class="anchored" data-anchor-id="interpretation">Interpretation</h4>
+<p>The coefficients give the change in the log of the expected count for a unit change in <span class="math inline">\(x_i\)</span>.</p>
+<p>You can also estimate the count of your variable of interest.</p>
+<p>You can also estimate changes in the expected count across a discrete difference in <span class="math inline">\(x_i\)</span>.</p>
+</section>
+</section>
+<section id="negative-binomial-models" class="level3">
+<h3 class="anchored" data-anchor-id="negative-binomial-models">Negative binomial models</h3>
+<p>This model accounts for overdispersion. It does this by adding a dispersion parameter, <span class="math inline">\(\alpha\)</span>, that allows for heterogeneity and non-independence across events.</p>
+<blockquote class="blockquote">
+<p>Generally, you should use this model. There will generally be non-independence or heterogeneity across events.</p>
+</blockquote>
+<p>The expected count is the same as that produced by a poisson regression model. However, the variance differs. #### Interpretation</p>
+<p>Similar to Poisson:</p>
+<p><span class="math display">\[
+E(y | x) = e^{X\beta}
+\]</span></p>
+</section>
+<section id="zero-inflated-models" class="level3">
+<h3 class="anchored" data-anchor-id="zero-inflated-models">Zero Inflated Models</h3>
+<p>This model allows you to explore very rare events. There needs to be a theoretical expectation that some <em>unknown</em> types of cases will only produce zeros. It is not sufficient for there to simply be a lot of zeros. It is important that you don’t know why these groups can only produce zero. If you know, you should remove them from your dataset. They are a restricted group.</p>
+<p>This model explores the probability that you never have a count <span class="math inline">\(&gt; 0\)</span>. Estimate a binary model for <span class="math inline">\(P(y = 0)\)</span> and use that to weight your data.</p>
+</section>
+<section id="exposure" class="level3">
+<h3 class="anchored" data-anchor-id="exposure">Exposure</h3>
+<p>You need to think about whether exposure differs across cases. Are events more likely to occur in a subset of your data due to some other factor? For example, number of attacks might be greater simply because a group has been around longer. To solve for this, you control for exposure. For example, add <code>ln(exposure)</code> and constrain the coefficient to 1.</p>
 
 
+</section>
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

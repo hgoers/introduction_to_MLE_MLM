@@ -268,6 +268,8 @@ plot_model(m1, show.values = T, value.offset = .3)
 
 We will discuss interpreting these coefficients in the next section. 
 
+> TODO: Likelihood ratio test to test for whether these categories are statistically different from each other. 
+
 ## Multinomial probit
 
 The process for defining the probability of success for more than two options remains similar to the multinomial logistic regression except that the multinomial probit model allows the errors across choices to be correlated. This means that our assumption that adding or removing choices does not disturb the balance of probabilities of success between the remaining choices does not need to hold. This makes multinomial probit regression a better choice for exploring choice entry and exit.
