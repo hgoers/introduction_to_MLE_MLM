@@ -86,9 +86,9 @@ $$
 Pr(Y = 1 | X) = ln(\frac{P}{1-P}) = \beta_0 + \beta_1X_1 + ... = \beta_kX_k
 $$
 
-This provides the log odds ratio of success, or $Y = 1$ for a binary outcome. 
+This provides the log odds ratio of success ($Y = 1$) for a binary outcome. 
 
-For multinomial logistic regression, our outcome is no longer the log odds of success against failure. Instead, we are measuring the log odds of the probability of one category over the probability of a base category. This is called the **relative log odds ratio**.
+For multinomial logistic regression, our outcome is no longer the log odds of success against failure. Instead, we are measuring the log odds ratio of the probability of one category over the probability of a base category. This is called the **relative log odds ratio**.
 
 $$
 ln(\frac{P_{category 2}}{P_{category 1}})
@@ -154,7 +154,7 @@ Like binary logistic regression, this model assumes that the outcome variable is
 
 #### The log-odds of the outcome and independent variable have a linear relationship
 
-Like binary logistic regression, this model assumes that the relationship between the log odds of the outcome variable and any continous independent variables is linear. In other words, our latent variable, $z_i$, must follow linear conventions (all $\beta$s must be linear). 
+Like binary logistic regression, this model assumes that the relationship between the log odds of the outcome variable and any continous independent variables is linear. In other words, our latent variable, $z_i$, must follow linear conventions (including, all $\beta$s must be linear). 
 
 #### Independent errors
 
@@ -270,7 +270,7 @@ We will discuss interpreting these coefficients in the next section.
 
 > TODO: Likelihood ratio test to test for whether these categories are statistically different from each other. 
 
-## Multinomial probit
+## Multinomial probit regression
 
 The process for defining the probability of success for more than two options remains similar to the multinomial logistic regression except that the multinomial probit model allows the errors across choices to be correlated. This means that our assumption that adding or removing choices does not disturb the balance of probabilities of success between the remaining choices does not need to hold. This makes multinomial probit regression a better choice for exploring choice entry and exit.
 
@@ -290,7 +290,7 @@ $$
 Pr(car) = \frac{3}{6}
 $$
 
-Therefore, the odds of taking a red bus to train are $\frac{\frac{1}{6}}{\frac{2}{6}} = \frac{1}{2}$. Now, let's add the option of taking a blue bus. Will people split evenly across the blue bus, red bus, train, or car? Unlikely: their transport decision is probably not influenced by the colour of their options. Rather, people will likely be split between the red and blue bus, with people who take the train or drive their car unaffected. 
+Therefore, the odds ratio of taking a red bus to train are $\frac{\frac{1}{6}}{\frac{2}{6}} = \frac{1}{2}$. Now, let's add the option of taking a blue bus. Will people split evenly across the blue bus, red bus, train, or car? Unlikely: their transport decision is probably not influenced by the colour of their options. Rather, people will likely be split between the red and blue bus, with people who take the train or drive their car unaffected. 
 
 Therefore, the probabilities change: 
 

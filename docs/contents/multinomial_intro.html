@@ -248,7 +248,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   </ul></li>
   <li><a href="#the-model" id="toc-the-model" class="nav-link" data-scroll-target="#the-model">The model</a></li>
   </ul></li>
-  <li><a href="#multinomial-probit" id="toc-multinomial-probit" class="nav-link" data-scroll-target="#multinomial-probit">Multinomial probit</a>
+  <li><a href="#multinomial-probit-regression" id="toc-multinomial-probit-regression" class="nav-link" data-scroll-target="#multinomial-probit-regression">Multinomial probit regression</a>
   <ul class="collapse">
   <li><a href="#a-more-flexible-model" id="toc-a-more-flexible-model" class="nav-link" data-scroll-target="#a-more-flexible-model">A more flexible model</a></li>
   </ul></li>
@@ -431,8 +431,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p><span class="math display">\[
 Pr(Y = 1 | X) = ln(\frac{P}{1-P}) = \beta_0 + \beta_1X_1 + ... = \beta_kX_k
 \]</span></p>
-<p>This provides the log odds ratio of success, or <span class="math inline">\(Y = 1\)</span> for a binary outcome.</p>
-<p>For multinomial logistic regression, our outcome is no longer the log odds of success against failure. Instead, we are measuring the log odds of the probability of one category over the probability of a base category. This is called the <strong>relative log odds ratio</strong>.</p>
+<p>This provides the log odds ratio of success (<span class="math inline">\(Y = 1\)</span>) for a binary outcome.</p>
+<p>For multinomial logistic regression, our outcome is no longer the log odds of success against failure. Instead, we are measuring the log odds ratio of the probability of one category over the probability of a base category. This is called the <strong>relative log odds ratio</strong>.</p>
 <p><span class="math display">\[
 ln(\frac{P_{category 2}}{P_{category 1}})
 \]</span></p>
@@ -482,7 +482,7 @@ Pr(cand\_4) = \frac{1}{5}
 </section>
 <section id="the-log-odds-of-the-outcome-and-independent-variable-have-a-linear-relationship" class="level4">
 <h4 class="anchored" data-anchor-id="the-log-odds-of-the-outcome-and-independent-variable-have-a-linear-relationship">The log-odds of the outcome and independent variable have a linear relationship</h4>
-<p>Like binary logistic regression, this model assumes that the relationship between the log odds of the outcome variable and any continous independent variables is linear. In other words, our latent variable, <span class="math inline">\(z_i\)</span>, must follow linear conventions (all <span class="math inline">\(\beta\)</span>s must be linear).</p>
+<p>Like binary logistic regression, this model assumes that the relationship between the log odds of the outcome variable and any continous independent variables is linear. In other words, our latent variable, <span class="math inline">\(z_i\)</span>, must follow linear conventions (including, all <span class="math inline">\(\beta\)</span>s must be linear).</p>
 </section>
 <section id="independent-errors" class="level4">
 <h4 class="anchored" data-anchor-id="independent-errors">Independent errors</h4>
@@ -607,12 +607,12 @@ converged</code></pre>
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl_regression</span>(m1, <span class="at">exponentiate =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
-<div id="hpeuvuqokp" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="btgbbkoups" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#hpeuvuqokp .gt_table {
+#btgbbkoups .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -637,7 +637,7 @@ converged</code></pre>
   border-left-color: #D3D3D3;
 }
 
-#hpeuvuqokp .gt_heading {
+#btgbbkoups .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -649,7 +649,7 @@ converged</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#hpeuvuqokp .gt_title {
+#btgbbkoups .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -661,7 +661,7 @@ converged</code></pre>
   border-bottom-width: 0;
 }
 
-#hpeuvuqokp .gt_subtitle {
+#btgbbkoups .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -673,13 +673,13 @@ converged</code></pre>
   border-top-width: 0;
 }
 
-#hpeuvuqokp .gt_bottom_border {
+#btgbbkoups .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#hpeuvuqokp .gt_col_headings {
+#btgbbkoups .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -694,7 +694,7 @@ converged</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#hpeuvuqokp .gt_col_heading {
+#btgbbkoups .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -714,7 +714,7 @@ converged</code></pre>
   overflow-x: hidden;
 }
 
-#hpeuvuqokp .gt_column_spanner_outer {
+#btgbbkoups .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -726,15 +726,15 @@ converged</code></pre>
   padding-right: 4px;
 }
 
-#hpeuvuqokp .gt_column_spanner_outer:first-child {
+#btgbbkoups .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#hpeuvuqokp .gt_column_spanner_outer:last-child {
+#btgbbkoups .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#hpeuvuqokp .gt_column_spanner {
+#btgbbkoups .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -746,7 +746,7 @@ converged</code></pre>
   width: 100%;
 }
 
-#hpeuvuqokp .gt_group_heading {
+#btgbbkoups .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -771,7 +771,7 @@ converged</code></pre>
   vertical-align: middle;
 }
 
-#hpeuvuqokp .gt_empty_group_heading {
+#btgbbkoups .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -786,15 +786,15 @@ converged</code></pre>
   vertical-align: middle;
 }
 
-#hpeuvuqokp .gt_from_md > :first-child {
+#btgbbkoups .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#hpeuvuqokp .gt_from_md > :last-child {
+#btgbbkoups .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#hpeuvuqokp .gt_row {
+#btgbbkoups .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -813,7 +813,7 @@ converged</code></pre>
   overflow-x: hidden;
 }
 
-#hpeuvuqokp .gt_stub {
+#btgbbkoups .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -826,7 +826,7 @@ converged</code></pre>
   padding-right: 5px;
 }
 
-#hpeuvuqokp .gt_stub_row_group {
+#btgbbkoups .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -840,11 +840,11 @@ converged</code></pre>
   vertical-align: top;
 }
 
-#hpeuvuqokp .gt_row_group_first td {
+#btgbbkoups .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#hpeuvuqokp .gt_summary_row {
+#btgbbkoups .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -854,16 +854,16 @@ converged</code></pre>
   padding-right: 5px;
 }
 
-#hpeuvuqokp .gt_first_summary_row {
+#btgbbkoups .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#hpeuvuqokp .gt_first_summary_row.thick {
+#btgbbkoups .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#hpeuvuqokp .gt_last_summary_row {
+#btgbbkoups .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -873,7 +873,7 @@ converged</code></pre>
   border-bottom-color: #D3D3D3;
 }
 
-#hpeuvuqokp .gt_grand_summary_row {
+#btgbbkoups .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -883,7 +883,7 @@ converged</code></pre>
   padding-right: 5px;
 }
 
-#hpeuvuqokp .gt_first_grand_summary_row {
+#btgbbkoups .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -893,11 +893,11 @@ converged</code></pre>
   border-top-color: #D3D3D3;
 }
 
-#hpeuvuqokp .gt_striped {
+#btgbbkoups .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#hpeuvuqokp .gt_table_body {
+#btgbbkoups .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -906,7 +906,7 @@ converged</code></pre>
   border-bottom-color: #D3D3D3;
 }
 
-#hpeuvuqokp .gt_footnotes {
+#btgbbkoups .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -920,7 +920,7 @@ converged</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#hpeuvuqokp .gt_footnote {
+#btgbbkoups .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-left: 4px;
@@ -929,7 +929,7 @@ converged</code></pre>
   padding-right: 5px;
 }
 
-#hpeuvuqokp .gt_sourcenotes {
+#btgbbkoups .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -943,7 +943,7 @@ converged</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#hpeuvuqokp .gt_sourcenote {
+#btgbbkoups .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -951,64 +951,64 @@ converged</code></pre>
   padding-right: 5px;
 }
 
-#hpeuvuqokp .gt_left {
+#btgbbkoups .gt_left {
   text-align: left;
 }
 
-#hpeuvuqokp .gt_center {
+#btgbbkoups .gt_center {
   text-align: center;
 }
 
-#hpeuvuqokp .gt_right {
+#btgbbkoups .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#hpeuvuqokp .gt_font_normal {
+#btgbbkoups .gt_font_normal {
   font-weight: normal;
 }
 
-#hpeuvuqokp .gt_font_bold {
+#btgbbkoups .gt_font_bold {
   font-weight: bold;
 }
 
-#hpeuvuqokp .gt_font_italic {
+#btgbbkoups .gt_font_italic {
   font-style: italic;
 }
 
-#hpeuvuqokp .gt_super {
+#btgbbkoups .gt_super {
   font-size: 65%;
 }
 
-#hpeuvuqokp .gt_footnote_marks {
+#btgbbkoups .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 75%;
   vertical-align: 0.4em;
 }
 
-#hpeuvuqokp .gt_asterisk {
+#btgbbkoups .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#hpeuvuqokp .gt_indent_1 {
+#btgbbkoups .gt_indent_1 {
   text-indent: 5px;
 }
 
-#hpeuvuqokp .gt_indent_2 {
+#btgbbkoups .gt_indent_2 {
   text-indent: 10px;
 }
 
-#hpeuvuqokp .gt_indent_3 {
+#btgbbkoups .gt_indent_3 {
   text-indent: 15px;
 }
 
-#hpeuvuqokp .gt_indent_4 {
+#btgbbkoups .gt_indent_4 {
   text-indent: 20px;
 }
 
-#hpeuvuqokp .gt_indent_5 {
+#btgbbkoups .gt_indent_5 {
   text-indent: 25px;
 }
 </style>
@@ -1188,8 +1188,8 @@ converged</code></pre>
 </blockquote>
 </section>
 </section>
-<section id="multinomial-probit" class="level2">
-<h2 class="anchored" data-anchor-id="multinomial-probit">Multinomial probit</h2>
+<section id="multinomial-probit-regression" class="level2">
+<h2 class="anchored" data-anchor-id="multinomial-probit-regression">Multinomial probit regression</h2>
 <p>The process for defining the probability of success for more than two options remains similar to the multinomial logistic regression except that the multinomial probit model allows the errors across choices to be correlated. This means that our assumption that adding or removing choices does not disturb the balance of probabilities of success between the remaining choices does not need to hold. This makes multinomial probit regression a better choice for exploring choice entry and exit.</p>
 <section id="a-more-flexible-model" class="level3">
 <h3 class="anchored" data-anchor-id="a-more-flexible-model">A more flexible model</h3>
@@ -1203,7 +1203,7 @@ Pr(train) = \frac{2}{6}
 <p><span class="math display">\[
 Pr(car) = \frac{3}{6}
 \]</span></p>
-<p>Therefore, the odds of taking a red bus to train are <span class="math inline">\(\frac{\frac{1}{6}}{\frac{2}{6}} = \frac{1}{2}\)</span>. Now, let’s add the option of taking a blue bus. Will people split evenly across the blue bus, red bus, train, or car? Unlikely: their transport decision is probably not influenced by the colour of their options. Rather, people will likely be split between the red and blue bus, with people who take the train or drive their car unaffected.</p>
+<p>Therefore, the odds ratio of taking a red bus to train are <span class="math inline">\(\frac{\frac{1}{6}}{\frac{2}{6}} = \frac{1}{2}\)</span>. Now, let’s add the option of taking a blue bus. Will people split evenly across the blue bus, red bus, train, or car? Unlikely: their transport decision is probably not influenced by the colour of their options. Rather, people will likely be split between the red and blue bus, with people who take the train or drive their car unaffected.</p>
 <p>Therefore, the probabilities change:</p>
 <p><span class="math display">\[
 Pr(red bus) = \frac{1}{12}
