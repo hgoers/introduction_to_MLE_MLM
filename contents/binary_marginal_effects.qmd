@@ -21,10 +21,8 @@ library(patchwork)
 library(tidyverse)
 library(rio)
 library(skimr)
-library(sjPlot)
 library(broom)
 library(gtsummary)
-library(janitor)
 ```
 
 Let's explore marginal and substantive effects using real-world data. How is a person's decision to vote influenced by the closing date of registration to vote in US elections? Suppose we hypothesize that the further from election day registration closes, the less likely an individual is to vote. We also believe that there are other socio-economic factors that influence a person's decision to vote for which we need to control. These are their level of education, and whether they are a homeowner.   
