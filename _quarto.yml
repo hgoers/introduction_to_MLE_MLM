@@ -9,15 +9,12 @@ website:
       - text: "Home"
         href: index.qmd
       - text: "Contents"
-        href: contents/index.qmd
+        href: contents/binary_intro_binary.qmd
         
   sidebar: 
     - title: "Contents"    
       style: "docked"
       contents: 
-        - section: "Introduction"
-          contents:
-            - contents/index.qmd
         - section: "Binary responses"
           contents:
             - contents/binary_intro_binary.qmd

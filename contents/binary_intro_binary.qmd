@@ -44,9 +44,11 @@ ggplot(df, aes(x = x, y = y)) +
   theme_minimal()
 ```
 
-There seems to be a pretty clear relationship between `y` and `x` (because we created the data that way). When `x` is less than 5, you are very likely (in fact 95 percent likely) to get a `y` of 0. But how do we formally measure this?
+There seems to be a pretty clear relationship between `y` and `x`. When `x` is less than 5, you are very likely (in fact 95 percent likely) to get a `y` of 0. But how do we formally measure this?
 
-When working with binary outcomes, we want to understand the probability that you will get an outcome for any given value of your independent variable(s). From there, you can make an informed guess as to the outcome for given values of $X$. For example, where the predicted probability of success is greater than 50 percent, you can predict that $y = 1$.
+When working with binary outcomes, we want to understand the probability that you will get an outcome (here, $Y = 0$ or $Y = 1$) for any given value of your independent variable(s). From there, you can make an informed guess as to the outcome for given values of $X$. For example, where the predicted probability of success is greater than 50 percent, you can predict that $y = 1$. You can also better understand how changing the value of your independent variable impacts the likelihood that you will get a different outcome. 
+
+In our research, we may want to better understand how some policy choice will impact the likelihood of many different relevant phenomena, including that individuals will vote, countries will go to war, or democracies will become autocracies.
 
 ## Linear Probability Model
 
@@ -67,27 +69,25 @@ m_lpr <- lm(y ~ x, data = df)
 tbl_regression(m_lpr, intercept = T)
 ```
 
-Our estimation of $y_i$ can (and often does) take on values other than 0 or 1. This is because we can interpret the coefficients of this model as differences in the probability of success ($y = 1$). We can see that increasing $x$ by one unit increases the probability that $y = 1$ by `r tidy(m_lpr) |> filter(term == "x") |> pull(estimate) |> percent(accuracy = 0.1)`.
+Our estimation of $y_i$ can (and often does) take on values other than 0 or 1. This is because we can interpret the coefficients of this model as differences in the probability of success ($y = 1$). We can see that increasing $x$ by one unit increases the probability that $y = 1$ by `r tidy(m_lpr) |> filter(term == "x") |> pull(estimate) |> percent(accuracy = 0.1)`. We have a very high level of confidence in this, with $p<0.001$. 
 
 ### Issues with LPM
 
 We run into difficulties using LPM for prediction. First, our model can predict probabilities of success less than 0 and greater than 1. Second, and relatedly, we lose information treating these discrete outcomes (0 or 1) as continuous.
 
-Importantly, our theory may suggest a non-linear relationship between changes in $x$ and the probability of success in $y$. If this is the case, we should not use a linear model for this relationship. 
-
 ## Latent Variable Approach
 
-We can only observe one of two outcomes: $y = 0$ (failure) or $y = 1$ (success). The linear model provided above does not account for this very well. How can we improve this model? The **latent variable approach** assumes a continuous relationship exists between our observed outcome ($y_i$) and our independent variables ($x_i$). This continuous relationship is driven by an unobserved outcome: $z_i$.
+We can only observe one of two outcomes: $y = 0$ (failure) or $y = 1$ (success). The linear model provided above does not account for this very well. How can we improve this model? The **latent variable approach** assumes a continuous relationship exists between our observed outcome ($Y$) and our independent variables ($X$). This continuous relationship is driven by an unobserved outcome: $Z$.
 
 $$
 z_i = X_i\beta + \epsilon_i
 $$
 
-This set up is familiar to us. Critically, though, we need to understand the shape of that independent error term, $\epsilon_i$. This defines the shape of the continuous relationship that takes us from $y = 0$ to $y = 1$. We have two common options to pick from: logistic or probit.
+This set up is familiar to us: it's a linear model. Critically, though, we need to understand the shape of that independent error term, $\epsilon_i$. This defines the shape of the continuous relationship that takes us from $y = 0$ to $y = 1$. We have two common options to pick from: logistic or probit.
 
 ### Logistic Regression
 
-The inverse logistic function suits our needs well. First, it is bounded between outcomes of 0 and 1. Second, it allows for a varying impact of a change in $x$ on $y$.   
+The inverse logistic function suits our needs well. First, it is bounded between outcomes of 0 and 1. Second, it allows for a varying impact of a change in $X$ on the probability that $Y = 1$.   
 
 Formally, the inverse logistic function is: 
 
@@ -106,6 +106,8 @@ tibble(x = seq(-10, 10, by = 0.5)) |>
 ```
 
 > The function `plogis()` gives you the inverse log of a number. For example, `plogis(1)` returns `r plogis(1)`. 
+
+Here, we have simply calculated and then plotted the inverse logit of all values sitting at 0.5 intervals between -10 and 10. 
 
 #### The model
 
@@ -132,7 +134,7 @@ We will explore how to interpret these coefficients and uncertainty in the next 
 
 ### Probit Regression
 
-An alternative approach is probit regression. This model is also bounded between outcomes of 0 and 1 and allows for a varying impact of a change in $x$ on $y$. The only real difference between the logistic and probit regression models are the ways they model the error term, $\epsilon_i$, in our latent variable $z_i$. Probit replaces the logistic distribution with the normal distribution. 
+An alternative approach is probit regression. This model is also bounded between outcomes of 0 and 1 and allows for a varying impact of a change in $x$ on $y$. The only real difference between the logistic and probit regression models are the ways they model the error term, $\epsilon_i$, in our latent variable $z_i$. Probit replaces the logistic distribution with the normal distribution. This changes how we can interpret the coefficients on our independent variables. We will discuss that in the next section. 
 
 Formally, the probit model is: 
 

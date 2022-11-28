@@ -140,7 +140,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <a class="nav-link" href="../index.html">Home</a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="../contents/index.html" aria-current="page">Contents</a>
+    <a class="nav-link active" href="../contents/binary_intro_binary.html" aria-current="page">Contents</a>
   </li>  
 </ul>
               <div id="quarto-search" class="" title="Search"></div>
@@ -164,27 +164,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Introduction</a>
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Binary responses</a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../contents/index.html" class="sidebar-item-text sidebar-link">Course Introduction</a>
-  </div>
-</li>
-      </ul>
-  </li>
-        <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">Binary responses</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../contents/binary_intro_binary.html" class="sidebar-item-text sidebar-link active">Introduction to Binary Response Modelling</a>
@@ -204,12 +189,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">3+ responses</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">3+ unordered responses</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../contents/multinomial_intro.html" class="sidebar-item-text sidebar-link">Introduction to Multinomial Models</a>
@@ -218,6 +203,24 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../contents/multinomial_marginal_effects.html" class="sidebar-item-text sidebar-link">Measuring Marginal Effects on Multiple Outcomes</a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <span class="sidebar-item-text sidebar-link text-start">3+ ordered responses</span>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">Count responses</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../contents/count_intro.html" class="sidebar-item-text sidebar-link">Introduction to Count Models</a>
   </div>
 </li>
       </ul>
@@ -287,12 +290,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <pre><code># A tibble: 6 × 2
       x     y
   &lt;dbl&gt; &lt;int&gt;
-1  5.36     1
-2  3.81     0
-3  2.77     0
-4  2.79     0
-5  7.61     1
-6  9.81     1</code></pre>
+1 5.87      1
+2 5.50      1
+3 6.70      1
+4 1.18      0
+5 5.62      1
+6 0.394     0</code></pre>
 </div>
 </div>
 <p>Now, let’s plot the relationship between our binary dependent variable, <code>y</code>, and our independent variable of interest, <code>x</code>.</p>
@@ -304,8 +307,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p><img src="binary_intro_binary_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>There seems to be a pretty clear relationship between <code>y</code> and <code>x</code> (because we created the data that way). When <code>x</code> is less than 5, you are very likely (in fact 95 percent likely) to get a <code>y</code> of 0. But how do we formally measure this?</p>
-<p>When working with binary outcomes, we want to understand the probability that you will get an outcome for any given value of your independent variable(s). From there, you can make an informed guess as to the outcome for given values of <span class="math inline">\(X\)</span>. For example, where the predicted probability of success is greater than 50 percent, you can predict that <span class="math inline">\(y = 1\)</span>.</p>
+<p>There seems to be a pretty clear relationship between <code>y</code> and <code>x</code>. When <code>x</code> is less than 5, you are very likely (in fact 95 percent likely) to get a <code>y</code> of 0. But how do we formally measure this?</p>
+<p>When working with binary outcomes, we want to understand the probability that you will get an outcome (here, <span class="math inline">\(Y = 0\)</span> or <span class="math inline">\(Y = 1\)</span>) for any given value of your independent variable(s). From there, you can make an informed guess as to the outcome for given values of <span class="math inline">\(X\)</span>. For example, where the predicted probability of success is greater than 50 percent, you can predict that <span class="math inline">\(y = 1\)</span>. You can also better understand how changing the value of your independent variable impacts the likelihood that you will get a different outcome.</p>
+<p>In our research, we may want to better understand how some policy choice will impact the likelihood of many different relevant phenomena, including that individuals will vote, countries will go to war, or democracies will become autocracies.</p>
 </section>
 <section id="linear-probability-model" class="level2">
 <h2 class="anchored" data-anchor-id="linear-probability-model">Linear Probability Model</h2>
@@ -326,12 +330,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl_regression</span>(m_lpr, <span class="at">intercept =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
-<div id="whfxpextac" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="uxwssnhgcx" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#whfxpextac .gt_table {
+#uxwssnhgcx .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -356,7 +360,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   border-left-color: #D3D3D3;
 }
 
-#whfxpextac .gt_heading {
+#uxwssnhgcx .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -368,7 +372,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   border-right-color: #D3D3D3;
 }
 
-#whfxpextac .gt_title {
+#uxwssnhgcx .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -380,7 +384,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   border-bottom-width: 0;
 }
 
-#whfxpextac .gt_subtitle {
+#uxwssnhgcx .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -392,13 +396,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   border-top-width: 0;
 }
 
-#whfxpextac .gt_bottom_border {
+#uxwssnhgcx .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#whfxpextac .gt_col_headings {
+#uxwssnhgcx .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -413,7 +417,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   border-right-color: #D3D3D3;
 }
 
-#whfxpextac .gt_col_heading {
+#uxwssnhgcx .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -433,7 +437,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   overflow-x: hidden;
 }
 
-#whfxpextac .gt_column_spanner_outer {
+#uxwssnhgcx .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -445,15 +449,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   padding-right: 4px;
 }
 
-#whfxpextac .gt_column_spanner_outer:first-child {
+#uxwssnhgcx .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#whfxpextac .gt_column_spanner_outer:last-child {
+#uxwssnhgcx .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#whfxpextac .gt_column_spanner {
+#uxwssnhgcx .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -465,7 +469,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   width: 100%;
 }
 
-#whfxpextac .gt_group_heading {
+#uxwssnhgcx .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -490,7 +494,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   vertical-align: middle;
 }
 
-#whfxpextac .gt_empty_group_heading {
+#uxwssnhgcx .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -505,15 +509,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   vertical-align: middle;
 }
 
-#whfxpextac .gt_from_md > :first-child {
+#uxwssnhgcx .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#whfxpextac .gt_from_md > :last-child {
+#uxwssnhgcx .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#whfxpextac .gt_row {
+#uxwssnhgcx .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -532,7 +536,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   overflow-x: hidden;
 }
 
-#whfxpextac .gt_stub {
+#uxwssnhgcx .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -545,7 +549,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   padding-right: 5px;
 }
 
-#whfxpextac .gt_stub_row_group {
+#uxwssnhgcx .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -559,11 +563,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   vertical-align: top;
 }
 
-#whfxpextac .gt_row_group_first td {
+#uxwssnhgcx .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#whfxpextac .gt_summary_row {
+#uxwssnhgcx .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -573,16 +577,16 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   padding-right: 5px;
 }
 
-#whfxpextac .gt_first_summary_row {
+#uxwssnhgcx .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#whfxpextac .gt_first_summary_row.thick {
+#uxwssnhgcx .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#whfxpextac .gt_last_summary_row {
+#uxwssnhgcx .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -592,7 +596,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   border-bottom-color: #D3D3D3;
 }
 
-#whfxpextac .gt_grand_summary_row {
+#uxwssnhgcx .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -602,7 +606,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   padding-right: 5px;
 }
 
-#whfxpextac .gt_first_grand_summary_row {
+#uxwssnhgcx .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -612,11 +616,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   border-top-color: #D3D3D3;
 }
 
-#whfxpextac .gt_striped {
+#uxwssnhgcx .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#whfxpextac .gt_table_body {
+#uxwssnhgcx .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -625,7 +629,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   border-bottom-color: #D3D3D3;
 }
 
-#whfxpextac .gt_footnotes {
+#uxwssnhgcx .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -639,7 +643,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   border-right-color: #D3D3D3;
 }
 
-#whfxpextac .gt_footnote {
+#uxwssnhgcx .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-left: 4px;
@@ -648,7 +652,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   padding-right: 5px;
 }
 
-#whfxpextac .gt_sourcenotes {
+#uxwssnhgcx .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -662,7 +666,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   border-right-color: #D3D3D3;
 }
 
-#whfxpextac .gt_sourcenote {
+#uxwssnhgcx .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -670,64 +674,64 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   padding-right: 5px;
 }
 
-#whfxpextac .gt_left {
+#uxwssnhgcx .gt_left {
   text-align: left;
 }
 
-#whfxpextac .gt_center {
+#uxwssnhgcx .gt_center {
   text-align: center;
 }
 
-#whfxpextac .gt_right {
+#uxwssnhgcx .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#whfxpextac .gt_font_normal {
+#uxwssnhgcx .gt_font_normal {
   font-weight: normal;
 }
 
-#whfxpextac .gt_font_bold {
+#uxwssnhgcx .gt_font_bold {
   font-weight: bold;
 }
 
-#whfxpextac .gt_font_italic {
+#uxwssnhgcx .gt_font_italic {
   font-style: italic;
 }
 
-#whfxpextac .gt_super {
+#uxwssnhgcx .gt_super {
   font-size: 65%;
 }
 
-#whfxpextac .gt_footnote_marks {
+#uxwssnhgcx .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 75%;
   vertical-align: 0.4em;
 }
 
-#whfxpextac .gt_asterisk {
+#uxwssnhgcx .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#whfxpextac .gt_indent_1 {
+#uxwssnhgcx .gt_indent_1 {
   text-indent: 5px;
 }
 
-#whfxpextac .gt_indent_2 {
+#uxwssnhgcx .gt_indent_2 {
   text-indent: 10px;
 }
 
-#whfxpextac .gt_indent_3 {
+#uxwssnhgcx .gt_indent_3 {
   text-indent: 15px;
 }
 
-#whfxpextac .gt_indent_4 {
+#uxwssnhgcx .gt_indent_4 {
   text-indent: 20px;
 }
 
-#whfxpextac .gt_indent_5 {
+#uxwssnhgcx .gt_indent_5 {
   text-indent: 25px;
 }
 </style>
@@ -743,11 +747,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   </thead>
   <tbody class="gt_table_body">
     <tr><td class="gt_row gt_left">(Intercept)</td>
-<td class="gt_row gt_center">-0.19</td>
-<td class="gt_row gt_center">-0.23, -0.16</td>
+<td class="gt_row gt_center">-0.18</td>
+<td class="gt_row gt_center">-0.22, -0.14</td>
 <td class="gt_row gt_center">&lt;0.001</td></tr>
     <tr><td class="gt_row gt_left">x</td>
-<td class="gt_row gt_center">0.14</td>
+<td class="gt_row gt_center">0.13</td>
 <td class="gt_row gt_center">0.13, 0.14</td>
 <td class="gt_row gt_center">&lt;0.001</td></tr>
   </tbody>
@@ -761,23 +765,22 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 </div>
 </div>
-<p>Our estimation of <span class="math inline">\(y_i\)</span> can (and often does) take on values other than 0 or 1. This is because we can interpret the coefficients of this model as differences in the probability of success (<span class="math inline">\(y = 1\)</span>). We can see that increasing <span class="math inline">\(x\)</span> by one unit increases the probability that <span class="math inline">\(y = 1\)</span> by 13.8%.</p>
+<p>Our estimation of <span class="math inline">\(y_i\)</span> can (and often does) take on values other than 0 or 1. This is because we can interpret the coefficients of this model as differences in the probability of success (<span class="math inline">\(y = 1\)</span>). We can see that increasing <span class="math inline">\(x\)</span> by one unit increases the probability that <span class="math inline">\(y = 1\)</span> by 13.4%. We have a very high level of confidence in this, with <span class="math inline">\(p&lt;0.001\)</span>.</p>
 <section id="issues-with-lpm" class="level3">
 <h3 class="anchored" data-anchor-id="issues-with-lpm">Issues with LPM</h3>
 <p>We run into difficulties using LPM for prediction. First, our model can predict probabilities of success less than 0 and greater than 1. Second, and relatedly, we lose information treating these discrete outcomes (0 or 1) as continuous.</p>
-<p>Importantly, our theory may suggest a non-linear relationship between changes in <span class="math inline">\(x\)</span> and the probability of success in <span class="math inline">\(y\)</span>. If this is the case, we should not use a linear model for this relationship.</p>
 </section>
 </section>
 <section id="latent-variable-approach" class="level2">
 <h2 class="anchored" data-anchor-id="latent-variable-approach">Latent Variable Approach</h2>
-<p>We can only observe one of two outcomes: <span class="math inline">\(y = 0\)</span> (failure) or <span class="math inline">\(y = 1\)</span> (success). The linear model provided above does not account for this very well. How can we improve this model? The <strong>latent variable approach</strong> assumes a continuous relationship exists between our observed outcome (<span class="math inline">\(y_i\)</span>) and our independent variables (<span class="math inline">\(x_i\)</span>). This continuous relationship is driven by an unobserved outcome: <span class="math inline">\(z_i\)</span>.</p>
+<p>We can only observe one of two outcomes: <span class="math inline">\(y = 0\)</span> (failure) or <span class="math inline">\(y = 1\)</span> (success). The linear model provided above does not account for this very well. How can we improve this model? The <strong>latent variable approach</strong> assumes a continuous relationship exists between our observed outcome (<span class="math inline">\(Y\)</span>) and our independent variables (<span class="math inline">\(X\)</span>). This continuous relationship is driven by an unobserved outcome: <span class="math inline">\(Z\)</span>.</p>
 <p><span class="math display">\[
 z_i = X_i\beta + \epsilon_i
 \]</span></p>
-<p>This set up is familiar to us. Critically, though, we need to understand the shape of that independent error term, <span class="math inline">\(\epsilon_i\)</span>. This defines the shape of the continuous relationship that takes us from <span class="math inline">\(y = 0\)</span> to <span class="math inline">\(y = 1\)</span>. We have two common options to pick from: logistic or probit.</p>
+<p>This set up is familiar to us: it’s a linear model. Critically, though, we need to understand the shape of that independent error term, <span class="math inline">\(\epsilon_i\)</span>. This defines the shape of the continuous relationship that takes us from <span class="math inline">\(y = 0\)</span> to <span class="math inline">\(y = 1\)</span>. We have two common options to pick from: logistic or probit.</p>
 <section id="logistic-regression" class="level3">
 <h3 class="anchored" data-anchor-id="logistic-regression">Logistic Regression</h3>
-<p>The inverse logistic function suits our needs well. First, it is bounded between outcomes of 0 and 1. Second, it allows for a varying impact of a change in <span class="math inline">\(x\)</span> on <span class="math inline">\(y\)</span>.</p>
+<p>The inverse logistic function suits our needs well. First, it is bounded between outcomes of 0 and 1. Second, it allows for a varying impact of a change in <span class="math inline">\(X\)</span> on the probability that <span class="math inline">\(Y = 1\)</span>.</p>
 <p>Formally, the inverse logistic function is:</p>
 <p><span class="math display">\[
 Pr(Y = 1 | X) = logit^{-1}(X) = \frac{e^X}{1 + e^X}
@@ -816,12 +819,12 @@ Pr(Y = 1 | X) = logit^{-1}(X) = \frac{e^X}{1 + e^X}
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl_regression</span>(m_lr, <span class="at">intercept =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
-<div id="hgictoepkf" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="zvkdshnbwj" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#hgictoepkf .gt_table {
+#zvkdshnbwj .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -846,7 +849,7 @@ Pr(Y = 1 | X) = logit^{-1}(X) = \frac{e^X}{1 + e^X}
   border-left-color: #D3D3D3;
 }
 
-#hgictoepkf .gt_heading {
+#zvkdshnbwj .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -858,7 +861,7 @@ Pr(Y = 1 | X) = logit^{-1}(X) = \frac{e^X}{1 + e^X}
   border-right-color: #D3D3D3;
 }
 
-#hgictoepkf .gt_title {
+#zvkdshnbwj .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -870,7 +873,7 @@ Pr(Y = 1 | X) = logit^{-1}(X) = \frac{e^X}{1 + e^X}
   border-bottom-width: 0;
 }
 
-#hgictoepkf .gt_subtitle {
+#zvkdshnbwj .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -882,13 +885,13 @@ Pr(Y = 1 | X) = logit^{-1}(X) = \frac{e^X}{1 + e^X}
   border-top-width: 0;
 }
 
-#hgictoepkf .gt_bottom_border {
+#zvkdshnbwj .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#hgictoepkf .gt_col_headings {
+#zvkdshnbwj .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -903,7 +906,7 @@ Pr(Y = 1 | X) = logit^{-1}(X) = \frac{e^X}{1 + e^X}
   border-right-color: #D3D3D3;
 }
 
-#hgictoepkf .gt_col_heading {
+#zvkdshnbwj .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -923,7 +926,7 @@ Pr(Y = 1 | X) = logit^{-1}(X) = \frac{e^X}{1 + e^X}
   overflow-x: hidden;
 }
 
-#hgictoepkf .gt_column_spanner_outer {
+#zvkdshnbwj .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -935,15 +938,15 @@ Pr(Y = 1 | X) = logit^{-1}(X) = \frac{e^X}{1 + e^X}
   padding-right: 4px;
 }
 
-#hgictoepkf .gt_column_spanner_outer:first-child {
+#zvkdshnbwj .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#hgictoepkf .gt_column_spanner_outer:last-child {
+#zvkdshnbwj .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#hgictoepkf .gt_column_spanner {
+#zvkdshnbwj .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -955,7 +958,7 @@ Pr(Y = 1 | X) = logit^{-1}(X) = \frac{e^X}{1 + e^X}
   width: 100%;
 }
 
-#hgictoepkf .gt_group_heading {
+#zvkdshnbwj .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -980,7 +983,7 @@ Pr(Y = 1 | X) = logit^{-1}(X) = \frac{e^X}{1 + e^X}
   vertical-align: middle;
 }
 
-#hgictoepkf .gt_empty_group_heading {
+#zvkdshnbwj .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -995,15 +998,15 @@ Pr(Y = 1 | X) = logit^{-1}(X) = \frac{e^X}{1 + e^X}
   vertical-align: middle;
 }
 
-#hgictoepkf .gt_from_md > :first-child {
+#zvkdshnbwj .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#hgictoepkf .gt_from_md > :last-child {
+#zvkdshnbwj .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#hgictoepkf .gt_row {
+#zvkdshnbwj .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1022,7 +1025,7 @@ Pr(Y = 1 | X) = logit^{-1}(X) = \frac{e^X}{1 + e^X}
   overflow-x: hidden;
 }
 
-#hgictoepkf .gt_stub {
+#zvkdshnbwj .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1035,7 +1038,7 @@ Pr(Y = 1 | X) = logit^{-1}(X) = \frac{e^X}{1 + e^X}
   padding-right: 5px;
 }
 
-#hgictoepkf .gt_stub_row_group {
+#zvkdshnbwj .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1049,11 +1052,11 @@ Pr(Y = 1 | X) = logit^{-1}(X) = \frac{e^X}{1 + e^X}
   vertical-align: top;
 }
 
-#hgictoepkf .gt_row_group_first td {
+#zvkdshnbwj .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#hgictoepkf .gt_summary_row {
+#zvkdshnbwj .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1063,16 +1066,16 @@ Pr(Y = 1 | X) = logit^{-1}(X) = \frac{e^X}{1 + e^X}
   padding-right: 5px;
 }
 
-#hgictoepkf .gt_first_summary_row {
+#zvkdshnbwj .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#hgictoepkf .gt_first_summary_row.thick {
+#zvkdshnbwj .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#hgictoepkf .gt_last_summary_row {
+#zvkdshnbwj .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1082,7 +1085,7 @@ Pr(Y = 1 | X) = logit^{-1}(X) = \frac{e^X}{1 + e^X}
   border-bottom-color: #D3D3D3;
 }
 
-#hgictoepkf .gt_grand_summary_row {
+#zvkdshnbwj .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1092,7 +1095,7 @@ Pr(Y = 1 | X) = logit^{-1}(X) = \frac{e^X}{1 + e^X}
   padding-right: 5px;
 }
 
-#hgictoepkf .gt_first_grand_summary_row {
+#zvkdshnbwj .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1102,11 +1105,11 @@ Pr(Y = 1 | X) = logit^{-1}(X) = \frac{e^X}{1 + e^X}
   border-top-color: #D3D3D3;
 }
 
-#hgictoepkf .gt_striped {
+#zvkdshnbwj .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#hgictoepkf .gt_table_body {
+#zvkdshnbwj .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1115,7 +1118,7 @@ Pr(Y = 1 | X) = logit^{-1}(X) = \frac{e^X}{1 + e^X}
   border-bottom-color: #D3D3D3;
 }
 
-#hgictoepkf .gt_footnotes {
+#zvkdshnbwj .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1129,7 +1132,7 @@ Pr(Y = 1 | X) = logit^{-1}(X) = \frac{e^X}{1 + e^X}
   border-right-color: #D3D3D3;
 }
 
-#hgictoepkf .gt_footnote {
+#zvkdshnbwj .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-left: 4px;
@@ -1138,7 +1141,7 @@ Pr(Y = 1 | X) = logit^{-1}(X) = \frac{e^X}{1 + e^X}
   padding-right: 5px;
 }
 
-#hgictoepkf .gt_sourcenotes {
+#zvkdshnbwj .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1152,7 +1155,7 @@ Pr(Y = 1 | X) = logit^{-1}(X) = \frac{e^X}{1 + e^X}
   border-right-color: #D3D3D3;
 }
 
-#hgictoepkf .gt_sourcenote {
+#zvkdshnbwj .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1160,64 +1163,64 @@ Pr(Y = 1 | X) = logit^{-1}(X) = \frac{e^X}{1 + e^X}
   padding-right: 5px;
 }
 
-#hgictoepkf .gt_left {
+#zvkdshnbwj .gt_left {
   text-align: left;
 }
 
-#hgictoepkf .gt_center {
+#zvkdshnbwj .gt_center {
   text-align: center;
 }
 
-#hgictoepkf .gt_right {
+#zvkdshnbwj .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#hgictoepkf .gt_font_normal {
+#zvkdshnbwj .gt_font_normal {
   font-weight: normal;
 }
 
-#hgictoepkf .gt_font_bold {
+#zvkdshnbwj .gt_font_bold {
   font-weight: bold;
 }
 
-#hgictoepkf .gt_font_italic {
+#zvkdshnbwj .gt_font_italic {
   font-style: italic;
 }
 
-#hgictoepkf .gt_super {
+#zvkdshnbwj .gt_super {
   font-size: 65%;
 }
 
-#hgictoepkf .gt_footnote_marks {
+#zvkdshnbwj .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 75%;
   vertical-align: 0.4em;
 }
 
-#hgictoepkf .gt_asterisk {
+#zvkdshnbwj .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#hgictoepkf .gt_indent_1 {
+#zvkdshnbwj .gt_indent_1 {
   text-indent: 5px;
 }
 
-#hgictoepkf .gt_indent_2 {
+#zvkdshnbwj .gt_indent_2 {
   text-indent: 10px;
 }
 
-#hgictoepkf .gt_indent_3 {
+#zvkdshnbwj .gt_indent_3 {
   text-indent: 15px;
 }
 
-#hgictoepkf .gt_indent_4 {
+#zvkdshnbwj .gt_indent_4 {
   text-indent: 20px;
 }
 
-#hgictoepkf .gt_indent_5 {
+#zvkdshnbwj .gt_indent_5 {
   text-indent: 25px;
 }
 </style>
@@ -1233,12 +1236,12 @@ Pr(Y = 1 | X) = logit^{-1}(X) = \frac{e^X}{1 + e^X}
   </thead>
   <tbody class="gt_table_body">
     <tr><td class="gt_row gt_left">(Intercept)</td>
-<td class="gt_row gt_center">-6.6</td>
-<td class="gt_row gt_center">-7.6, -5.8</td>
+<td class="gt_row gt_center">-5.7</td>
+<td class="gt_row gt_center">-6.4, -5.0</td>
 <td class="gt_row gt_center">&lt;0.001</td></tr>
     <tr><td class="gt_row gt_left">x</td>
-<td class="gt_row gt_center">1.3</td>
-<td class="gt_row gt_center">1.2, 1.5</td>
+<td class="gt_row gt_center">1.1</td>
+<td class="gt_row gt_center">1.0, 1.3</td>
 <td class="gt_row gt_center">&lt;0.001</td></tr>
   </tbody>
   
@@ -1302,12 +1305,12 @@ Pr(Y = 1|X) = \Phi(X\beta)
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl_regression</span>(m_pr, <span class="at">intercept =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
-<div id="qoiyrxelet" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="nxkxsahetc" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#qoiyrxelet .gt_table {
+#nxkxsahetc .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -1332,7 +1335,7 @@ Pr(Y = 1|X) = \Phi(X\beta)
   border-left-color: #D3D3D3;
 }
 
-#qoiyrxelet .gt_heading {
+#nxkxsahetc .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1344,7 +1347,7 @@ Pr(Y = 1|X) = \Phi(X\beta)
   border-right-color: #D3D3D3;
 }
 
-#qoiyrxelet .gt_title {
+#nxkxsahetc .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1356,7 +1359,7 @@ Pr(Y = 1|X) = \Phi(X\beta)
   border-bottom-width: 0;
 }
 
-#qoiyrxelet .gt_subtitle {
+#nxkxsahetc .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1368,13 +1371,13 @@ Pr(Y = 1|X) = \Phi(X\beta)
   border-top-width: 0;
 }
 
-#qoiyrxelet .gt_bottom_border {
+#nxkxsahetc .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#qoiyrxelet .gt_col_headings {
+#nxkxsahetc .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1389,7 +1392,7 @@ Pr(Y = 1|X) = \Phi(X\beta)
   border-right-color: #D3D3D3;
 }
 
-#qoiyrxelet .gt_col_heading {
+#nxkxsahetc .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1409,7 +1412,7 @@ Pr(Y = 1|X) = \Phi(X\beta)
   overflow-x: hidden;
 }
 
-#qoiyrxelet .gt_column_spanner_outer {
+#nxkxsahetc .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1421,15 +1424,15 @@ Pr(Y = 1|X) = \Phi(X\beta)
   padding-right: 4px;
 }
 
-#qoiyrxelet .gt_column_spanner_outer:first-child {
+#nxkxsahetc .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#qoiyrxelet .gt_column_spanner_outer:last-child {
+#nxkxsahetc .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#qoiyrxelet .gt_column_spanner {
+#nxkxsahetc .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1441,7 +1444,7 @@ Pr(Y = 1|X) = \Phi(X\beta)
   width: 100%;
 }
 
-#qoiyrxelet .gt_group_heading {
+#nxkxsahetc .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1466,7 +1469,7 @@ Pr(Y = 1|X) = \Phi(X\beta)
   vertical-align: middle;
 }
 
-#qoiyrxelet .gt_empty_group_heading {
+#nxkxsahetc .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1481,15 +1484,15 @@ Pr(Y = 1|X) = \Phi(X\beta)
   vertical-align: middle;
 }
 
-#qoiyrxelet .gt_from_md > :first-child {
+#nxkxsahetc .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#qoiyrxelet .gt_from_md > :last-child {
+#nxkxsahetc .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#qoiyrxelet .gt_row {
+#nxkxsahetc .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1508,7 +1511,7 @@ Pr(Y = 1|X) = \Phi(X\beta)
   overflow-x: hidden;
 }
 
-#qoiyrxelet .gt_stub {
+#nxkxsahetc .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1521,7 +1524,7 @@ Pr(Y = 1|X) = \Phi(X\beta)
   padding-right: 5px;
 }
 
-#qoiyrxelet .gt_stub_row_group {
+#nxkxsahetc .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1535,11 +1538,11 @@ Pr(Y = 1|X) = \Phi(X\beta)
   vertical-align: top;
 }
 
-#qoiyrxelet .gt_row_group_first td {
+#nxkxsahetc .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#qoiyrxelet .gt_summary_row {
+#nxkxsahetc .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1549,16 +1552,16 @@ Pr(Y = 1|X) = \Phi(X\beta)
   padding-right: 5px;
 }
 
-#qoiyrxelet .gt_first_summary_row {
+#nxkxsahetc .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#qoiyrxelet .gt_first_summary_row.thick {
+#nxkxsahetc .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#qoiyrxelet .gt_last_summary_row {
+#nxkxsahetc .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1568,7 +1571,7 @@ Pr(Y = 1|X) = \Phi(X\beta)
   border-bottom-color: #D3D3D3;
 }
 
-#qoiyrxelet .gt_grand_summary_row {
+#nxkxsahetc .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1578,7 +1581,7 @@ Pr(Y = 1|X) = \Phi(X\beta)
   padding-right: 5px;
 }
 
-#qoiyrxelet .gt_first_grand_summary_row {
+#nxkxsahetc .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1588,11 +1591,11 @@ Pr(Y = 1|X) = \Phi(X\beta)
   border-top-color: #D3D3D3;
 }
 
-#qoiyrxelet .gt_striped {
+#nxkxsahetc .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#qoiyrxelet .gt_table_body {
+#nxkxsahetc .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1601,7 +1604,7 @@ Pr(Y = 1|X) = \Phi(X\beta)
   border-bottom-color: #D3D3D3;
 }
 
-#qoiyrxelet .gt_footnotes {
+#nxkxsahetc .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1615,7 +1618,7 @@ Pr(Y = 1|X) = \Phi(X\beta)
   border-right-color: #D3D3D3;
 }
 
-#qoiyrxelet .gt_footnote {
+#nxkxsahetc .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-left: 4px;
@@ -1624,7 +1627,7 @@ Pr(Y = 1|X) = \Phi(X\beta)
   padding-right: 5px;
 }
 
-#qoiyrxelet .gt_sourcenotes {
+#nxkxsahetc .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1638,7 +1641,7 @@ Pr(Y = 1|X) = \Phi(X\beta)
   border-right-color: #D3D3D3;
 }
 
-#qoiyrxelet .gt_sourcenote {
+#nxkxsahetc .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1646,64 +1649,64 @@ Pr(Y = 1|X) = \Phi(X\beta)
   padding-right: 5px;
 }
 
-#qoiyrxelet .gt_left {
+#nxkxsahetc .gt_left {
   text-align: left;
 }
 
-#qoiyrxelet .gt_center {
+#nxkxsahetc .gt_center {
   text-align: center;
 }
 
-#qoiyrxelet .gt_right {
+#nxkxsahetc .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#qoiyrxelet .gt_font_normal {
+#nxkxsahetc .gt_font_normal {
   font-weight: normal;
 }
 
-#qoiyrxelet .gt_font_bold {
+#nxkxsahetc .gt_font_bold {
   font-weight: bold;
 }
 
-#qoiyrxelet .gt_font_italic {
+#nxkxsahetc .gt_font_italic {
   font-style: italic;
 }
 
-#qoiyrxelet .gt_super {
+#nxkxsahetc .gt_super {
   font-size: 65%;
 }
 
-#qoiyrxelet .gt_footnote_marks {
+#nxkxsahetc .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 75%;
   vertical-align: 0.4em;
 }
 
-#qoiyrxelet .gt_asterisk {
+#nxkxsahetc .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#qoiyrxelet .gt_indent_1 {
+#nxkxsahetc .gt_indent_1 {
   text-indent: 5px;
 }
 
-#qoiyrxelet .gt_indent_2 {
+#nxkxsahetc .gt_indent_2 {
   text-indent: 10px;
 }
 
-#qoiyrxelet .gt_indent_3 {
+#nxkxsahetc .gt_indent_3 {
   text-indent: 15px;
 }
 
-#qoiyrxelet .gt_indent_4 {
+#nxkxsahetc .gt_indent_4 {
   text-indent: 20px;
 }
 
-#qoiyrxelet .gt_indent_5 {
+#nxkxsahetc .gt_indent_5 {
   text-indent: 25px;
 }
 </style>
@@ -1719,12 +1722,12 @@ Pr(Y = 1|X) = \Phi(X\beta)
   </thead>
   <tbody class="gt_table_body">
     <tr><td class="gt_row gt_left">(Intercept)</td>
-<td class="gt_row gt_center">-3.2</td>
-<td class="gt_row gt_center">-3.6, -2.9</td>
+<td class="gt_row gt_center">-2.8</td>
+<td class="gt_row gt_center">-3.2, -2.6</td>
 <td class="gt_row gt_center">&lt;0.001</td></tr>
     <tr><td class="gt_row gt_left">x</td>
-<td class="gt_row gt_center">0.63</td>
-<td class="gt_row gt_center">0.57, 0.70</td>
+<td class="gt_row gt_center">0.55</td>
+<td class="gt_row gt_center">0.50, 0.61</td>
 <td class="gt_row gt_center">&lt;0.001</td></tr>
   </tbody>
   
