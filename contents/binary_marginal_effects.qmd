@@ -174,6 +174,37 @@ augment(m, newdata = tibble(x = seq(1, 10, 0.1)), type.predict = "response") |>
   labs(y = "Difference in predicted probability of success")
 ```
 
+To illustrate, let's look at the effect on the probability of success of moving from $x = 2$ to $x = 3$ compared to the effect of moving from $x = 4$ to $x = 5$: 
+
+```{r, include = FALSE}
+m0 <- glm(y ~ x, data = df, family = binomial(link = "logit"))
+
+x_2_pred <- augment(m0, newdata = tibble(x = 2), type.predict = "response") |> pull(.fitted)
+x_3_pred <- augment(m0, newdata = tibble(x = 3), type.predict = "response") |> pull(.fitted)
+x_4_pred <- augment(m0, newdata = tibble(x = 4), type.predict = "response") |> pull(.fitted)
+x_5_pred <- augment(m0, newdata = tibble(x = 5), type.predict = "response") |> pull(.fitted)
+
+```
+
+```{r, echo = FALSE}
+ggplot(df, aes(x = x, y = y)) + 
+  geom_point(alpha = 0.5) + 
+  geom_smooth(method = "glm", se = FALSE, method.args = list(family = binomial(link="logit"))) + 
+  geom_vline(xintercept = 2, colour = "lightblue") + 
+  geom_hline(yintercept = x_2_pred, colour = "lightblue", size = 1) + 
+  geom_vline(xintercept = 3, colour = "darkblue") + 
+  geom_hline(yintercept = x_3_pred, colour = "darkblue", size = 1) +
+  geom_vline(xintercept = 4, colour = "pink") + 
+  geom_hline(yintercept = x_4_pred, colour = "pink", size = 1) +
+  geom_vline(xintercept = 5, colour = "red") + 
+  geom_hline(yintercept = x_5_pred, colour = "red", size = 1) +
+  theme_minimal()
+```
+
+Moving from $x = 2$ (highlighted in light blue) to $x = 3$ (highlighted in dark blue) increases the probability of success by `r round(x_3_pred - x_2_pred, 3)`, from `r round(x_2_pred, 3)` to `r round(x_3_pred, 3)`. Moving *the same interval* of one unit from $x = 4$ (highlighted in pink) to $x = 5$ (highlighted in red) increases the probability of success by `r round(x_5_pred - x_4_pred, 3)`, from `r round(x_4_pred, 3)` to `r round(x_5_pred, 3)`. That's a `r round((x_5_pred - x_4_pred) / (x_3_pred - x_2_pred), 3)` times increase in the effect of a one unit change in $x$. 
+
+Therefore, to measure the effect of moving from one value of $x$ to another in a non-linear model, we need to know which values of $x$ we are moving between. 
+
 We will look at logit and probit in turn. 
 
 ### Logistic Regression
