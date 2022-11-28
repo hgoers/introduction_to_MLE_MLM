@@ -163,7 +163,20 @@ ggplot(df, aes(x = x, y = y)) +
   theme_minimal()
 ```
 
-We will look at each of these in turn. 
+In fact, these marginal effects are bell-shaped: 
+
+```{r, echo = FALSE}
+m <- glm(y ~ x, data = df, family = binomial(link = "logit"))
+
+augment(m, newdata = tibble(x = seq(1, 10, 0.1)), type.predict = "response") |> 
+  mutate(diff = .fitted - lag(.fitted)) |> 
+  ggplot(aes(x = x, y = diff)) + 
+  geom_line() + 
+  theme_minimal() + 
+  labs(y = "Difference in predicted probability of success")
+```
+
+We will look at logit and probit in turn. 
 
 ### Logistic Regression
 
@@ -331,5 +344,63 @@ The effect change is not constant. Moving from $close = 0$ to $close = 1$ decrea
 
 These marginal effects are really small! Does changing the registration closing date in a state have a substantial impact on the likelihood that an individual will vote? We will discuss interpreting substantive significance in the next chapter.  
 
+### Probit Regression
 
+Next, let’s fit a probit model, focusing only on the effect of `close` on `vote`:
 
+```{r}
+m3 <- glm(vote ~ close, data = voters, family = binomial(link = "probit"))
+
+tbl_regression(m3, intercept = T)
+```
+
+#### Interpreting the coefficients
+
+The regression coefficients presented above give the change in the z-score or probit index for a one unit change in the predictor. These can be interpreted as the change in the probability of success for a one unit change in the predictor. Unlike logit, we get straight to the point. 
+
+#### Interpreting the intercept 
+
+> TODO
+
+#### Predicting outcomes
+
+Using `augment::broom()`, we can easily produce our predicted probabilities for each of the plausible values of `close`:
+
+```{r}
+pred_m3 <- augment(m3, newdata = tibble(close = 0:30), type.predict = "response")
+pred_m3
+```
+
+Visually: 
+
+```{r}
+ggplot(pred_m3, aes(x = close, y = .fitted * 100)) + 
+  geom_line() + 
+  theme_minimal() + 
+  labs(x = "Closing date (days)",
+       y = "Predicted probability of voting (%)")
+```
+
+#### Marginal effects
+
+Finally, let’s look at the difference in the predicted probability of voting by changing the closing date by one day for all plausible values of `close`:
+
+```{r}
+me_m3 <- pred_m3 |> 
+  arrange(close) |> 
+  mutate(diff = .fitted - lag(.fitted))
+
+me_m3
+```
+
+```{r}
+ggplot(me_m3, aes(x = close, y = diff * 100)) + 
+  geom_line() + 
+  geom_hline(yintercept = 0, colour = "darkgrey") + 
+  theme_minimal() + 
+  scale_y_continuous(limits = c(-0.3, 0.3)) + 
+  labs(x = "Closing date (days)",
+       y = "Difference in predicted probability of voting (%)")
+```
+
+As with our logit model, the effect change is not constant. Moving from $close = 0$ to $close = 1$ decreases the predicted probability that an individual will vote by `r me_m3 |> filter(close == 1) |> pull(diff) |> abs() |> percent(accuracy = 0.001)`. Moving from $close = 20$ to $close = 21$ decreases the predicted probability that an individual will vote by `r me_m3 |> filter(close == 21) |> pull(diff) |> abs() |> percent(accuracy = 0.001)`.
