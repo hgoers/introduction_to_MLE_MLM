@@ -39,16 +39,22 @@ df <- tibble(x = runif(1000, 0, 10)) |>
 
 Let's explore our data. First, we need to load it in. I will use `rio::import()`.
 
+> `rio` allows you to import or export many different file types with a single command. This makes your code robust to changes in file types: if your data source changes the file type for your data, your code will not break. I recommend it for interactive coding.[^1] The package documentation can be found [here](https://www.rdocumentation.org/packages/rio/versions/0.5.29). 
+
+[^1]: `rio` has a lot of dependencies and can, therefore, make your packages very heavy.
+
 ```{r}
 voters_raw <- import("/Users/harrietgoers/Documents/GVPT729A/class_sets/data/cps00for729a.dta")
 ```
+
+This dataset contains individual-level survey data of US adults. It includes: information on whether they voted (`vote`); the number of days prior to election day their state closes registration (`close`); their level of education recorded in seven, ordered categories (`edu7cat`); and whether or not they are a homeowner (`homeown`). 
 
 Next, we need to clean this data up: 
 
 ```{r}
 voters <- voters_raw |> 
   transmute(vote = factor(vote, levels = c(0, 1), labels = c("Did not vote", "Voted")), 
-            close, 
+            close = as.integer(close), 
             edu7cat = factor(edu7cat), 
             homeown = factor(homeown, levels = c(0, 1), labels = c("Not homeowner", "Homeowner"))) |> 
   labelled::set_variable_labels(vote = "Voted", close = "Registration closing", edu7cat = "Education level", homeown = "Homeownership") |> 
@@ -57,7 +63,11 @@ voters <- voters_raw |>
 head(voters)
 ```
 
-> If your categorical variables are stored as numeric data in your dataset, your model will treat them as continuous numeric variables. It will not exclude a base category. This will cause significant problems with your model. Always convert categorical variables to factors. 
+Note that we have removed any observations with missing values. 
+
+> If your categorical variables are stored as numeric data in your dataset, your model will treat them as continuous numeric variables. It will not exclude a base category. This will cause significant problems with your model. Always convert categorical variables to factors.[^2]
+
+[^2]: If you really must keep them as numbers, convert them to integers. 
 
 Now, let's look at a summary of our data using `skimr::skim()`:
 
@@ -65,15 +75,85 @@ Now, let's look at a summary of our data using `skimr::skim()`:
 skim(voters)
 ```
 
-Our dataset contains `r nrow(voters) |> comma()` observations and `r length(voters)` variables. Each observation represents an individual. For each individual, we have information on: whether or not they voted (`vote`); the number of days before the election that voter registration closes in their state (`close`); their level of education, broken down into seven categories (`edu7cat`); and whether or not they own a home (`homeown`). 
-
-Note that we have removed any observations with missing values. 
+Our dataset contains `r nrow(voters) |> comma()` observations and `r length(voters)` variables. Of those `r nrow(voters) |> comma()` individuals, `r voters |> count(vote) |> mutate(prop = n / sum(n)) |> filter(vote == "Voted") |> pull(prop) |> percent()` voted.
 
 ## Introduction
 
 Our goal is to make inferences from the sample to the population about how changes in our independent variable of interest, $x$, influences the probability of success in our outcome of interest, $y$. We can calculate this effect for each known value of $x$, or the **marginal effect**. We can also calculate this effect for a meaningful change in the value of $x$, or the **substantive effect**. We will discuss this in the next section. 
 
-The marginal effect is the effect of a given $x_i$ on $y_i$. In linear models, this effect is constant. However, both logit and probit models are curved. Therefore, the effect of $x_i$ on $y_i$ depends on your $x_i$. As demonstrated in the figure below, the steepest change for both the logit (blue) and probit (red) models occurs around the middle values of $x_i$. 
+The marginal effect measures the change in the probability of success gained (or lost) from changing $x_i$ by one unit. In our example, we want to understand the marginal effect of `close`, or how increasing the number of days prior to an election registration closes by one impacts the likelihood that an individual will vote.  
+
+## Linear probability models
+
+In linear models, this effect is constant. To illustrate, let's fit a linear probability model to our voting data. We will focus only on the effect of `close` on `vote` for now. 
+
+> Note that `lm()` will not allow us to fit a linear model to binary data!
+
+```{r}
+voters_linear <- mutate(voters, vote = as.integer(vote) - 1)
+
+m1 <- lm(vote ~ close, data = voters_linear)
+
+tbl_regression(m1, intercept = T)
+```
+
+```{r}
+ggplot(voters_linear, aes(x = close, y = vote)) + 
+  geom_point() +
+  geom_smooth(method = "lm", se = F) + 
+  theme_minimal()
+```
+
+#### Interpreting the coefficients
+
+This model suggests that increasing the registration closing day by one decreases the likelihood than individual will vote by `r tidy(m1) |> filter(term == "close") |> pull(estimate) |> abs() |> percent(accuracy = 0.001)`, on average. However, this result is not statistically significant. A individual registered in a state with election day registration ($close = 0$) will vote `r tidy(m1) |> filter(term == "(Intercept)") |> pull(estimate) |> percent()` of the time, on average.
+
+The important take away from this is that the marginal effect of `close` on `vote` is constant across all values of `close`. If your state changes from election day registration to closing registration one day prior to election day, your probability of voting decreases `r tidy(m1) |> filter(term == "close") |> pull(estimate) |> abs() |> percent(accuracy = 0.001)`. Similarly, if your state changes from 20 days prior to 21 days prior to election day, your probability of voting decreases `r tidy(m1) |> filter(term == "close") |> pull(estimate) |> abs() |> percent(accuracy = 0.001)`.
+
+#### Predicting outcomes using your LPM
+
+Let's take a closer look at this. We can use `broom::augment()` to see what our model predicts the probability of an individual to vote to be for each of the plausible closing dates (0 to 30 days prior to an election):
+
+```{r}
+pred_m1 <- augment(m1, newdata = tibble(close = 0:30), type.predict = "response")
+head(pred_m1)
+```
+
+```{r}
+ggplot(pred_m1, aes(x = close, y = .fitted * 100)) + 
+  geom_line() + 
+  theme_minimal() + 
+  labs(x = "Closing date (days)",
+       y = "Predicted probability of voting (%)")
+```
+
+#### Marginal effects
+
+Finally, let's look at the difference in the predicted probability of voting by chnaging the closing date by one day for all plausible values of `close`:
+
+```{r}
+me_m1 <- pred_m1 |> 
+  arrange(close) |> 
+  mutate(diff = .fitted - lag(.fitted))
+
+head(me_m1)
+```
+
+```{r}
+ggplot(me_m1, aes(x = close, y = diff * 100)) + 
+  geom_line() + 
+  geom_hline(yintercept = 0, colour = "darkgrey") + 
+  theme_minimal() + 
+  scale_y_continuous(limits = c(-0.3, 0.3)) + 
+  labs(x = "Closing date (days)",
+       y = "Difference in predicted probability of voting (%)")
+```
+
+As expected, this difference is constant. It is, in fact, the `close` coefficient. **In LPMs, the variable coefficients are their marginal effects**. 
+
+## Latent variable models
+
+Both logit and probit models are curved. Therefore, the effect of a one-unit increase in $x_i$ on the probability that $Y=1$ is not constant. In fact, the marginal effect of a one-unit change in $x_i$ depends on the starting value of $x_i$. As demonstrated in the figure below, the steepest change for both the logit (blue) and probit (red) models occurs around the middle values of $x$. 
 
 ```{r, echo = FALSE}
 ggplot(df, aes(x = x, y = y)) + 
@@ -83,113 +163,90 @@ ggplot(df, aes(x = x, y = y)) +
   theme_minimal()
 ```
 
-Let's take a look at the effect of setting the closing registration date 20 days prior to the election day. We will start with a logistic regression.  
+We will look at each of these in turn. 
 
-## Logistic Regression
+### Logistic Regression
 
-First, let's fit our model: 
+First, let's fit our logit model, focusing only on the effect of `close` on `vote`: 
 
 ```{r}
-m1 <- glm(vote ~ close + edu7cat + homeown, data = voters, family = binomial(link = "logit"))
+m2 <- glm(vote ~ close, data = voters, family = binomial(link = "logit"))
 
-tbl_regression(m1, intercept = T)
+tbl_regression(m2, intercept = T)
 ```
 
-### Interpreting the coefficients
+#### Interpreting the coefficients
 
-These coefficients are difficult to interpret because the model is non-linear. With linear regression, we can interpret the coefficient of $x_i$ to be the effect of a one unit change in $x_i$ on the expected value of $y$. This effect is the same for every value of $x_i$. 
+The coefficients presented above are **log odds ratios**. We can easily interpret their statistical significance and their sign. For example, we know that our independent variable of interest, `close`, is not statistically significant ($p = `r tidy(m2) |> filter(term == "close") |> pull(p.value) |> round(3)`$). We also know that its effect on an individual's decision to vote is negative: as days before an election the date of voter registration closes increases, the likelihood that an individual will vote decreases. 
 
-With non-linear logistic regression, we need to choose where we want to evaluate a change in $x_i$ on $y$. We also need to transform our coefficients to make them more interpretable. We will discuss that shortly. 
+Remember that logit (and probit) models are simply transformed linear models. We take our linear model of the relationship between `close` and `vote` and reshape it to better predict probabilities (bound it between 0 and 1, and reshape it to reflect varying effects of changes of $x$ on $y$). We can reshape these coefficients to make them more interpretable. 
 
-The coefficients presented above are log odds ratios. We can interpret their statistical significance and their sign. For example, we know that our independent variable of interest, `close`, is not statistically significant ($p = `r tidy(m1) |> filter(term == "close") |> pull(p.value) |> round(3)`$). We also know that its effect on an individual's decision to vote is negative: as days before an election the date of voter registration closes increases, the likelihood that an individual will vote decreases. We also know that a one day increase in the number of days prior to election day registration closes in a state is associated with a negative difference of `r tidy(m1) |> filter(term == "close") |> pull(estimate) |> round(2)` in the logit probability of voting. What do we mean by logit probability? Good question: this is not a very familiar way of thinking about probabilities. Let's transform this value into something more interpretable. 
+##### Odds ratios
 
-#### Predicted probabilities
+The regression coefficient provided above is a log odds ratio. Log-transformed variables are really hard to interpret. So, let's get rid of that log. The opposite operation to taking the logarithum of a number is to exponentiate it. To demonstrate: 
 
-We can use the inverse logit function to discover the predicted probability that an individual will vote for a given set of predictors. 
+```{r}
+tibble(x = 1:5,
+       log_x = log(x),
+       exp_log_x = exp(log_x))
+```
 
-$$
-Pr(Y = 1 | X) = \frac{e^{X\beta}}{1 + e^{X\beta}}
-$$
+So, exponentiating the log odd ratio will get us the **odds ratio**. The odds ratio is much easier to interpret. If the probability of success of an outcome is $p$ and, therefore, the probability of failure is  $1-p$, the the odds of success is $\frac{p}{1-p}$. Now, dividing two odds by each other gives you their odds ratio. For example, if two outcomes have the odds $\frac{p_1}{1-p_1}$ and $\frac{p_2}{1-p_2}$, then these outcomes have an odds ratio of $\frac{\frac{p_1}{1-p_1}}{\frac{p_2}{1-p_2}}$.
 
-Holding all other values at their modes ($edu7cat = 4$ and $homeown = 1$), the probability that an individual will vote when $close = 20$ is: 
+This is particularly useful for comparing the probability of success and failure for a given value of $x_i$. When the odds ratio is 1, the odds of success are the same as the odds of failure ($\frac{0.5}{0.5} = 1$). When the odds ratio is greater than 1, the odds of success are greater than the odds of failure (for example, $\frac{0.8}{0.2} = 4$). Where the odds ratio of success is four, the odds of success are four times higher than the odds of failure. 
 
-$$
-Pr(Y = 1 | close = 20) = \frac{e^{\beta_0 - \beta_{close} * 20 + \beta_{edu7cat4} * 1 + \beta_{homeown} * 1}}{1 + e^{\beta_0 - \beta_{close} * 20 + \beta_{edu7cat4} * 1 + \beta_{homeown} * 1}} = \frac{e^{-0.81 - 0.01 * 20 + 0.51 + 0.83}}{1 + e^{-0.81 - 0.01 * 20 + 0.51 + 0.83}} = \frac{e^{0.33}}{1 + e^{0.33}} = 0.582
-$$
-
-> Remember, `edu7cat` is a categorical variable. We need to convert this variable into a series of dummy variables. 
-
-Therefore, a person with an education level 4 who owns a home and lives in a state in which registration closes 20 days prior to election day is 58.2 percent likely to vote.
-
-#### Odds ratios
-
-You can also interpret the coefficient in terms of its odds ratio. If the probability of success of an outcome is $p$ (calculated using the function above) and, therefore, the probability of failure is  $1-p$, the the odds of success is $\frac{p}{1-p}$. Now, dividing two odds by each other gives you their odds ratio. For example, if two outcomes have the odds $\frac{p_1}{1-p_1}$ and $\frac{p_2}{1-p_2}$, then these outcomes have an odds ratio of $\frac{\frac{p_1}{1-p_1}}{\frac{p_2}{1-p_2}}$.
-
-This is particularly useful for comparing the probability of success and failure for a given value of $x_i$. When the odds ratio is 1, the odds of success are the same as the odds of failure ($\frac{0.5}{0.5} = 1$). When the odds ratio is greater than 1, the odds of success are greater than the odds of failure (for example, $\frac{0.8}{0.2} = 4$). 
-
-To get the odds ratio from the coefficients presented above, we exponentiate them: 
+Getting back to our model, the odds ratio that an individual will vote is: 
 
 $$
-e^{X\beta}
+e^{-0.01} = 0.99
 $$
 
-> Exponentiation is the opposite operation to log transformation. So, to get from the log odds ratio presented in the table above to the odds ratio, we simply need to get rid of the log (leaving the odds ratio).
-
-The coefficient for `homeown`, $\beta_{homeown}$, is the log odds ratio between homeowners and non-homeowners. To get the odds ratio for homeowners, we exponentiate that log odds ratio:
-
-$$
-e^{\beta_{homeown}} = e^{0.83} = 2.29
-$$
-
-This means that a homeowner is 2.29 times more likely to vote than a non-homeowner (our reference category), holding all other variables a fixed values.
-
-> To get the exponential of a number in R, use `exp()`. 
-
-For education level 5: 
-
-$$
-e^{\beta_{edu7cat5}} = e^{1.2} = 3.32
-$$
-
-This means that a person with a level of education in category 5 is 3.32 times more likely to vote than someone with a level of education in category 1 (our reference category), holding all other variables a fixed values. You can calculate this for any education level. The interpretation should always be in reference to your reference category. 
-
-For `close`: 
-
-$$
-e^{\beta_{close}} = e^{-0.01} = 0.99
-$$
-
-Holding `homeown` and `edu7cat` at fixed values, we will see a 1 percentage point decrease ($1 - 0.99$) in the probability that an individual will vote for every one day increase in the days before an election registration closes. 
-
-##### Calculating the odds ratio
+So, increasing the closing date by one day makes the decreases the odds that an individual will vote by 0.01 (or $1 - 0.99$).   
 
 Happily, `gtsummary::tbl_regression()` can easily present these results for us: 
 
 ```{r}
-tbl_regression(m1, intercept = T, exponentiate = T)
+tbl_regression(m2, intercept = T, exponentiate = T)
 ```
 
-We can also get these results programmatically using `broom::tidy()`:
+And we can also get these results programmatically using `broom::tidy()`:
 
 ```{r}
-tidy(m1, exponentiate = T)
+tidy(m2, exponentiate = T)
 ```
 
-Finally, we can visualise these results using `sjPlot::plot_model()`: 
+##### Predicted probabilities
 
-```{r}
-plot_model(m1, sort.est = T, show.values = T, value.offset = .3)
-```
+Odds ratios are certainly easier to interpret than log odds ratios, but they are still a bit awkward. It is easier again to discuss the effects of changing our independent variables of interest in terms of probabilities, rather than odds. 
 
-### Interpreting the intercept
-
-As usual, the intercept should be interpreted as the expected value when all independent variables are set to 0. 
+Remember, the odds ratio is simply the odds of success divided by the odds of failure:
 
 $$
-Pr(Y = 1 | X) = log(\frac{p}{1 - p}) = -0.81
+OR = \frac{\frac{p}{1-p}}{\frac{1-p}{p}}
 $$
 
-This is simple to interpret in terms of the probability of success. Remember:
+We are interested in getting the odds of success ($p$). To get this: 
+
+$$
+p = \frac{OR}{1 + OR}
+$$
+
+More generally: 
+
+$$
+Pr(Y = 1|X) = \frac{e^{X\beta}}{1 + e^{X\beta}}
+$$
+
+For our simple model, this is: 
+
+$$
+Pr(vote = 1 | close) = \frac{e^{0.872 - 0.01close + \epsilon}}{1 + e^{0.872 - 0.01close + \epsilon}}
+$$
+Where $vote = 0.872 - 0.01 close + \epsilon$ is our logit model. Critically, the predicted probability still includes `close`. **We need to provide a value for `close` to calculate a predicted probability.** 
+
+#### Interpreting the intercept
+
+As usual, the intercept should be interpreted as the expected value when all independent variables are set to 0. This is simple to interpret in terms of the probability of success. Remember:
 
 $$
 Pr(Y = 1 | X) = \frac{e^{X\beta}}{1 + e^{X\beta}}
@@ -198,7 +255,81 @@ $$
 Therefore, for our voter model: 
 
 $$
-\frac{e^{\beta_0}}{1 + e^{\beta_0}} = \frac{e^{-0.81}}{1 + e^{-0.81}} = \frac{0.445}{1.445} = 0.308
+\frac{e^{\beta_0}}{1 + e^{\beta_0}} = \frac{e^{0.87}}{1 + e^{0.87}} = \frac{2.39}{3.39} = 0.705
 $$
 
-The probability that an individual in a state with election day registration, who has an education level of category 1, and who does not own a house is 0.308 or 30.8%. 
+The probability that an individual in a state with election day registration will vote is 70.5%, on average. 
+
+#### Predicting outcomes
+
+You now have a couple of different options in terms of how you present and interpret your predicted outcomes from your logit model: log odds ratios, odds ratios, and predicted probability. 
+
+I find predicted probabilities the easiest to interpret and with which to work. Using `augment::broom()`, we can easily produce our predicted probabilities for each of the plausible values of `close`: 
+
+```{r}
+pred_m2 <- augment(m2, newdata = tibble(close = 0:30), type.predict = "response")
+pred_m2
+```
+
+All this function is doing, is calculating $Pr(Y = 1 | X) = \frac{e^{X\beta}}{1 + e^{X\beta}}$ for each of these values of `close`. You can check this yourself:
+
+```{r}
+pred_prob_logit <- function(close) {
+  
+  intercept <- tidy(m2) |> 
+    filter(term == "(Intercept)") |> 
+    pull(estimate)
+
+  beta_close <- tidy(m2) |> 
+    filter(term == "close") |> 
+    pull(estimate)
+
+  exp(intercept + (beta_close * close)) / (1 + exp(intercept + (beta_close * close)))
+  
+}
+
+# Calculate the predicted probability an individual will vote when closing date is 
+# three days prior to the election
+pred_prob_logit(3)
+```
+
+Visually: 
+
+```{r}
+ggplot(pred_m2, aes(x = close, y = .fitted * 100)) + 
+  geom_line() + 
+  theme_minimal() + 
+  labs(x = "Closing date (days)",
+       y = "Predicted probability of voting (%)")
+```
+
+Okay, so this looks linear but I promise it is not! We will get to that shortly. This graph shows the predicted probability that an individual will vote for each plausible closing date. 
+
+### Marginal effects
+
+Finally, let’s look at the difference in the predicted probability of voting by changing the closing date by one day for all plausible values of `close`:
+
+```{r}
+me_m2 <- pred_m2 |> 
+  arrange(close) |> 
+  mutate(diff = .fitted - lag(.fitted))
+
+head(me_m2)
+```
+
+```{r}
+ggplot(me_m2, aes(x = close, y = diff * 100)) + 
+  geom_line() + 
+  geom_hline(yintercept = 0, colour = "darkgrey") + 
+  theme_minimal() + 
+  scale_y_continuous(limits = c(-0.3, 0.3)) + 
+  labs(x = "Closing date (days)",
+       y = "Difference in predicted probability of voting (%)")
+```
+
+The effect change is not constant. Moving from $close = 0$ to $close = 1$ decreases the predicted probability that an individual will vote by `r me_m2 |> filter(close == 1) |> pull(diff) |> abs() |> percent(accuracy = 0.001)`. Moving from $close = 20$ to $close = 21$ decreases the predicted probability that an individual will vote by `r me_m2 |> filter(close == 21) |> pull(diff) |> abs() |> percent(accuracy = 0.001)`.
+
+These marginal effects are really small! Does changing the registration closing date in a state have a substantial impact on the likelihood that an individual will vote? We will discuss interpreting substantive significance in the next chapter.  
+
+
+
