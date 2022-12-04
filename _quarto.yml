@@ -20,14 +20,20 @@ website:
             - contents/binary_intro_binary.qmd
             - contents/binary_marginal_effects.qmd
             - contents/binary_substantive_effects.qmd
+        - section: "3+ ordered responses"
+          contents: 
+            - contents/ordered_intro.qmd
+            - contents/ordered_logistic.qmd
         - section: "3+ unordered responses"
           contents: 
             - contents/multinomial_intro.qmd
             - contents/multinomial_marginal_effects.qmd 
-        - section: "3+ ordered responses"
         - section: "Count responses"
           contents:
             - contents/count_intro.qmd
+        - section: "Duration models"
+          contents:
+            - contents/event_intro.qmd
 
 format:
   html:

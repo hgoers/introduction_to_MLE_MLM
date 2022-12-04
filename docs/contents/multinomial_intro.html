@@ -189,12 +189,32 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">3+ unordered responses</a>
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">3+ ordered responses</a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../contents/ordered_intro.html" class="sidebar-item-text sidebar-link">Introduction to Ordered Models</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../contents/ordered_logistic.html" class="sidebar-item-text sidebar-link">Ordered logistic regression</a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">3+ unordered responses</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../contents/multinomial_intro.html" class="sidebar-item-text sidebar-link active">Introduction to Multinomial Models</a>
@@ -208,9 +228,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
-      <span class="sidebar-item-text sidebar-link text-start">3+ ordered responses</span>
-  </li>
-        <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">Count responses</a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">
@@ -221,6 +238,21 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../contents/count_intro.html" class="sidebar-item-text sidebar-link">Introduction to Count Models</a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="true">Duration models</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../contents/event_intro.html" class="sidebar-item-text sidebar-link">Introduction to Duration Models</a>
   </div>
 </li>
       </ul>
@@ -607,12 +639,12 @@ converged</code></pre>
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl_regression</span>(m1, <span class="at">exponentiate =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
-<div id="btgbbkoups" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="lxkntraqmo" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#btgbbkoups .gt_table {
+#lxkntraqmo .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -637,7 +669,7 @@ converged</code></pre>
   border-left-color: #D3D3D3;
 }
 
-#btgbbkoups .gt_heading {
+#lxkntraqmo .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -649,7 +681,7 @@ converged</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#btgbbkoups .gt_title {
+#lxkntraqmo .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -661,7 +693,7 @@ converged</code></pre>
   border-bottom-width: 0;
 }
 
-#btgbbkoups .gt_subtitle {
+#lxkntraqmo .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -673,13 +705,13 @@ converged</code></pre>
   border-top-width: 0;
 }
 
-#btgbbkoups .gt_bottom_border {
+#lxkntraqmo .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#btgbbkoups .gt_col_headings {
+#lxkntraqmo .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -694,7 +726,7 @@ converged</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#btgbbkoups .gt_col_heading {
+#lxkntraqmo .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -714,7 +746,7 @@ converged</code></pre>
   overflow-x: hidden;
 }
 
-#btgbbkoups .gt_column_spanner_outer {
+#lxkntraqmo .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -726,15 +758,15 @@ converged</code></pre>
   padding-right: 4px;
 }
 
-#btgbbkoups .gt_column_spanner_outer:first-child {
+#lxkntraqmo .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#btgbbkoups .gt_column_spanner_outer:last-child {
+#lxkntraqmo .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#btgbbkoups .gt_column_spanner {
+#lxkntraqmo .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -746,7 +778,7 @@ converged</code></pre>
   width: 100%;
 }
 
-#btgbbkoups .gt_group_heading {
+#lxkntraqmo .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -771,7 +803,7 @@ converged</code></pre>
   vertical-align: middle;
 }
 
-#btgbbkoups .gt_empty_group_heading {
+#lxkntraqmo .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -786,15 +818,15 @@ converged</code></pre>
   vertical-align: middle;
 }
 
-#btgbbkoups .gt_from_md > :first-child {
+#lxkntraqmo .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#btgbbkoups .gt_from_md > :last-child {
+#lxkntraqmo .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#btgbbkoups .gt_row {
+#lxkntraqmo .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -813,7 +845,7 @@ converged</code></pre>
   overflow-x: hidden;
 }
 
-#btgbbkoups .gt_stub {
+#lxkntraqmo .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -826,7 +858,7 @@ converged</code></pre>
   padding-right: 5px;
 }
 
-#btgbbkoups .gt_stub_row_group {
+#lxkntraqmo .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -840,11 +872,11 @@ converged</code></pre>
   vertical-align: top;
 }
 
-#btgbbkoups .gt_row_group_first td {
+#lxkntraqmo .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#btgbbkoups .gt_summary_row {
+#lxkntraqmo .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -854,16 +886,16 @@ converged</code></pre>
   padding-right: 5px;
 }
 
-#btgbbkoups .gt_first_summary_row {
+#lxkntraqmo .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#btgbbkoups .gt_first_summary_row.thick {
+#lxkntraqmo .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#btgbbkoups .gt_last_summary_row {
+#lxkntraqmo .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -873,7 +905,7 @@ converged</code></pre>
   border-bottom-color: #D3D3D3;
 }
 
-#btgbbkoups .gt_grand_summary_row {
+#lxkntraqmo .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -883,7 +915,7 @@ converged</code></pre>
   padding-right: 5px;
 }
 
-#btgbbkoups .gt_first_grand_summary_row {
+#lxkntraqmo .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -893,11 +925,11 @@ converged</code></pre>
   border-top-color: #D3D3D3;
 }
 
-#btgbbkoups .gt_striped {
+#lxkntraqmo .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#btgbbkoups .gt_table_body {
+#lxkntraqmo .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -906,7 +938,7 @@ converged</code></pre>
   border-bottom-color: #D3D3D3;
 }
 
-#btgbbkoups .gt_footnotes {
+#lxkntraqmo .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -920,7 +952,7 @@ converged</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#btgbbkoups .gt_footnote {
+#lxkntraqmo .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-left: 4px;
@@ -929,7 +961,7 @@ converged</code></pre>
   padding-right: 5px;
 }
 
-#btgbbkoups .gt_sourcenotes {
+#lxkntraqmo .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -943,7 +975,7 @@ converged</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#btgbbkoups .gt_sourcenote {
+#lxkntraqmo .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -951,64 +983,64 @@ converged</code></pre>
   padding-right: 5px;
 }
 
-#btgbbkoups .gt_left {
+#lxkntraqmo .gt_left {
   text-align: left;
 }
 
-#btgbbkoups .gt_center {
+#lxkntraqmo .gt_center {
   text-align: center;
 }
 
-#btgbbkoups .gt_right {
+#lxkntraqmo .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#btgbbkoups .gt_font_normal {
+#lxkntraqmo .gt_font_normal {
   font-weight: normal;
 }
 
-#btgbbkoups .gt_font_bold {
+#lxkntraqmo .gt_font_bold {
   font-weight: bold;
 }
 
-#btgbbkoups .gt_font_italic {
+#lxkntraqmo .gt_font_italic {
   font-style: italic;
 }
 
-#btgbbkoups .gt_super {
+#lxkntraqmo .gt_super {
   font-size: 65%;
 }
 
-#btgbbkoups .gt_footnote_marks {
+#lxkntraqmo .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 75%;
   vertical-align: 0.4em;
 }
 
-#btgbbkoups .gt_asterisk {
+#lxkntraqmo .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#btgbbkoups .gt_indent_1 {
+#lxkntraqmo .gt_indent_1 {
   text-indent: 5px;
 }
 
-#btgbbkoups .gt_indent_2 {
+#lxkntraqmo .gt_indent_2 {
   text-indent: 10px;
 }
 
-#btgbbkoups .gt_indent_3 {
+#lxkntraqmo .gt_indent_3 {
   text-indent: 15px;
 }
 
-#btgbbkoups .gt_indent_4 {
+#lxkntraqmo .gt_indent_4 {
   text-indent: 20px;
 }
 
-#btgbbkoups .gt_indent_5 {
+#lxkntraqmo .gt_indent_5 {
   text-indent: 25px;
 }
 </style>

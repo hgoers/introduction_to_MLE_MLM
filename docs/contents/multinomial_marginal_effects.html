@@ -189,12 +189,32 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">3+ unordered responses</a>
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">3+ ordered responses</a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../contents/ordered_intro.html" class="sidebar-item-text sidebar-link">Introduction to Ordered Models</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../contents/ordered_logistic.html" class="sidebar-item-text sidebar-link">Ordered logistic regression</a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">3+ unordered responses</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../contents/multinomial_intro.html" class="sidebar-item-text sidebar-link">Introduction to Multinomial Models</a>
@@ -208,9 +228,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
-      <span class="sidebar-item-text sidebar-link text-start">3+ ordered responses</span>
-  </li>
-        <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">Count responses</a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">
@@ -221,6 +238,21 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../contents/count_intro.html" class="sidebar-item-text sidebar-link">Introduction to Count Models</a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="true">Duration models</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../contents/event_intro.html" class="sidebar-item-text sidebar-link">Introduction to Duration Models</a>
   </div>
 </li>
       </ul>
@@ -243,8 +275,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <li><a href="#relative-risk-ratios" id="toc-relative-risk-ratios" class="nav-link" data-scroll-target="#relative-risk-ratios">Relative risk ratios</a></li>
   <li><a href="#predicted-probabilities" id="toc-predicted-probabilities" class="nav-link" data-scroll-target="#predicted-probabilities">Predicted probabilities</a></li>
   </ul></li>
+  <li><a href="#marginal-effects" id="toc-marginal-effects" class="nav-link" data-scroll-target="#marginal-effects">Marginal effects</a></li>
   </ul></li>
-  <li><a href="#marginal-effects-in-multinomial-logistic-regression" id="toc-marginal-effects-in-multinomial-logistic-regression" class="nav-link" data-scroll-target="#marginal-effects-in-multinomial-logistic-regression">Marginal effects in multinomial logistic regression</a></li>
   </ul>
 </nav>
     </div>
@@ -274,39 +306,16 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(janitor)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(skimr)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(nnet)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom)</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(marginaleffects)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gtsummary)</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggeffects)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sjPlot)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(nnet)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(marginaleffects)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gtsummary)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggeffects)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>We will use the same data as the previous section:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>student_survey <span class="ot">&lt;-</span> rio<span class="sc">::</span><span class="fu">import</span>(<span class="st">"/Users/harrietgoers/Downloads/student vote GVPT 729a.dta"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(<span class="at">warsup =</span> <span class="fu">factor</span>(warsup, </span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>                            <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>),</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>                            <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Strongly support"</span>,</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>                                       <span class="st">"Somewhat support"</span>,</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>                                       <span class="st">"Somewhat oppose"</span>,</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>                                       <span class="st">"Strongly oppose"</span>)), </span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">female =</span> <span class="fu">factor</span>(female, </span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>                            <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), </span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>                            <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Not female"</span>, <span class="st">"Female"</span>)), </span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>            <span class="at">pid =</span> <span class="fu">factor</span>(pid,</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>                         <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">7</span>),</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>                         <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Strong democrat"</span>,</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">"Weak democrat"</span>,</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">"Independent democrat"</span>,</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">"Independent"</span>,</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">"Independent republican"</span>,</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">"Weak republican"</span>,</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">"Strong republican"</span>))) <span class="sc">|&gt;</span> </span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  labelled<span class="sc">::</span><span class="fu">set_variable_labels</span>(<span class="at">warsup =</span> <span class="st">"Support for the war"</span>,</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>                                <span class="at">female =</span> <span class="st">"Female"</span>,</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>                                <span class="at">pid =</span> <span class="st">"Party ID"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>()</span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(student_survey)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(student_survey)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>            warsup     female                    pid
 1  Somewhat oppose     Female          Weak democrat
@@ -337,12 +346,12 @@ converged</code></pre>
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl_regression</span>(m1, <span class="at">intercept =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
-<div id="yihpxvdinv" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="kmauzveuyw" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#yihpxvdinv .gt_table {
+#kmauzveuyw .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -367,7 +376,7 @@ converged</code></pre>
   border-left-color: #D3D3D3;
 }
 
-#yihpxvdinv .gt_heading {
+#kmauzveuyw .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -379,7 +388,7 @@ converged</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#yihpxvdinv .gt_title {
+#kmauzveuyw .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -391,7 +400,7 @@ converged</code></pre>
   border-bottom-width: 0;
 }
 
-#yihpxvdinv .gt_subtitle {
+#kmauzveuyw .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -403,13 +412,13 @@ converged</code></pre>
   border-top-width: 0;
 }
 
-#yihpxvdinv .gt_bottom_border {
+#kmauzveuyw .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#yihpxvdinv .gt_col_headings {
+#kmauzveuyw .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -424,7 +433,7 @@ converged</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#yihpxvdinv .gt_col_heading {
+#kmauzveuyw .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -444,7 +453,7 @@ converged</code></pre>
   overflow-x: hidden;
 }
 
-#yihpxvdinv .gt_column_spanner_outer {
+#kmauzveuyw .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -456,15 +465,15 @@ converged</code></pre>
   padding-right: 4px;
 }
 
-#yihpxvdinv .gt_column_spanner_outer:first-child {
+#kmauzveuyw .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#yihpxvdinv .gt_column_spanner_outer:last-child {
+#kmauzveuyw .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#yihpxvdinv .gt_column_spanner {
+#kmauzveuyw .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -476,7 +485,7 @@ converged</code></pre>
   width: 100%;
 }
 
-#yihpxvdinv .gt_group_heading {
+#kmauzveuyw .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -501,7 +510,7 @@ converged</code></pre>
   vertical-align: middle;
 }
 
-#yihpxvdinv .gt_empty_group_heading {
+#kmauzveuyw .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -516,15 +525,15 @@ converged</code></pre>
   vertical-align: middle;
 }
 
-#yihpxvdinv .gt_from_md > :first-child {
+#kmauzveuyw .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#yihpxvdinv .gt_from_md > :last-child {
+#kmauzveuyw .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#yihpxvdinv .gt_row {
+#kmauzveuyw .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -543,7 +552,7 @@ converged</code></pre>
   overflow-x: hidden;
 }
 
-#yihpxvdinv .gt_stub {
+#kmauzveuyw .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -556,7 +565,7 @@ converged</code></pre>
   padding-right: 5px;
 }
 
-#yihpxvdinv .gt_stub_row_group {
+#kmauzveuyw .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -570,11 +579,11 @@ converged</code></pre>
   vertical-align: top;
 }
 
-#yihpxvdinv .gt_row_group_first td {
+#kmauzveuyw .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#yihpxvdinv .gt_summary_row {
+#kmauzveuyw .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -584,16 +593,16 @@ converged</code></pre>
   padding-right: 5px;
 }
 
-#yihpxvdinv .gt_first_summary_row {
+#kmauzveuyw .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#yihpxvdinv .gt_first_summary_row.thick {
+#kmauzveuyw .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#yihpxvdinv .gt_last_summary_row {
+#kmauzveuyw .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -603,7 +612,7 @@ converged</code></pre>
   border-bottom-color: #D3D3D3;
 }
 
-#yihpxvdinv .gt_grand_summary_row {
+#kmauzveuyw .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -613,7 +622,7 @@ converged</code></pre>
   padding-right: 5px;
 }
 
-#yihpxvdinv .gt_first_grand_summary_row {
+#kmauzveuyw .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -623,11 +632,11 @@ converged</code></pre>
   border-top-color: #D3D3D3;
 }
 
-#yihpxvdinv .gt_striped {
+#kmauzveuyw .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#yihpxvdinv .gt_table_body {
+#kmauzveuyw .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -636,7 +645,7 @@ converged</code></pre>
   border-bottom-color: #D3D3D3;
 }
 
-#yihpxvdinv .gt_footnotes {
+#kmauzveuyw .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -650,7 +659,7 @@ converged</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#yihpxvdinv .gt_footnote {
+#kmauzveuyw .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-left: 4px;
@@ -659,7 +668,7 @@ converged</code></pre>
   padding-right: 5px;
 }
 
-#yihpxvdinv .gt_sourcenotes {
+#kmauzveuyw .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -673,7 +682,7 @@ converged</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#yihpxvdinv .gt_sourcenote {
+#kmauzveuyw .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -681,64 +690,64 @@ converged</code></pre>
   padding-right: 5px;
 }
 
-#yihpxvdinv .gt_left {
+#kmauzveuyw .gt_left {
   text-align: left;
 }
 
-#yihpxvdinv .gt_center {
+#kmauzveuyw .gt_center {
   text-align: center;
 }
 
-#yihpxvdinv .gt_right {
+#kmauzveuyw .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#yihpxvdinv .gt_font_normal {
+#kmauzveuyw .gt_font_normal {
   font-weight: normal;
 }
 
-#yihpxvdinv .gt_font_bold {
+#kmauzveuyw .gt_font_bold {
   font-weight: bold;
 }
 
-#yihpxvdinv .gt_font_italic {
+#kmauzveuyw .gt_font_italic {
   font-style: italic;
 }
 
-#yihpxvdinv .gt_super {
+#kmauzveuyw .gt_super {
   font-size: 65%;
 }
 
-#yihpxvdinv .gt_footnote_marks {
+#kmauzveuyw .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 75%;
   vertical-align: 0.4em;
 }
 
-#yihpxvdinv .gt_asterisk {
+#kmauzveuyw .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#yihpxvdinv .gt_indent_1 {
+#kmauzveuyw .gt_indent_1 {
   text-indent: 5px;
 }
 
-#yihpxvdinv .gt_indent_2 {
+#kmauzveuyw .gt_indent_2 {
   text-indent: 10px;
 }
 
-#yihpxvdinv .gt_indent_3 {
+#kmauzveuyw .gt_indent_3 {
   text-indent: 15px;
 }
 
-#yihpxvdinv .gt_indent_4 {
+#kmauzveuyw .gt_indent_4 {
   text-indent: 20px;
 }
 
-#yihpxvdinv .gt_indent_5 {
+#kmauzveuyw .gt_indent_5 {
   text-indent: 25px;
 }
 </style>
@@ -920,36 +929,14 @@ converged</code></pre>
 <p>We have three options for interpreting coefficients in multinomial logistic regression.</p>
 <section id="relative-log-odds" class="level4">
 <h4 class="anchored" data-anchor-id="relative-log-odds">Relative log odds</h4>
-<p>Similar to log odds ratios in binary logistic regression, these can be interpreted as the effect of a one-unit change in <span class="math inline">\(x_i\)</span> on the log odds of being in category 2 compared to being in category 1.</p>
-<p>For example, identifying as female is associated with a 0.676 change in the log odds of strongly opposing compared to strongly supporting the war in Iraq.</p>
-<p>This is the default output for our model:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(m1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 24 × 6
-   y.level          term                      estimate std.error stati…¹ p.value
-   &lt;chr&gt;            &lt;chr&gt;                        &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
- 1 Somewhat support (Intercept)                  0.239     0.427   0.560 5.76e-1
- 2 Somewhat support femaleFemale                 0.655     0.181   3.61  3.06e-4
- 3 Somewhat support pidWeak democrat             0.535     0.540   0.991 3.22e-1
- 4 Somewhat support pidIndependent democrat      0.691     0.578   1.20  2.32e-1
- 5 Somewhat support pidIndependent              -0.284     0.531  -0.535 5.93e-1
- 6 Somewhat support pidIndependent republican   -0.323     0.484  -0.667 5.04e-1
- 7 Somewhat support pidWeak republican          -0.406     0.450  -0.902 3.67e-1
- 8 Somewhat support pidStrong republican        -1.30      0.439  -2.97  3.01e-3
- 9 Somewhat oppose  (Intercept)                  1.70      0.377   4.52  6.30e-6
-10 Somewhat oppose  femaleFemale                 0.468     0.222   2.11  3.49e-2
-# … with 14 more rows, and abbreviated variable name ¹​statistic</code></pre>
-</div>
-</div>
+<p>Similar to log odds ratios in binary logistic regression, these can be interpreted as the effect of a one-unit change in <span class="math inline">\(x_i\)</span> on the log odds of being in category 2 compared to being in category 1. For example, identifying as female is associated with a 0.676 change in the log odds of strongly opposing compared to strongly supporting the war in Iraq.</p>
 </section>
 <section id="relative-risk-ratios" class="level4">
 <h4 class="anchored" data-anchor-id="relative-risk-ratios">Relative risk ratios</h4>
-<p>Similar to odds ratios in binary logistic regression, these can be interpreted as the effect of a one-unit change in <span class="math inline">\(x_i\)</span> on the probability of being in category 2 compared to being in category 1.</p>
-<p>For example, identifying as female is associated with a 197% change in the probability of strongly opposing compared to strongly supporting the war in Iraq.</p>
+<p>Similar to odds ratios in binary logistic regression, these can be interpreted as the effect of a one-unit change in <span class="math inline">\(x_i\)</span> on the probability of being in category 2 compared to being in category 1. For example, identifying as female is associated with a 197% change in the probability of strongly opposing compared to strongly supporting the war in Iraq.</p>
 <p>You can get this using <code>broom::tidy()</code>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(m1, <span class="at">exponentiate =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(m1, <span class="at">exponentiate =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 24 × 6
    y.level          term                      estimate std.error stati…¹ p.value
@@ -967,14 +954,20 @@ converged</code></pre>
 # … with 14 more rows, and abbreviated variable name ¹​statistic</code></pre>
 </div>
 </div>
+<p>Or plot your results using <code>sjPlot::plot_model()</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_model</span>(m1, <span class="at">show.values =</span> T, <span class="at">value.offset =</span> .<span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="multinomial_marginal_effects_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
 </section>
 <section id="predicted-probabilities" class="level4">
 <h4 class="anchored" data-anchor-id="predicted-probabilities">Predicted probabilities</h4>
-<p>This describes the probability that an observation will be in a category for a given a set of observed values.</p>
-<p>For example, the predicted probability that a strong democratic female will strongly support the war in Iraq is 3%. The predicted probability that she will strongly oppose the war is 64%.</p>
+<p>This describes the probability that an observation will be in a category for a given a set of observed values. For example, the predicted probability that a strong democratic female will strongly support the war in Iraq is 3%. The predicted probability that she will strongly oppose the war is 64%.</p>
 <p><code>broom::augment()</code> does not currently support multinomial regression. Instead, we can use base R’s <code>predict()</code>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">predict</span>(m1, <span class="at">newdata =</span> <span class="fu">tibble</span>(<span class="at">female =</span> <span class="fu">factor</span>(<span class="st">"Female"</span>), <span class="at">pid =</span> <span class="fu">factor</span>(<span class="st">"Strong democrat"</span>)), <span class="at">type =</span> <span class="st">"probs"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">predict</span>(m1, <span class="at">newdata =</span> <span class="fu">tibble</span>(<span class="at">female =</span> <span class="fu">factor</span>(<span class="st">"Female"</span>), <span class="at">pid =</span> <span class="fu">factor</span>(<span class="st">"Strong democrat"</span>)), <span class="at">type =</span> <span class="st">"probs"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Strongly support Somewhat support  Somewhat oppose  Strongly oppose 
       0.02910128       0.07112958       0.25530009       0.64446905 </code></pre>
@@ -982,30 +975,28 @@ converged</code></pre>
 </div>
 <p>We can plot these predicted probabilities across our outcomes and variable options using <code>ggeffects::ggeffect()</code>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggeffect</span>(m1, <span class="at">terms =</span> <span class="st">"female"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<p><img src="multinomial_marginal_effects_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggeffect</span>(m1, <span class="at">terms =</span> <span class="st">"pid"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggeffect</span>(m1, <span class="at">terms =</span> <span class="st">"female"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="multinomial_marginal_effects_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggeffect</span>(m1, <span class="at">terms =</span> <span class="st">"pid"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="multinomial_marginal_effects_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
 </section>
 </section>
-</section>
-<section id="marginal-effects-in-multinomial-logistic-regression" class="level2">
-<h2 class="anchored" data-anchor-id="marginal-effects-in-multinomial-logistic-regression">Marginal effects in multinomial logistic regression</h2>
-<p>We can interpret the marginal effects of a one-unit change in <span class="math inline">\(x_i\)</span> on the change in probability that an observation will fall into one category.</p>
-<p>For example, moving from a strong republican to a strong democrat decreases the probability that an individual will strongly support the war in Iraq by 59%.</p>
+<section id="marginal-effects" class="level3">
+<h3 class="anchored" data-anchor-id="marginal-effects">Marginal effects</h3>
+<p>We can interpret the marginal effects of a one-unit change in <span class="math inline">\(x_i\)</span> on the change in probability that an observation will fall into one category. For example, moving from a strong republican to a strong democrat decreases the probability that an individual will strongly support the war in Iraq by 59%.</p>
 <p>You can calculate the marginal effects of each change using <code>marginaleffects::marginaleffects()</code>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>marginaleffects<span class="sc">::</span><span class="fu">marginaleffects</span>(m1, <span class="at">variables =</span> <span class="st">"pid"</span>, <span class="at">type =</span> <span class="st">"probs"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summary</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>marginaleffects<span class="sc">::</span><span class="fu">marginaleffects</span>(m1, <span class="at">variables =</span> <span class="st">"pid"</span>, <span class="at">type =</span> <span class="st">"probs"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summary</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>              Group Term                                 Contrast    Effect
 1  Strongly support  pid          Weak democrat - Strong democrat  0.019132
@@ -1064,6 +1055,7 @@ Prediction type:  probs </code></pre>
 </div>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->

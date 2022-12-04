@@ -1,0 +1,71 @@
+---
+title: "Introduction to Ordered Models"
+page-layout: full
+editor: source
+execute:
+  message: false
+  warning: false
+---
+
+## Set up
+
+This section uses the following packages:
+
+```{r, include = FALSE}
+library(scales)
+```
+
+```{r}
+library(tidyverse)
+library(rio)
+library(skimr)
+```
+
+To understand ordered models, we will explore data that describe individuals' decision to apply to graduate school. 
+
+First, we read in our data using `rio::import()` and clean it up:
+
+```{r}
+df <- import("https://stats.idre.ucla.edu/stat/data/ologit.dta") |> 
+  mutate(apply = factor(apply, 
+                        labels = c("Unlikely", "Somewhat likely", "Very likely"),
+                        ordered = T),
+         pared = factor(pared),
+         public = factor(public))
+
+head(df)
+```
+
+Let's take a quick look at the data using `skimr::skim()`: 
+
+```{r}
+skim(df)
+```
+
+This data is used in the [UCLA Ordinal Logistic Regression post](https://stats.oarc.ucla.edu/r/dae/ordinal-logistic-regression/). It contains a level variable called `apply`, with levels “unlikely”, “somewhat likely”, and “very likely”. This is our outcome variable. We also have three variables that we will use as predictors: `pared`, which is a binary variable indicating whether at least one parent has a graduate degree; `public`, which is a binary variable where 1 indicates that the undergraduate institution is public and 0 private, and `gpa`, which is the student’s grade point average.
+
+## Introduction
+
+We often want to know the relationship between some independent variables and an ordered categorical outcome. These are outcomes for which the order is clear but the distance between different categories is not uniform or known. For example, a survey asks respondents whether they strongly support, somewhat support, somewhat oppose, or strongly oppose some event. Here, we know that strongly support $>$ somewhat support, but we can't really measure the distance between strongly support and somewhat support in a meaningful way.
+
+## Ordered models
+
+We can use ordered models to estimate the probability that an individual observation will fall into one of the three or more categories of our outcome variable. How do we do this? 
+
+Ordered models follow the latent variable approach introduced in earlier sections. Let's assume that our ordered categories can be understood as some continuous, latent variable, $Y^*$, that ranges from $-\infty$ to $\infty$. So when we talk about someone strongly supporting, weakly supporting, weakly opposing, or strongly opposing something, we aren't really talking about categories. People's beliefs sit on some continous spectrum. However, we can't observe or measure values along this spectrum so we have to resort to categories. If we could observe this continuous variable we would, but we can't so we use categories.    
+
+> Think about when we convert continuous variables into binned categorical variables. For example, we might not use individuals' actual incomes. Instead we use brackets: below $50,000/year, between $50,001 and $80,000/year, above $80,000/year. Let's imagine we can't collect individuals' actual incomes. All we can collect is the bracket in which they fall. The same idea applies to our latent variable of strongly support to strongly oppose but we get a bit more philosophical about it. We are assuming that there is a some continuous variable of people's level of support (similar to the continuous variable of individuals' income). We just can't observe this continuous variable of support. All we can get are these categories.
+
+There exist some thresholds, or cut points, along this continuous variable that define our observed categories. For example, there is some continuous latent variable that defines the likelihood that an individual will apply to graduate school ($Y^*$) given some set of predictors ($X$). An individual who is unlikely to apply has a value of $Y^*$ that sits between $-\infty$ and some threshold $\tau_{unlikely}$. An individual who is somewhat likely to apply has a value of $Y^*$ that sits between that point, $\tau_{unlikely}$, and some greater threshold $\tau_{somewhatlikely}$. Finally, an individual who is very likely to apply has a value of $Y^*$ that sits between $\tau_{somewhatlikely}$ and $\infty$. These thresholds translate our unobservable latent variable $Y^*$ to our observed ordered categorical variable $Y$. 
+
+We now have the building blocks for our model. We need to estimate some latent variable, $Y^*$, and the thresholds that define our ordered categories. 
+
+### The latent variable
+
+Let's assume that the latent variable is linear such that:
+
+$$
+Y^* = X\beta + \epsilon
+$$
+
+As with our other latent variable models, we need to make an assumption about the distribution of that error. We will return to our familiar distributions: normal and logistic cumulative distributions that define the probit or logit models with which we are familiar. 

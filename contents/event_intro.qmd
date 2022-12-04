@@ -1,0 +1,109 @@
+---
+title: "Introduction to Duration Models"
+page-layout: full
+editor: source
+toc-depth: 5
+execute:
+  message: false
+  warning: false
+---
+
+## Set up
+
+This section uses the following packages: 
+
+```{r}
+library(tidyverse)
+```
+
+## Introduction
+
+Outcome is the time until an event occurs. 
+
+> Also known as event history or survival models. 
+
+OLS is problematic:
+
+-   Negative predicted values: can predict negative outcomes, but time (our outcome of interest) cannot be negative. 
+
+-   Normality: assumes duration times are normally distributed, but long durations are often right skewed. 
+
+-   Censoring: does not easily distinguish between drop out and the end of the study.
+
+-   Time varying covariates: cannot easily accommodation independent variables that change value over time. 
+
+## Censoring
+
+Right censoring: the subject participates in the study for a time and is no longer observed. 
+
+-   The failure event has not yet occurred by the end of the study. 
+
+-   Subject withdraws. Think of individuals who drop out of a survey. Or political groups that dissolve. 
+
+We know the the subject survived from the start of the study to some time, $t$. 
+
+## Survival functions
+
+Our outcome is $T$, a non-negative random variable denoting the time to a failure event. 
+
+We want to understand the probability that an actor will survive past some time $t$.
+
+First, find the probability that they will survive to time $t$. Then work out the probability that won't occur:
+
+$$
+S(t) = 1 - Pr(T \leq t)
+$$
+
+$S(t) = 0$ at $t = 0$. It declines from there. 
+
+## Hazard function
+
+Describes the risk that the failure event will occur. This is the instantaneous rate of failure. 
+
+This is a conditional idea: what is the risk of failure given survival to time $t$?
+
+Ranges from 0 (no risk of failure) to infinity (the certainty of failure).
+
+$$
+risk = \frac{chance that some thing happens}{change that it hasn't happened yet} = \frac{Pr(failure)}{Pr(survival)}
+$$
+
+For example, duration of peace. Given that a country has been in peace for 14 years, what is the rik that it will be at war next year. 
+
+### Cox proportional hazard model 
+
+We have a baseline hazard function, $h_0(t)$, which must be positive. We discuss risk relative to this baseline. 
+
+$$
+h_i(t) = h_0(t)e^{X\beta}
+$$
+
+This does not assume knowledge about absolute risk: everything is relative. You want to compare the hazard rates of observations that have different covariates. Why did this country adopt this policy before this other country? 
+
+You can change the values of your covariates to test how the relative risk changes. 
+
+> Look at slides.
+
+This means that hazard functions should be strictly parallel. I.e. the shape of the hazard is the same for $x=1$ and $x=2$. Is this the case? 
+
+The intercept is always 0: the probability of survival at the start of the study is 100%. 
+
+### Time dependence in binary data
+
+Logit with time dummies or splines (Beck, Katz, and Tucker (1998)).
+
+Time dummies lead to errors in estimation. Not a lot of variance within time periods, leads to perfect estimation. A problem. If you drop those observations, you are missing what you were trying to study. Carter and Signorino (2010).  
+
+Also leads to identification issues if you have a lot of time dummies. Carter and Signorino (2010).
+
+Splines designate similar time periods. 
+
+Can overcome above problem, but need to be defined carefully with theory. Carter and Signorino (2010).
+
+Carter and Signorino (2010) say: run a logit model, but include variables for $t$, $t^2$, and $t^3$.
+
+> Why does this work? 
+
+### Thinking about time
+
+Is it discrete or continuous? Need to be careful. 

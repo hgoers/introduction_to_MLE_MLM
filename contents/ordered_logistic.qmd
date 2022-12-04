@@ -1,0 +1,137 @@
+---
+title: "Ordered Logistic Regression"
+page-layout: full
+editor: source
+execute:
+  message: false
+  warning: false
+---
+
+## Set up
+
+This section uses the following packages:
+
+```{r, include = FALSE}
+library(scales)
+library(rio)
+```
+
+```{r}
+library(MASS)
+library(tidyverse)
+library(broom)
+```
+
+> I recommend loading `MASS` first, or using it directly (`MASS::polr()`). Super annoyingly, `MASS` masks `dplyr`'s `select()` function. This can lead to errors.  
+
+We will use the dataset we discussed in the previous section: 
+
+```{r, echo = FALSE}
+
+df <- import("https://stats.idre.ucla.edu/stat/data/ologit.dta") |> 
+  mutate(apply = factor(apply, 
+                        labels = c("Unlikely", "Somewhat likely", "Very likely"),
+                        ordered = T),
+         pared = factor(pared),
+         public = factor(public))
+
+head(df) 
+```
+
+## Introduction
+
+Ordered logistic regression models estimate the log odds ratio of an outcome, $Y^*$, being at any level up to and including a specified level, $\tau_i$. Recall that $\tau_i$ is the cut off point at which we define the end of an ordered category. 
+
+$$
+ln(\frac{Pr(Y^* \leq \tau_i)}{Pr(Y^* > \tau_i)})
+$$
+
+Note that we need to develop a model for each threshold, or $\tau_i$. We are estimating a series of binary logistic regression models that provide us with the relative probability that our outcome $Y^*$ sits at or below the threshold for each category compared to the probability that it sits above this threshold. For an outcome with three categories, we will get two different models (we have two different thresholds). 
+
+> We will always get $J - 1$ models for our $J-1$ thresholds where $J$ is the number of categories in our dependent variable.  
+
+Let's return to our illustrative example. How likely is an individual to apply for graduate school given three factors: their parents' level of education; whether they went to a public or private university for their undergraduate degree; and their grade point average?
+
+Let's fit our ordered logistic regression using `MASS::polr()`: 
+
+```{r}
+m1 <- polr(apply ~ pared + public + gpa, data = df, Hess = T)
+
+summary(m1)
+```
+
+> We specify `Hess = TRUE` to have the model return the observed information matrix from optimization (called the Hessian) which is used to get standard errors.
+
+### Interpreting the intercepts
+
+As expected, we get two different intercepts. One for the threshold sitting at the boundary of unlikely and somewhat likely and another at the boundary of somewhat likely and very likely. 
+
+We can access these intercepts using `broom::tidy()`: 
+
+```{r}
+tidy(m1) |> 
+  filter(coef.type == "scale")
+```
+
+We can get the odds ratio using `exponentiate = TRUE`: 
+
+```{r}
+tidy(m1, exponentiate = T) |> 
+  filter(coef.type == "scale")
+```
+
+Let's convert these intercepts to predicted probabilities, which are the easiest to interpret. Remember from binary logistic regression that the predicted probability is calculated using: 
+
+$$
+Pr(Y = 1 | X) = \frac{e^{X\beta}}{1 + e^{X\beta}}
+$$
+
+For the intercept, this is simply: 
+
+```{r}
+m1_pred_prob <- tidy(m1) |> 
+  filter(coef.type == "scale") |> 
+  mutate(pred_prob = exp(estimate) / (1 + exp(estimate))) |> 
+  select(term, pred_prob)
+
+m1_pred_prob
+```
+
+> Remember, the intercept provides us with the predicted probability of an outcome when all other predictors are set to 0.
+
+So, the probability that an individual with no parents who went to graduate school, who went to a private school for their undergraduate degree, and who has a GPA of 0 is unlikely to apply to college is `r m1_pred_prob |> filter(term == "Unlikely|Somewhat likely") |> pull(pred_prob) |> percent()`. The probability that they are either unlikely to somewhat likely or apply for graduate school is `r m1_pred_prob |> filter(term == "Somewhat likely|Very likely") |> pull(pred_prob) |> percent()`. 
+
+> Note, we don't need to estimate the third threshold because this is always equal to 1. 
+
+The predicted probability that an individual is unlikely to apply to college is $Pr(Y^* \leq \tau_{unlikely})$, which is equal to `r m1_pred_prob |> filter(term == "Unlikely|Somewhat likely") |> pull(pred_prob) |> percent()`. 
+
+The predicted probability that an individual is somewhat likely to apply to college is the predicted probability that they either are unlikely or somewhat likely to apply minus the probability that they are unlikely to apply. This is $Pr(Y^* \leq \tau_{somewhatlikely}) - Pr(Y^* \leq \tau_{unlikely})$, which is equal to $`r m1_pred_prob |> filter(term == "Somewhat likely|Very likely") |> pull(pred_prob) |> round(3)` - `r m1_pred_prob |> filter(term == "Unlikely|Somewhat likely") |> pull(pred_prob) |> round(3)`$, or `r (m1_pred_prob |> filter(term == "Somewhat likely|Very likely") |> pull(pred_prob) - m1_pred_prob |> filter(term == "Unlikely|Somewhat likely") |> pull(pred_prob)) |> percent()`. 
+
+Finally, the probability that such an individual is very likely to apply is 1 (or 100%, or certainty) minus the predicted probability that they either are unlikely or somewhat likely to apply. This is $Pr(Y^* > \tau_{somewhatlikely})$ or $1 - Pr(Y^* \leq \tau_{somewhatlikely})$. This is equal to `r percent(1 - (m1_pred_prob |> filter(term == "Somewhat likely|Very likely") |> pull(pred_prob)))`.
+
+### Interpreting the coefficients
+
+The coefficients are the log odds ratio for each predictor. We can access them using `broom::tidy()`: 
+
+```{r}
+tidy(m1) |> 
+  filter(coef.type == "coefficient")
+```
+
+We can get the more easily interpretable odds ratios using `exponentiate = TRUE`: 
+
+```{r}
+tidy(m1, exponentiate = TRUE) |> 
+  filter(coef.type == "coefficient")
+```
+
+Unlike our intercepts, we only have one set of coefficients for each of our predictors. This is because ordered logistic (and probit) models assume that the effect of $x_i$ on the outcome $Y^*$ *is the same across each different category $J$*. This assumption is called the **proportional odds assumption**: it implies that the odds ratio for any predictor, $x_i$, is the same for all categories contained in $Y$. No matter where you split $Y^*$, the resulting odds of any value of $x_i$ are proportional. 
+
+This makes interpretation of our coefficients a little awkward. Let's power through. An individual with a parent who has attended graduate school ($pared = 1$) is `r tidy(m1, exponentiate = TRUE) |> filter(term == "pared1") |> pull(estimate) |> round(2)` times more likely to be in a higher category of likelihood of applying to graduate school than an individual with no parents who attended graduate school ($pared = 0$).  
+
+An individual who attended a public university for their undergraduate degree ($public = 1$) is `r tidy(m1, exponentiate = TRUE) |> filter(term == "public1") |> pull(estimate) |> round(2)` times as likely to be in a higher category of likelihood of applying to graduate school than an individual who attended a private school.  
+
+An individual with one point higher in their GPA is `r tidy(m1, exponentiate = TRUE) |> filter(term == "gpa") |> pull(estimate) |> round(2)` times as likely to be in a higher category of likelihood of applying to graduate school than an individual with a GPA of one point less.
+
+As with binary logistic regression, estimating predicted probabilities depends on the values of our predictors in which we are interested.
+

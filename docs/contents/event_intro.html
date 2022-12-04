@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Introduction to MLE - Introduction to Count Models</title>
+<title>Introduction to MLE - Introduction to Duration Models</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -15,6 +15,69 @@ span.underline{text-decoration: underline;}
 div.column{display: inline-block; vertical-align: top; width: 50%;}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
 
@@ -86,7 +149,7 @@ ul.task-list{list-style: none;}
     </nav>
   <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
     <div class="container-fluid d-flex justify-content-between">
-      <h1 class="quarto-secondary-nav-title">Introduction to Count Models</h1>
+      <h1 class="quarto-secondary-nav-title">Introduction to Duration Models</h1>
       <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
         <i class="bi bi-chevron-right"></i>
       </button>
@@ -94,7 +157,7 @@ ul.task-list{list-style: none;}
   </nav>
 </header>
 <!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
 <!-- sidebar -->
   <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto">
     <div class="sidebar-menu-container"> 
@@ -174,7 +237,7 @@ ul.task-list{list-style: none;}
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../contents/count_intro.html" class="sidebar-item-text sidebar-link active">Introduction to Count Models</a>
+  <a href="../contents/count_intro.html" class="sidebar-item-text sidebar-link">Introduction to Count Models</a>
   </div>
 </li>
       </ul>
@@ -189,7 +252,7 @@ ul.task-list{list-style: none;}
       <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../contents/event_intro.html" class="sidebar-item-text sidebar-link">Introduction to Duration Models</a>
+  <a href="../contents/event_intro.html" class="sidebar-item-text sidebar-link active">Introduction to Duration Models</a>
   </div>
 </li>
       </ul>
@@ -203,23 +266,25 @@ ul.task-list{list-style: none;}
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#problems-with-ols" id="toc-problems-with-ols" class="nav-link active" data-scroll-target="#problems-with-ols">Problems with OLS</a></li>
-  <li><a href="#count-models" id="toc-count-models" class="nav-link" data-scroll-target="#count-models">Count models</a>
+  <li><a href="#set-up" id="toc-set-up" class="nav-link active" data-scroll-target="#set-up">Set up</a></li>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#censoring" id="toc-censoring" class="nav-link" data-scroll-target="#censoring">Censoring</a></li>
+  <li><a href="#survival-functions" id="toc-survival-functions" class="nav-link" data-scroll-target="#survival-functions">Survival functions</a></li>
+  <li><a href="#hazard-function" id="toc-hazard-function" class="nav-link" data-scroll-target="#hazard-function">Hazard function</a>
   <ul class="collapse">
-  <li><a href="#poisson-regression-model" id="toc-poisson-regression-model" class="nav-link" data-scroll-target="#poisson-regression-model">Poisson Regression Model</a></li>
-  <li><a href="#negative-binomial-models" id="toc-negative-binomial-models" class="nav-link" data-scroll-target="#negative-binomial-models">Negative binomial models</a></li>
-  <li><a href="#zero-inflated-models" id="toc-zero-inflated-models" class="nav-link" data-scroll-target="#zero-inflated-models">Zero Inflated Models</a></li>
-  <li><a href="#exposure" id="toc-exposure" class="nav-link" data-scroll-target="#exposure">Exposure</a></li>
+  <li><a href="#cox-proportional-hazard-model" id="toc-cox-proportional-hazard-model" class="nav-link" data-scroll-target="#cox-proportional-hazard-model">Cox proportional hazard model</a></li>
+  <li><a href="#time-dependence-in-binary-data" id="toc-time-dependence-in-binary-data" class="nav-link" data-scroll-target="#time-dependence-in-binary-data">Time dependence in binary data</a></li>
+  <li><a href="#thinking-about-time" id="toc-thinking-about-time" class="nav-link" data-scroll-target="#thinking-about-time">Thinking about time</a></li>
   </ul></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
+<main class="content column-body" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title d-none d-lg-block">Introduction to Count Models</h1>
+<h1 class="title d-none d-lg-block">Introduction to Duration Models</h1>
 </div>
 
 
@@ -233,64 +298,84 @@ ul.task-list{list-style: none;}
 
 </header>
 
-<section id="problems-with-ols" class="level2">
-<h2 class="anchored" data-anchor-id="problems-with-ols">Problems with OLS</h2>
-<p>A count dependent model is non-negative, an integer, and often skewed. OLS does not model this well.</p>
+<section id="set-up" class="level2">
+<h2 class="anchored" data-anchor-id="set-up">Set up</h2>
+<p>This section uses the following packages:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
-<section id="count-models" class="level2">
-<h2 class="anchored" data-anchor-id="count-models">Count models</h2>
-<p>Count models follow the poisson distribution.</p>
-<p>Count models are theoretically unbounded.</p>
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>Outcome is the time until an event occurs.</p>
 <blockquote class="blockquote">
-<p>If you are measuring a bounded phenomenon and your count model is predicted out of scope results, you may want to use an ordered model instead. This is not a very efficient model for count events: you are throwing away a lot of information. However, you will get more realistic predictions.</p>
+<p>Also known as event history or survival models.</p>
 </blockquote>
-<section id="poisson-regression-model" class="level3">
-<h3 class="anchored" data-anchor-id="poisson-regression-model">Poisson Regression Model</h3>
-<p>Expected count:</p>
-<p><span class="math display">\[
-\mu_i = E(y_i | x_i) = e^{x_i\beta}
-\]</span></p>
-<section id="potential-problems" class="level4">
-<h4 class="anchored" data-anchor-id="potential-problems">Potential problems</h4>
-<p>The model is not very good at predicting 0. We will under-predict 0s.</p>
-<p>The model can often only predict events that have already taken place. It will not predict the first instance of an event.</p>
-<p>Overdispersion occurs when the conditional mean is less than the conditional variance. This occurs when:</p>
+<p>OLS is problematic:</p>
 <ul>
-<li><p>Assumes events are independent. This is a very (and often too) strong assumption.</p></li>
-<li><p>There is heterogeneity: the <span class="math inline">\(\mu\)</span> differs across cases.</p></li>
+<li><p>Negative predicted values: can predict negative outcomes, but time (our outcome of interest) cannot be negative.</p></li>
+<li><p>Normality: assumes duration times are normally distributed, but long durations are often right skewed.</p></li>
+<li><p>Censoring: does not easily distinguish between drop out and the end of the study.</p></li>
+<li><p>Time varying covariates: cannot easily accommodation independent variables that change value over time.</p></li>
 </ul>
-<p>Overdispersion produces estimates that are consistent and inefficient. The standard errors are biased downwards. It is, therefore, easier to find statistical significance.</p>
-<blockquote class="blockquote">
-<p>You have consistent results, as you add more data you will get closer to the true relationship between the dependent and independent variables.</p>
-</blockquote>
 </section>
-<section id="interpretation" class="level4">
-<h4 class="anchored" data-anchor-id="interpretation">Interpretation</h4>
-<p>The coefficients give the change in the log of the expected count for a unit change in <span class="math inline">\(x_i\)</span>.</p>
-<p>You can also estimate the count of your variable of interest.</p>
-<p>You can also estimate changes in the expected count across a discrete difference in <span class="math inline">\(x_i\)</span>.</p>
+<section id="censoring" class="level2">
+<h2 class="anchored" data-anchor-id="censoring">Censoring</h2>
+<p>Right censoring: the subject participates in the study for a time and is no longer observed.</p>
+<ul>
+<li><p>The failure event has not yet occurred by the end of the study.</p></li>
+<li><p>Subject withdraws. Think of individuals who drop out of a survey. Or political groups that dissolve.</p></li>
+</ul>
+<p>We know the the subject survived from the start of the study to some time, <span class="math inline">\(t\)</span>.</p>
 </section>
-</section>
-<section id="negative-binomial-models" class="level3">
-<h3 class="anchored" data-anchor-id="negative-binomial-models">Negative binomial models</h3>
-<p>This model accounts for overdispersion. It does this by adding a dispersion parameter, <span class="math inline">\(\alpha\)</span>, that allows for heterogeneity and non-independence across events.</p>
-<blockquote class="blockquote">
-<p>Generally, you should use this model. There will generally be non-independence or heterogeneity across events.</p>
-</blockquote>
-<p>The expected count is the same as that produced by a poisson regression model. However, the variance differs. #### Interpretation</p>
-<p>Similar to Poisson:</p>
+<section id="survival-functions" class="level2">
+<h2 class="anchored" data-anchor-id="survival-functions">Survival functions</h2>
+<p>Our outcome is <span class="math inline">\(T\)</span>, a non-negative random variable denoting the time to a failure event.</p>
+<p>We want to understand the probability that an actor will survive past some time <span class="math inline">\(t\)</span>.</p>
+<p>First, find the probability that they will survive to time <span class="math inline">\(t\)</span>. Then work out the probability that won’t occur:</p>
 <p><span class="math display">\[
-E(y | x) = e^{X\beta}
+S(t) = 1 - Pr(T \leq t)
 \]</span></p>
+<p><span class="math inline">\(S(t) = 0\)</span> at <span class="math inline">\(t = 0\)</span>. It declines from there.</p>
 </section>
-<section id="zero-inflated-models" class="level3">
-<h3 class="anchored" data-anchor-id="zero-inflated-models">Zero Inflated Models</h3>
-<p>This model allows you to explore very rare events. There needs to be a theoretical expectation that some <em>unknown</em> types of cases will only produce zeros. It is not sufficient for there to simply be a lot of zeros. It is important that you don’t know why these groups can only produce zero. If you know, you should remove them from your dataset. They are a restricted group.</p>
-<p>This model explores the probability that you never have a count <span class="math inline">\(&gt; 0\)</span>. Estimate a binary model for <span class="math inline">\(P(y = 0)\)</span> and use that to weight your data.</p>
+<section id="hazard-function" class="level2">
+<h2 class="anchored" data-anchor-id="hazard-function">Hazard function</h2>
+<p>Describes the risk that the failure event will occur. This is the instantaneous rate of failure.</p>
+<p>This is a conditional idea: what is the risk of failure given survival to time <span class="math inline">\(t\)</span>?</p>
+<p>Ranges from 0 (no risk of failure) to infinity (the certainty of failure).</p>
+<p><span class="math display">\[
+risk = \frac{chance that some thing happens}{change that it hasn't happened yet} = \frac{Pr(failure)}{Pr(survival)}
+\]</span></p>
+<p>For example, duration of peace. Given that a country has been in peace for 14 years, what is the rik that it will be at war next year.</p>
+<section id="cox-proportional-hazard-model" class="level3">
+<h3 class="anchored" data-anchor-id="cox-proportional-hazard-model">Cox proportional hazard model</h3>
+<p>We have a baseline hazard function, <span class="math inline">\(h_0(t)\)</span>, which must be positive. We discuss risk relative to this baseline.</p>
+<p><span class="math display">\[
+h_i(t) = h_0(t)e^{X\beta}
+\]</span></p>
+<p>This does not assume knowledge about absolute risk: everything is relative. You want to compare the hazard rates of observations that have different covariates. Why did this country adopt this policy before this other country?</p>
+<p>You can change the values of your covariates to test how the relative risk changes.</p>
+<blockquote class="blockquote">
+<p>Look at slides.</p>
+</blockquote>
+<p>This means that hazard functions should be strictly parallel. I.e. the shape of the hazard is the same for <span class="math inline">\(x=1\)</span> and <span class="math inline">\(x=2\)</span>. Is this the case?</p>
+<p>The intercept is always 0: the probability of survival at the start of the study is 100%.</p>
 </section>
-<section id="exposure" class="level3">
-<h3 class="anchored" data-anchor-id="exposure">Exposure</h3>
-<p>You need to think about whether exposure differs across cases. Are events more likely to occur in a subset of your data due to some other factor? For example, number of attacks might be greater simply because a group has been around longer. To solve for this, you control for exposure. For example, add <code>ln(exposure)</code> and constrain the coefficient to 1.</p>
+<section id="time-dependence-in-binary-data" class="level3">
+<h3 class="anchored" data-anchor-id="time-dependence-in-binary-data">Time dependence in binary data</h3>
+<p>Logit with time dummies or splines (Beck, Katz, and Tucker (1998)).</p>
+<p>Time dummies lead to errors in estimation. Not a lot of variance within time periods, leads to perfect estimation. A problem. If you drop those observations, you are missing what you were trying to study. Carter and Signorino (2010).</p>
+<p>Also leads to identification issues if you have a lot of time dummies. Carter and Signorino (2010).</p>
+<p>Splines designate similar time periods.</p>
+<p>Can overcome above problem, but need to be defined carefully with theory. Carter and Signorino (2010).</p>
+<p>Carter and Signorino (2010) say: run a logit model, but include variables for <span class="math inline">\(t\)</span>, <span class="math inline">\(t^2\)</span>, and <span class="math inline">\(t^3\)</span>.</p>
+<blockquote class="blockquote">
+<p>Why does this work?</p>
+</blockquote>
+</section>
+<section id="thinking-about-time" class="level3">
+<h3 class="anchored" data-anchor-id="thinking-about-time">Thinking about time</h3>
+<p>Is it discrete or continuous? Need to be careful.</p>
 
 
 </section>
