@@ -202,7 +202,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../contents/ordered_logistic.html" class="sidebar-item-text sidebar-link">Ordered logistic regression</a>
+  <a href="../contents/ordered_logistic.html" class="sidebar-item-text sidebar-link">Ordered Logistic Regression</a>
   </div>
 </li>
       </ul>
@@ -322,60 +322,44 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <section id="introduction" class="level2">
 <h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
 <p>In political science, we are often interested in measuring the probability of success for more than two outcomes. For example, we may want to know the probability that an individual will vote for a specific candidate in an election. If our individuals have more than two candidates from which to choose, we can take advantage of multinomial modelling.</p>
-<p>Multinomial models are linear regression models that measure the probability of success across outcomes with more than two options. As with binary outcomes, we can choose between two common approaches to these models: logit and probit regression. Multinomial logit and probit models are an extension of the binary latent variable models we discussed in the previous section. Rather than modelling the choice made between two options - success or failure, vote or not vote - we can efficiently model the choice between many different options, for example: strongly favour, weakly favour, weakly dislike, strongly dislike.</p>
+<p>Multinomial models are linear regression models that measure the probability of success across outcomes with more than two, unordered options. As with binary outcomes, we can choose between two common approaches to these models: logit and probit regression. Multinomial logit and probit models are an extension of the binary latent variable models we discussed in the previous section. Rather than modelling the choice made between two options - success or failure, vote or not vote - we can efficiently model the choice between many different options.</p>
 <p>Unlike previously, the choice between a multinomial logit model and a multinomial probit model is not trivial. This difference centres on the Independence of Irrelevant Alternatives (IIA) assumption. We will discuss this shortly.</p>
-<p>To explore this question, we will look at students’ level of support for the Iraq war based on their gender and their party affiliation (measured on a seven-point scale).</p>
+<p>To explore this question, we will look at which type of schooling program students choose given a set of predictors. This example is provided in the <a href="https://stats.oarc.ucla.edu/r/dae/multinomial-logistic-regression/">UCLA Multinomial Logistic Regression post</a>.</p>
 <p>Let’s load and clean our data:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>student_survey <span class="ot">&lt;-</span> rio<span class="sc">::</span><span class="fu">import</span>(<span class="st">"/Users/harrietgoers/Downloads/student vote GVPT 729a.dta"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(<span class="at">warsup =</span> <span class="fu">factor</span>(warsup, </span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>                            <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>),</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>                            <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Strongly support"</span>,</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>                                       <span class="st">"Somewhat support"</span>,</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>                                       <span class="st">"Somewhat oppose"</span>,</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>                                       <span class="st">"Strongly oppose"</span>)), </span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">female =</span> <span class="fu">factor</span>(female, </span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>                            <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), </span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>                            <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Not female"</span>, <span class="st">"Female"</span>)), </span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>            <span class="at">pid =</span> <span class="fu">factor</span>(pid,</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>                         <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">7</span>),</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>                         <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Strong democrat"</span>,</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">"Weak democrat"</span>,</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">"Independent democrat"</span>,</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">"Independent"</span>,</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">"Independent republican"</span>,</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">"Weak republican"</span>,</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">"Strong republican"</span>))) <span class="sc">|&gt;</span> </span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  labelled<span class="sc">::</span><span class="fu">set_variable_labels</span>(<span class="at">warsup =</span> <span class="st">"Support for the war"</span>,</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>                                <span class="at">female =</span> <span class="st">"Female"</span>,</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>                                <span class="at">pid =</span> <span class="st">"Party ID"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>()</span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(student_survey)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> rio<span class="sc">::</span><span class="fu">import</span>(<span class="st">"https://stats.idre.ucla.edu/stat/data/hsbdemo.dta"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">prog =</span> <span class="fu">factor</span>(prog, <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"General"</span>, <span class="st">"Academic"</span>, <span class="st">"Vocational"</span>), <span class="at">ordered =</span> F),</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">ses =</span> <span class="fu">factor</span>(ses, <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Low"</span>, <span class="st">"Middle"</span>, <span class="st">"High"</span>), <span class="at">ordered =</span> T),</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    write</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>            warsup     female                    pid
-1  Somewhat oppose     Female          Weak democrat
-2 Somewhat support     Female      Strong republican
-3 Strongly support Not female            Independent
-4 Strongly support     Female      Strong republican
-5 Strongly support Not female Independent republican
-6 Strongly support     Female      Strong republican</code></pre>
+<pre><code>        prog    ses write
+1 Vocational    Low    35
+2    General Middle    33
+3 Vocational   High    39
+4 Vocational    Low    37
+5 Vocational Middle    31
+6    General   High    36</code></pre>
 </div>
 </div>
+<p>The data set contains variables on 200 students. The outcome variable is <code>prog</code>, or program type. The predictor variables are social economic status, <code>ses</code>, a three-level categorical variable and writing score, <code>write</code>, a continuous variable.</p>
 <p>Let’s look at our dataset:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">skim</span>(student_survey)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">skim</span>(df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <caption>Data summary</caption>
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">Name</td>
-<td style="text-align: left;">student_survey</td>
+<td style="text-align: left;">df</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Number of rows</td>
-<td style="text-align: left;">1154</td>
+<td style="text-align: left;">200</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Number of columns</td>
@@ -391,13 +375,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </tr>
 <tr class="even">
 <td style="text-align: left;">factor</td>
-<td style="text-align: left;">3</td>
+<td style="text-align: left;">2</td>
 </tr>
 <tr class="odd">
+<td style="text-align: left;">numeric</td>
+<td style="text-align: left;">1</td>
+</tr>
+<tr class="even">
 <td style="text-align: left;">________________________</td>
 <td style="text-align: left;"></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">Group variables</td>
 <td style="text-align: left;">None</td>
 </tr>
@@ -406,12 +394,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p><strong>Variable type: factor</strong></p>
 <table class="table table-sm table-striped">
 <colgroup>
-<col style="width: 14%">
-<col style="width: 10%">
-<col style="width: 14%">
-<col style="width: 8%">
+<col style="width: 17%">
+<col style="width: 12%">
+<col style="width: 17%">
 <col style="width: 9%">
-<col style="width: 41%">
+<col style="width: 10%">
+<col style="width: 32%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -425,28 +413,66 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">warsup</td>
+<td style="text-align: left;">prog</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: left;">FALSE</td>
-<td style="text-align: right;">4</td>
-<td style="text-align: left;">Str: 379, Som: 275, Str: 272, Som: 228</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: left;">Aca: 105, Voc: 50, Gen: 45</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">female</td>
+<td style="text-align: left;">ses</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: left;">FALSE</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: left;">Fem: 649, Not: 505</td>
+<td style="text-align: left;">TRUE</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: left;">Mid: 95, Hig: 58, Low: 47</td>
 </tr>
+</tbody>
+</table>
+<p><strong>Variable type: numeric</strong></p>
+<table class="table table-sm table-striped">
+<colgroup>
+<col style="width: 18%">
+<col style="width: 12%">
+<col style="width: 18%">
+<col style="width: 7%">
+<col style="width: 6%">
+<col style="width: 3%">
+<col style="width: 7%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 6%">
+<col style="width: 7%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">skim_variable</th>
+<th style="text-align: right;">n_missing</th>
+<th style="text-align: right;">complete_rate</th>
+<th style="text-align: right;">mean</th>
+<th style="text-align: right;">sd</th>
+<th style="text-align: right;">p0</th>
+<th style="text-align: right;">p25</th>
+<th style="text-align: right;">p50</th>
+<th style="text-align: right;">p75</th>
+<th style="text-align: right;">p100</th>
+<th style="text-align: left;">hist</th>
+</tr>
+</thead>
+<tbody>
 <tr class="odd">
-<td style="text-align: left;">pid</td>
+<td style="text-align: left;">write</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: left;">FALSE</td>
-<td style="text-align: right;">7</td>
-<td style="text-align: left;">Str: 244, Str: 218, Wea: 192, Ind: 164</td>
+<td style="text-align: right;">52.78</td>
+<td style="text-align: right;">9.48</td>
+<td style="text-align: right;">31</td>
+<td style="text-align: right;">45.75</td>
+<td style="text-align: right;">54</td>
+<td style="text-align: right;">60</td>
+<td style="text-align: right;">67</td>
+<td style="text-align: left;">▂▅▆▇▇</td>
 </tr>
 </tbody>
 </table>
@@ -455,7 +481,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </section>
 <section id="multinomial-logit-regression" class="level2">
 <h2 class="anchored" data-anchor-id="multinomial-logit-regression">Multinomial logit regression</h2>
-<p>In a binomial logistic regression, we measure the probability that our outcome, <span class="math inline">\(y\)</span>, will take on one of two options: usually <span class="math inline">\(y = 0\)</span> or <span class="math inline">\(y = 1\)</span>. For multinomial logit regression, we model the probability that our outcome, <span class="math inline">\(y\)</span>, will take on one of more than two options. You need to select a baseline category from which you will compare your probability of success for all other categories.</p>
+<p>In a binomial logistic regression, we measure the probability that our outcome, <span class="math inline">\(y\)</span>, will take on one of two options: usually <span class="math inline">\(y = 0\)</span> or <span class="math inline">\(y = 1\)</span>. For multinomial logit regression, we model the probability that our outcome, <span class="math inline">\(y\)</span>, will take on one of more than two unordered options. You need to select a baseline category from which you will compare your probability of success for all other categories.</p>
 <blockquote class="blockquote">
 <p>A multinomial model is genuinely an extension of binomial logistic regression. We could fit a series of binomial logistic regression models and get the same outcome.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
 </blockquote>
@@ -468,15 +494,13 @@ Pr(Y = 1 | X) = ln(\frac{P}{1-P}) = \beta_0 + \beta_1X_1 + ... = \beta_kX_k
 <p><span class="math display">\[
 ln(\frac{P_{category 2}}{P_{category 1}})
 \]</span></p>
-<p>Let’s explore this by looking at the level of support university students had for the Iraq war. Our outcome variable can take on one of four options: strong opposition, weak opposition, weak support, and strong support for the war. Let’s pick strong support as our baseline category. We now need to calculate three equations that model the relative log odds ratio that an individual will express strong opposition, weak opposition, or weak support for the war relative to the probability that they will express strong support for the war:</p>
+<p>Let’s explore this by looking at which program a student is likely to select given two predictors: their socio-economic status and their writing ability. Our outcome variable, <code>prog</code>, can take on one of three options: general, academic, or vocational. There is no inherent order among these choices.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p>
+<p>We need to pick a baseline option. From there, we can estimate the probability that an individual will choose one of the other programs relative to that baseline option. Let’s choose the general program as our baseline. Now, we can define our two relative log odds ratios as:</p>
 <p><span class="math display">\[
-Pr(y = strong\_opposition | X) = log(\frac{Pr(y = strong\_opposition)}{Pr(y = strong\_support)})
+Pr(prog = academic | X) = log(\frac{Pr(prog = academic)}{Pr(prog = general)})
 \]</span></p>
 <p><span class="math display">\[
-Pr(y = weak\_opposition | X) = log(\frac{Pr(y = weak\_opposition)}{Pr(y = strong\_support)})
-\]</span></p>
-<p><span class="math display">\[
-Pr(y = weak\_support | X) = log(\frac{Pr(y = weak\_support)}{Pr(y = strong\_support)})
+Pr(prog = vocational | X) = log(\frac{Pr(prog = vocational)}{Pr(prog = general)})
 \]</span></p>
 <section id="assumptions" class="level3">
 <h3 class="anchored" data-anchor-id="assumptions">Assumptions</h3>
@@ -532,119 +556,94 @@ Pr(cand\_4) = \frac{1}{5}
 Pr(y_i = m | x_i) = \frac{e^{x_i\beta(m)}}{\sum^{J}_{j = 1}e^{x_i\beta(j)}}
 \]</span></p>
 <p>Where <span class="math inline">\(m\)</span> is the option you have set to the baseline and <span class="math inline">\(j\)</span> is all other options.</p>
-<p>Let’s visualise the relationship between support for the war and gender:</p>
+<p>Let’s visualise the relationship between the program selected and the student’s socio-economic status:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> student_survey <span class="sc">|&gt;</span> </span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(warsup <span class="sc">==</span> <span class="st">"Strongly support"</span> <span class="sc">|</span> warsup <span class="sc">==</span> <span class="st">"Somewhat support"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">as.numeric</span>(female), <span class="at">y =</span> <span class="fu">as.numeric</span>(warsup))) <span class="sc">+</span> </span>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> df <span class="sc">|&gt;</span> </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(prog <span class="sc">==</span> <span class="st">"General"</span> <span class="sc">|</span> prog <span class="sc">==</span> <span class="st">"Academic"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">as.numeric</span>(ses), <span class="at">y =</span> <span class="fu">as.numeric</span>(prog))) <span class="sc">+</span> </span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"loess"</span>, <span class="at">se =</span> F) <span class="sc">+</span> </span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span> </span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Somewhat support"</span>, </span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Academic"</span>, </span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="cn">NULL</span>)</span>
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> student_survey <span class="sc">|&gt;</span> </span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(warsup <span class="sc">==</span> <span class="st">"Strongly support"</span> <span class="sc">|</span> warsup <span class="sc">==</span> <span class="st">"Somewhat oppose"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">as.numeric</span>(female), <span class="at">y =</span> <span class="fu">as.numeric</span>(warsup))) <span class="sc">+</span> </span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> df <span class="sc">|&gt;</span> </span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(prog <span class="sc">==</span> <span class="st">"General"</span> <span class="sc">|</span> prog <span class="sc">==</span> <span class="st">"Vocational"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">as.numeric</span>(ses), <span class="at">y =</span> <span class="fu">as.numeric</span>(prog))) <span class="sc">+</span> </span>
 <span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
 <span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"loess"</span>, <span class="at">se =</span> F) <span class="sc">+</span> </span>
 <span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span> </span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Somewhat oppose"</span>, </span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="cn">NULL</span>)</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Vocational"</span>, </span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="cn">NULL</span>)</span>
 <span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>p3 <span class="ot">&lt;-</span> student_survey <span class="sc">|&gt;</span> </span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(warsup <span class="sc">==</span> <span class="st">"Strongly support"</span> <span class="sc">|</span> warsup <span class="sc">==</span> <span class="st">"Strongly oppose"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">as.numeric</span>(female), <span class="at">y =</span> <span class="fu">as.numeric</span>(warsup))) <span class="sc">+</span> </span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"loess"</span>, <span class="at">se =</span> F) <span class="sc">+</span> </span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span> </span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Strongly oppose"</span>, </span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="cn">NULL</span>,</span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="cn">NULL</span>)</span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>p1 <span class="sc">|</span> p2 <span class="sc">|</span> p3</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>p1 <span class="sc">|</span> p2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="multinomial_intro_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>And for party ID:</p>
+<p>And for writing scores:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> student_survey <span class="sc">|&gt;</span> </span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(warsup <span class="sc">==</span> <span class="st">"Strongly support"</span> <span class="sc">|</span> warsup <span class="sc">==</span> <span class="st">"Somewhat support"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">as.numeric</span>(pid), <span class="at">y =</span> <span class="fu">as.numeric</span>(warsup))) <span class="sc">+</span> </span>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> df <span class="sc">|&gt;</span> </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(prog <span class="sc">==</span> <span class="st">"General"</span> <span class="sc">|</span> prog <span class="sc">==</span> <span class="st">"Academic"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> write, <span class="at">y =</span> <span class="fu">as.numeric</span>(prog))) <span class="sc">+</span> </span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"loess"</span>, <span class="at">se =</span> F) <span class="sc">+</span> </span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span> </span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Somewhat support"</span>, </span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Academic"</span>, </span>
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="cn">NULL</span>)</span>
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> student_survey <span class="sc">|&gt;</span> </span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(warsup <span class="sc">==</span> <span class="st">"Strongly support"</span> <span class="sc">|</span> warsup <span class="sc">==</span> <span class="st">"Somewhat oppose"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">as.numeric</span>(pid), <span class="at">y =</span> <span class="fu">as.numeric</span>(warsup))) <span class="sc">+</span> </span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> df <span class="sc">|&gt;</span> </span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(prog <span class="sc">==</span> <span class="st">"General"</span> <span class="sc">|</span> prog <span class="sc">==</span> <span class="st">"Vocational"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> write, <span class="at">y =</span> <span class="fu">as.numeric</span>(prog))) <span class="sc">+</span> </span>
 <span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
 <span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"loess"</span>, <span class="at">se =</span> F) <span class="sc">+</span> </span>
 <span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span> </span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Somewhat oppose"</span>, </span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="cn">NULL</span>)</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Vocational"</span>, </span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="cn">NULL</span>)</span>
 <span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>p3 <span class="ot">&lt;-</span> student_survey <span class="sc">|&gt;</span> </span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(warsup <span class="sc">==</span> <span class="st">"Strongly support"</span> <span class="sc">|</span> warsup <span class="sc">==</span> <span class="st">"Strongly oppose"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">as.numeric</span>(pid), <span class="at">y =</span> <span class="fu">as.numeric</span>(warsup))) <span class="sc">+</span> </span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"loess"</span>, <span class="at">se =</span> F) <span class="sc">+</span> </span>
-<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span> </span>
-<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Strongly oppose"</span>, </span>
-<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="cn">NULL</span>,</span>
-<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="cn">NULL</span>)</span>
-<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>p1 <span class="sc">|</span> p2 <span class="sc">|</span> p3</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>p1 <span class="sc">|</span> p2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="multinomial_intro_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>We can see here that the relationship between these independent variables and an individual’s level of support for the war is different based on the choice at hand. Multinomial modelling allows us to measure this. We are essentially developing a different model for each outcome option: strongly support vs.&nbsp;strong oppose, strongly support vs.&nbsp;weakly oppose, and strongly support vs.&nbsp;weakly support.</p>
+<p>We can see here that the relationship between these independent variables and the student’s choice of program is different based on the choice at hand. Multinomial modelling allows us to measure this. We are essentially developing a different model for each outcome option: general vs.&nbsp;academic, and general vs.&nbsp;vocational.</p>
 <p>Let’s fit our model using <code>nnet::multinom()</code> and display the results using <code>broom::tidy()</code>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>m1 <span class="ot">&lt;-</span> <span class="fu">multinom</span>(warsup <span class="sc">~</span> female <span class="sc">+</span> pid, <span class="at">data =</span> student_survey)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>m1 <span class="ot">&lt;-</span> <span class="fu">multinom</span>(prog <span class="sc">~</span> ses <span class="sc">+</span> write, <span class="at">data =</span> df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># weights:  36 (24 variable)
-initial  value 1599.783693 
-iter  10 value 1269.729784
-iter  20 value 1238.972501
-iter  30 value 1232.894042
-final  value 1232.880028 
+<pre><code># weights:  15 (8 variable)
+initial  value 219.722458 
+iter  10 value 179.991227
+final  value 179.981726 
 converged</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(m1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 24 × 6
-   y.level          term                      estimate std.error stati…¹ p.value
-   &lt;chr&gt;            &lt;chr&gt;                        &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
- 1 Somewhat support (Intercept)                  0.239     0.427   0.560 5.76e-1
- 2 Somewhat support femaleFemale                 0.655     0.181   3.61  3.06e-4
- 3 Somewhat support pidWeak democrat             0.535     0.540   0.991 3.22e-1
- 4 Somewhat support pidIndependent democrat      0.691     0.578   1.20  2.32e-1
- 5 Somewhat support pidIndependent              -0.284     0.531  -0.535 5.93e-1
- 6 Somewhat support pidIndependent republican   -0.323     0.484  -0.667 5.04e-1
- 7 Somewhat support pidWeak republican          -0.406     0.450  -0.902 3.67e-1
- 8 Somewhat support pidStrong republican        -1.30      0.439  -2.97  3.01e-3
- 9 Somewhat oppose  (Intercept)                  1.70      0.377   4.52  6.30e-6
-10 Somewhat oppose  femaleFemale                 0.468     0.222   2.11  3.49e-2
-# … with 14 more rows, and abbreviated variable name ¹​statistic</code></pre>
+<pre><code># A tibble: 8 × 6
+  y.level    term        estimate std.error statistic p.value
+  &lt;chr&gt;      &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+1 Academic   (Intercept)  -2.29      1.16      -1.98  0.0479 
+2 Academic   ses.L         0.822     0.364      2.26  0.0237 
+3 Academic   ses.Q         0.0393    0.306      0.128 0.898  
+4 Academic   write         0.0579    0.0214     2.71  0.00682
+5 Vocational (Intercept)   2.70      1.17       2.31  0.0211 
+6 Vocational ses.L         0.127     0.459      0.278 0.781  
+7 Vocational ses.Q        -0.600     0.356     -1.68  0.0922 
+8 Vocational write        -0.0557    0.0233    -2.39  0.0170 </code></pre>
 </div>
 </div>
-<p>Here, we can see that the model has produced different coefficients for each of our independent variables for each outcome option. The first column tells us which outcome option we are modelling: weak support, weak opposition, and strong opposition.</p>
+<p>Here, we can see that the model has produced different coefficients for each of our independent variables for each outcome option. The first column tells us which outcome option we are modelling: academic or vocational.</p>
 <p>We can more formally present these results using <code>gtsummary::tbl_regression()</code>:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl_regression</span>(m1, <span class="at">exponentiate =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
-<div id="lxkntraqmo" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="lpbwdrsyro" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#lxkntraqmo .gt_table {
+#lpbwdrsyro .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -669,7 +668,7 @@ converged</code></pre>
   border-left-color: #D3D3D3;
 }
 
-#lxkntraqmo .gt_heading {
+#lpbwdrsyro .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -681,7 +680,7 @@ converged</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#lxkntraqmo .gt_title {
+#lpbwdrsyro .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -693,7 +692,7 @@ converged</code></pre>
   border-bottom-width: 0;
 }
 
-#lxkntraqmo .gt_subtitle {
+#lpbwdrsyro .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -705,13 +704,13 @@ converged</code></pre>
   border-top-width: 0;
 }
 
-#lxkntraqmo .gt_bottom_border {
+#lpbwdrsyro .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#lxkntraqmo .gt_col_headings {
+#lpbwdrsyro .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -726,7 +725,7 @@ converged</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#lxkntraqmo .gt_col_heading {
+#lpbwdrsyro .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -746,7 +745,7 @@ converged</code></pre>
   overflow-x: hidden;
 }
 
-#lxkntraqmo .gt_column_spanner_outer {
+#lpbwdrsyro .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -758,15 +757,15 @@ converged</code></pre>
   padding-right: 4px;
 }
 
-#lxkntraqmo .gt_column_spanner_outer:first-child {
+#lpbwdrsyro .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#lxkntraqmo .gt_column_spanner_outer:last-child {
+#lpbwdrsyro .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#lxkntraqmo .gt_column_spanner {
+#lpbwdrsyro .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -778,7 +777,7 @@ converged</code></pre>
   width: 100%;
 }
 
-#lxkntraqmo .gt_group_heading {
+#lpbwdrsyro .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -803,7 +802,7 @@ converged</code></pre>
   vertical-align: middle;
 }
 
-#lxkntraqmo .gt_empty_group_heading {
+#lpbwdrsyro .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -818,15 +817,15 @@ converged</code></pre>
   vertical-align: middle;
 }
 
-#lxkntraqmo .gt_from_md > :first-child {
+#lpbwdrsyro .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#lxkntraqmo .gt_from_md > :last-child {
+#lpbwdrsyro .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#lxkntraqmo .gt_row {
+#lpbwdrsyro .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -845,7 +844,7 @@ converged</code></pre>
   overflow-x: hidden;
 }
 
-#lxkntraqmo .gt_stub {
+#lpbwdrsyro .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -858,7 +857,7 @@ converged</code></pre>
   padding-right: 5px;
 }
 
-#lxkntraqmo .gt_stub_row_group {
+#lpbwdrsyro .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -872,11 +871,11 @@ converged</code></pre>
   vertical-align: top;
 }
 
-#lxkntraqmo .gt_row_group_first td {
+#lpbwdrsyro .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#lxkntraqmo .gt_summary_row {
+#lpbwdrsyro .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -886,16 +885,16 @@ converged</code></pre>
   padding-right: 5px;
 }
 
-#lxkntraqmo .gt_first_summary_row {
+#lpbwdrsyro .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#lxkntraqmo .gt_first_summary_row.thick {
+#lpbwdrsyro .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#lxkntraqmo .gt_last_summary_row {
+#lpbwdrsyro .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -905,7 +904,7 @@ converged</code></pre>
   border-bottom-color: #D3D3D3;
 }
 
-#lxkntraqmo .gt_grand_summary_row {
+#lpbwdrsyro .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -915,7 +914,7 @@ converged</code></pre>
   padding-right: 5px;
 }
 
-#lxkntraqmo .gt_first_grand_summary_row {
+#lpbwdrsyro .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -925,11 +924,11 @@ converged</code></pre>
   border-top-color: #D3D3D3;
 }
 
-#lxkntraqmo .gt_striped {
+#lpbwdrsyro .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#lxkntraqmo .gt_table_body {
+#lpbwdrsyro .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -938,7 +937,7 @@ converged</code></pre>
   border-bottom-color: #D3D3D3;
 }
 
-#lxkntraqmo .gt_footnotes {
+#lpbwdrsyro .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -952,7 +951,7 @@ converged</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#lxkntraqmo .gt_footnote {
+#lpbwdrsyro .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-left: 4px;
@@ -961,7 +960,7 @@ converged</code></pre>
   padding-right: 5px;
 }
 
-#lxkntraqmo .gt_sourcenotes {
+#lpbwdrsyro .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -975,7 +974,7 @@ converged</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#lxkntraqmo .gt_sourcenote {
+#lpbwdrsyro .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -983,64 +982,64 @@ converged</code></pre>
   padding-right: 5px;
 }
 
-#lxkntraqmo .gt_left {
+#lpbwdrsyro .gt_left {
   text-align: left;
 }
 
-#lxkntraqmo .gt_center {
+#lpbwdrsyro .gt_center {
   text-align: center;
 }
 
-#lxkntraqmo .gt_right {
+#lpbwdrsyro .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#lxkntraqmo .gt_font_normal {
+#lpbwdrsyro .gt_font_normal {
   font-weight: normal;
 }
 
-#lxkntraqmo .gt_font_bold {
+#lpbwdrsyro .gt_font_bold {
   font-weight: bold;
 }
 
-#lxkntraqmo .gt_font_italic {
+#lpbwdrsyro .gt_font_italic {
   font-style: italic;
 }
 
-#lxkntraqmo .gt_super {
+#lpbwdrsyro .gt_super {
   font-size: 65%;
 }
 
-#lxkntraqmo .gt_footnote_marks {
+#lpbwdrsyro .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 75%;
   vertical-align: 0.4em;
 }
 
-#lxkntraqmo .gt_asterisk {
+#lpbwdrsyro .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#lxkntraqmo .gt_indent_1 {
+#lpbwdrsyro .gt_indent_1 {
   text-indent: 5px;
 }
 
-#lxkntraqmo .gt_indent_2 {
+#lpbwdrsyro .gt_indent_2 {
   text-indent: 10px;
 }
 
-#lxkntraqmo .gt_indent_3 {
+#lpbwdrsyro .gt_indent_3 {
   text-indent: 15px;
 }
 
-#lxkntraqmo .gt_indent_4 {
+#lpbwdrsyro .gt_indent_4 {
   text-indent: 20px;
 }
 
-#lxkntraqmo .gt_indent_5 {
+#lpbwdrsyro .gt_indent_5 {
   text-indent: 25px;
 }
 </style>
@@ -1056,146 +1055,43 @@ converged</code></pre>
   </thead>
   <tbody class="gt_table_body">
     <tr class="gt_group_heading_row">
-      <td colspan="4" class="gt_group_heading">Somewhat support</td>
+      <td colspan="4" class="gt_group_heading">Academic</td>
     </tr>
-    <tr class="gt_row_group_first"><td class="gt_row gt_left">Female</td>
+    <tr class="gt_row_group_first"><td class="gt_row gt_left">ses</td>
 <td class="gt_row gt_center"></td>
 <td class="gt_row gt_center"></td>
 <td class="gt_row gt_center"></td></tr>
-    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Not female</td>
-<td class="gt_row gt_center">—</td>
-<td class="gt_row gt_center">—</td>
-<td class="gt_row gt_center"></td></tr>
-    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Female</td>
-<td class="gt_row gt_center">1.92</td>
-<td class="gt_row gt_center">1.35, 2.75</td>
-<td class="gt_row gt_center">&lt;0.001</td></tr>
-    <tr><td class="gt_row gt_left">Party ID</td>
-<td class="gt_row gt_center"></td>
-<td class="gt_row gt_center"></td>
-<td class="gt_row gt_center"></td></tr>
-    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Strong democrat</td>
-<td class="gt_row gt_center">—</td>
-<td class="gt_row gt_center">—</td>
-<td class="gt_row gt_center"></td></tr>
-    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Weak democrat</td>
-<td class="gt_row gt_center">1.71</td>
-<td class="gt_row gt_center">0.59, 4.92</td>
-<td class="gt_row gt_center">0.3</td></tr>
-    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Independent democrat</td>
-<td class="gt_row gt_center">2.00</td>
-<td class="gt_row gt_center">0.64, 6.19</td>
-<td class="gt_row gt_center">0.2</td></tr>
-    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Independent</td>
-<td class="gt_row gt_center">0.75</td>
-<td class="gt_row gt_center">0.27, 2.13</td>
-<td class="gt_row gt_center">0.6</td></tr>
-    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Independent republican</td>
-<td class="gt_row gt_center">0.72</td>
-<td class="gt_row gt_center">0.28, 1.87</td>
-<td class="gt_row gt_center">0.5</td></tr>
-    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Weak republican</td>
-<td class="gt_row gt_center">0.67</td>
-<td class="gt_row gt_center">0.28, 1.61</td>
-<td class="gt_row gt_center">0.4</td></tr>
-    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Strong republican</td>
-<td class="gt_row gt_center">0.27</td>
-<td class="gt_row gt_center">0.11, 0.64</td>
-<td class="gt_row gt_center">0.003</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">ses.L</td>
+<td class="gt_row gt_center">2.28</td>
+<td class="gt_row gt_center">1.12, 4.64</td>
+<td class="gt_row gt_center">0.024</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">ses.Q</td>
+<td class="gt_row gt_center">1.04</td>
+<td class="gt_row gt_center">0.57, 1.89</td>
+<td class="gt_row gt_center">0.9</td></tr>
+    <tr><td class="gt_row gt_left">writing score</td>
+<td class="gt_row gt_center">1.06</td>
+<td class="gt_row gt_center">1.02, 1.11</td>
+<td class="gt_row gt_center">0.007</td></tr>
     <tr class="gt_group_heading_row">
-      <td colspan="4" class="gt_group_heading">Somewhat oppose</td>
+      <td colspan="4" class="gt_group_heading">Vocational</td>
     </tr>
-    <tr class="gt_row_group_first"><td class="gt_row gt_left">Female</td>
+    <tr class="gt_row_group_first"><td class="gt_row gt_left">ses</td>
 <td class="gt_row gt_center"></td>
 <td class="gt_row gt_center"></td>
 <td class="gt_row gt_center"></td></tr>
-    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Not female</td>
-<td class="gt_row gt_center">—</td>
-<td class="gt_row gt_center">—</td>
-<td class="gt_row gt_center"></td></tr>
-    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Female</td>
-<td class="gt_row gt_center">1.60</td>
-<td class="gt_row gt_center">1.03, 2.47</td>
-<td class="gt_row gt_center">0.035</td></tr>
-    <tr><td class="gt_row gt_left">Party ID</td>
-<td class="gt_row gt_center"></td>
-<td class="gt_row gt_center"></td>
-<td class="gt_row gt_center"></td></tr>
-    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Strong democrat</td>
-<td class="gt_row gt_center">—</td>
-<td class="gt_row gt_center">—</td>
-<td class="gt_row gt_center"></td></tr>
-    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Weak democrat</td>
-<td class="gt_row gt_center">0.86</td>
-<td class="gt_row gt_center">0.33, 2.21</td>
-<td class="gt_row gt_center">0.7</td></tr>
-    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Independent democrat</td>
-<td class="gt_row gt_center">0.90</td>
-<td class="gt_row gt_center">0.32, 2.51</td>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">ses.L</td>
+<td class="gt_row gt_center">1.14</td>
+<td class="gt_row gt_center">0.46, 2.79</td>
 <td class="gt_row gt_center">0.8</td></tr>
-    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Independent</td>
-<td class="gt_row gt_center">0.08</td>
-<td class="gt_row gt_center">0.03, 0.24</td>
-<td class="gt_row gt_center">&lt;0.001</td></tr>
-    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Independent republican</td>
-<td class="gt_row gt_center">0.11</td>
-<td class="gt_row gt_center">0.04, 0.26</td>
-<td class="gt_row gt_center">&lt;0.001</td></tr>
-    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Weak republican</td>
-<td class="gt_row gt_center">0.03</td>
-<td class="gt_row gt_center">0.01, 0.08</td>
-<td class="gt_row gt_center">&lt;0.001</td></tr>
-    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Strong republican</td>
-<td class="gt_row gt_center">0.01</td>
-<td class="gt_row gt_center">0.00, 0.02</td>
-<td class="gt_row gt_center">&lt;0.001</td></tr>
-    <tr class="gt_group_heading_row">
-      <td colspan="4" class="gt_group_heading">Strongly oppose</td>
-    </tr>
-    <tr class="gt_row_group_first"><td class="gt_row gt_left">Female</td>
-<td class="gt_row gt_center"></td>
-<td class="gt_row gt_center"></td>
-<td class="gt_row gt_center"></td></tr>
-    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Not female</td>
-<td class="gt_row gt_center">—</td>
-<td class="gt_row gt_center">—</td>
-<td class="gt_row gt_center"></td></tr>
-    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Female</td>
-<td class="gt_row gt_center">1.97</td>
-<td class="gt_row gt_center">1.30, 2.98</td>
-<td class="gt_row gt_center">0.001</td></tr>
-    <tr><td class="gt_row gt_left">Party ID</td>
-<td class="gt_row gt_center"></td>
-<td class="gt_row gt_center"></td>
-<td class="gt_row gt_center"></td></tr>
-    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Strong democrat</td>
-<td class="gt_row gt_center">—</td>
-<td class="gt_row gt_center">—</td>
-<td class="gt_row gt_center"></td></tr>
-    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Weak democrat</td>
-<td class="gt_row gt_center">0.45</td>
-<td class="gt_row gt_center">0.18, 1.14</td>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">ses.Q</td>
+<td class="gt_row gt_center">0.55</td>
+<td class="gt_row gt_center">0.27, 1.10</td>
 <td class="gt_row gt_center">0.092</td></tr>
-    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Independent democrat</td>
-<td class="gt_row gt_center">0.67</td>
-<td class="gt_row gt_center">0.25, 1.80</td>
-<td class="gt_row gt_center">0.4</td></tr>
-    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Independent</td>
-<td class="gt_row gt_center">0.14</td>
-<td class="gt_row gt_center">0.06, 0.34</td>
-<td class="gt_row gt_center">&lt;0.001</td></tr>
-    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Independent republican</td>
-<td class="gt_row gt_center">0.03</td>
-<td class="gt_row gt_center">0.01, 0.08</td>
-<td class="gt_row gt_center">&lt;0.001</td></tr>
-    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Weak republican</td>
-<td class="gt_row gt_center">0.01</td>
-<td class="gt_row gt_center">0.00, 0.02</td>
-<td class="gt_row gt_center">&lt;0.001</td></tr>
-    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Strong republican</td>
-<td class="gt_row gt_center">0.00</td>
-<td class="gt_row gt_center">0.00, 0.01</td>
-<td class="gt_row gt_center">&lt;0.001</td></tr>
+    <tr><td class="gt_row gt_left">writing score</td>
+<td class="gt_row gt_center">0.95</td>
+<td class="gt_row gt_center">0.90, 0.99</td>
+<td class="gt_row gt_center">0.017</td></tr>
   </tbody>
   
   <tfoot class="gt_footnotes">
@@ -1260,6 +1156,7 @@ Pr(car) = \frac{3}{6}
 
 <ol>
 <li id="fn1" role="doc-endnote"><p>Well… almost the same outcome. Multinomial regression is more efficient. Our errors will be slightly different to those we would obtain if we fit multiple binary regressions.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2" role="doc-endnote"><p>If there is some inherent order, you should use ordered logistic regression. See the previous section for more details.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

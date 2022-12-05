@@ -31,9 +31,6 @@ website:
         - section: "Count responses"
           contents:
             - contents/count_intro.qmd
-        - section: "Duration models"
-          contents:
-            - contents/event_intro.qmd
 
 format:
   html:

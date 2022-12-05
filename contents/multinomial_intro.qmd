@@ -30,51 +30,36 @@ library(sjPlot)
 
 In political science, we are often interested in measuring the probability of success for more than two outcomes. For example, we may want to know the probability that an individual will vote for a specific candidate in an election. If our individuals have more than two candidates from which to choose, we can take advantage of multinomial modelling. 
 
-Multinomial models are linear regression models that measure the probability of success across outcomes with more than two options. As with binary outcomes, we can choose between two common approaches to these models: logit and probit regression. Multinomial logit and probit models are an extension of the binary latent variable models we discussed in the previous section. Rather than modelling the choice made between two options - success or failure, vote or not vote - we can efficiently model the choice between many different options, for example: strongly favour, weakly favour, weakly dislike, strongly dislike. 
+Multinomial models are linear regression models that measure the probability of success across outcomes with more than two, unordered options. As with binary outcomes, we can choose between two common approaches to these models: logit and probit regression. Multinomial logit and probit models are an extension of the binary latent variable models we discussed in the previous section. Rather than modelling the choice made between two options - success or failure, vote or not vote - we can efficiently model the choice between many different options. 
 
 Unlike previously, the choice between a multinomial logit model and a multinomial probit model is not trivial. This difference centres on the Independence of Irrelevant Alternatives (IIA) assumption. We will discuss this shortly. 
 
-To explore this question, we will look at students' level of support for the Iraq war based on their gender and their party affiliation (measured on a seven-point scale).
+To explore this question, we will look at which type of schooling program students choose given a set of predictors. This example is provided in the [UCLA Multinomial Logistic Regression post](https://stats.oarc.ucla.edu/r/dae/multinomial-logistic-regression/). 
 
 Let's load and clean our data:
 
 ```{r}
-student_survey <- rio::import("/Users/harrietgoers/Downloads/student vote GVPT 729a.dta") |> 
-  transmute(warsup = factor(warsup, 
-                            levels = c(1, 2, 3, 4),
-                            labels = c("Strongly support",
-                                       "Somewhat support",
-                                       "Somewhat oppose",
-                                       "Strongly oppose")), 
-            female = factor(female, 
-                            levels = c(0, 1), 
-                            labels = c("Not female", "Female")), 
-            pid = factor(pid,
-                         levels = c(1, 2, 3, 4, 5, 6, 7),
-                         labels = c("Strong democrat",
-                                    "Weak democrat",
-                                    "Independent democrat",
-                                    "Independent",
-                                    "Independent republican",
-                                    "Weak republican",
-                                    "Strong republican"))) |> 
-  labelled::set_variable_labels(warsup = "Support for the war",
-                                female = "Female",
-                                pid = "Party ID") |> 
-  drop_na()
+df <- rio::import("https://stats.idre.ucla.edu/stat/data/hsbdemo.dta") |> 
+  transmute(
+    prog = factor(prog, labels = c("General", "Academic", "Vocational"), ordered = F),
+    ses = factor(ses, labels = c("Low", "Middle", "High"), ordered = T),
+    write
+  )
 
-head(student_survey)
+head(df)
 ```
+
+The data set contains variables on 200 students. The outcome variable is `prog`, or program type. The predictor variables are social economic status, `ses`, a three-level categorical variable and writing score, `write`, a continuous variable. 
 
 Let's look at our dataset: 
 
 ```{r}
-skim(student_survey)
+skim(df)
 ```
 
 ## Multinomial logit regression
 
-In a binomial logistic regression, we measure the probability that our outcome, $y$, will take on one of two options: usually $y = 0$ or $y = 1$. For multinomial logit regression, we model the probability that our outcome, $y$, will take on one of more than two options. You need to select a baseline category from which you will compare your probability of success for all other categories.
+In a binomial logistic regression, we measure the probability that our outcome, $y$, will take on one of two options: usually $y = 0$ or $y = 1$. For multinomial logit regression, we model the probability that our outcome, $y$, will take on one of more than two unordered options. You need to select a baseline category from which you will compare your probability of success for all other categories.
 
 > A multinomial model is genuinely an extension of binomial logistic regression. We could fit a series of binomial logistic regression models and get the same outcome.[^1]
 
@@ -94,18 +79,18 @@ $$
 ln(\frac{P_{category 2}}{P_{category 1}})
 $$
 
-Let's explore this by looking at the level of support university students had for the Iraq war. Our outcome variable can take on one of four options: strong opposition, weak opposition, weak support, and strong support for the war. Let's pick strong support as our baseline category. We now need to calculate three equations that model the relative log odds ratio that an individual will express strong opposition, weak opposition, or weak support for the war relative to the probability that they will express strong support for the war: 
+Let's explore this by looking at which program a student is likely to select given two predictors: their socio-economic status and their writing ability. Our outcome variable, `prog`, can take on one of three options: general, academic, or vocational. There is no inherent order among these choices.[^2]
+
+[^2]: If there is some inherent order, you should use ordered logistic regression. See the previous section for more details. 
+
+We need to pick a baseline option. From there, we can estimate the probability that an individual will choose one of the other programs relative to that baseline option. Let's choose the general program as our baseline. Now, we can define our two relative log odds ratios as: 
 
 $$
-Pr(y = strong\_opposition | X) = log(\frac{Pr(y = strong\_opposition)}{Pr(y = strong\_support)})
+Pr(prog = academic | X) = log(\frac{Pr(prog = academic)}{Pr(prog = general)})
 $$
 
 $$
-Pr(y = weak\_opposition | X) = log(\frac{Pr(y = weak\_opposition)}{Pr(y = strong\_support)})
-$$
-
-$$
-Pr(y = weak\_support | X) = log(\frac{Pr(y = weak\_support)}{Pr(y = strong\_support)})
+Pr(prog = vocational | X) = log(\frac{Pr(prog = vocational)}{Pr(prog = general)})
 $$
 
 ### Assumptions
@@ -174,85 +159,65 @@ $$
 
 Where $m$ is the option you have set to the baseline and $j$ is all other options. 
 
-Let's visualise the relationship between support for the war and gender:
+Let's visualise the relationship between the program selected and the student's socio-economic status:
 
 ```{r}
-p1 <- student_survey |> 
-  filter(warsup == "Strongly support" | warsup == "Somewhat support") |> 
-  ggplot(aes(x = as.numeric(female), y = as.numeric(warsup))) + 
+p1 <- df |> 
+  filter(prog == "General" | prog == "Academic") |> 
+  ggplot(aes(x = as.numeric(ses), y = as.numeric(prog))) + 
   geom_point() + 
   geom_smooth(method = "loess", se = F) + 
   theme_minimal() + 
-  labs(title = "Somewhat support", 
+  labs(title = "Academic", 
        x = NULL)
 
-p2 <- student_survey |> 
-  filter(warsup == "Strongly support" | warsup == "Somewhat oppose") |> 
-  ggplot(aes(x = as.numeric(female), y = as.numeric(warsup))) + 
+p2 <- df |> 
+  filter(prog == "General" | prog == "Vocational") |> 
+  ggplot(aes(x = as.numeric(ses), y = as.numeric(prog))) + 
   geom_point() + 
   geom_smooth(method = "loess", se = F) + 
   theme_minimal() + 
-  labs(title = "Somewhat oppose", 
-       y = NULL)
+  labs(title = "Vocational", 
+       x = NULL)
 
-p3 <- student_survey |> 
-  filter(warsup == "Strongly support" | warsup == "Strongly oppose") |> 
-  ggplot(aes(x = as.numeric(female), y = as.numeric(warsup))) + 
-  geom_point() + 
-  geom_smooth(method = "loess", se = F) + 
-  theme_minimal() + 
-  labs(title = "Strongly oppose", 
-       x = NULL,
-       y = NULL)
-
-p1 | p2 | p3
+p1 | p2
 ```
 
-And for party ID: 
+And for writing scores: 
 
 ```{r}
-p1 <- student_survey |> 
-  filter(warsup == "Strongly support" | warsup == "Somewhat support") |> 
-  ggplot(aes(x = as.numeric(pid), y = as.numeric(warsup))) + 
+p1 <- df |> 
+  filter(prog == "General" | prog == "Academic") |> 
+  ggplot(aes(x = write, y = as.numeric(prog))) + 
   geom_point() + 
   geom_smooth(method = "loess", se = F) + 
   theme_minimal() + 
-  labs(title = "Somewhat support", 
+  labs(title = "Academic", 
        x = NULL)
 
-p2 <- student_survey |> 
-  filter(warsup == "Strongly support" | warsup == "Somewhat oppose") |> 
-  ggplot(aes(x = as.numeric(pid), y = as.numeric(warsup))) + 
+p2 <- df |> 
+  filter(prog == "General" | prog == "Vocational") |> 
+  ggplot(aes(x = write, y = as.numeric(prog))) + 
   geom_point() + 
   geom_smooth(method = "loess", se = F) + 
   theme_minimal() + 
-  labs(title = "Somewhat oppose", 
-       y = NULL)
+  labs(title = "Vocational", 
+       x = NULL)
 
-p3 <- student_survey |> 
-  filter(warsup == "Strongly support" | warsup == "Strongly oppose") |> 
-  ggplot(aes(x = as.numeric(pid), y = as.numeric(warsup))) + 
-  geom_point() + 
-  geom_smooth(method = "loess", se = F) + 
-  theme_minimal() + 
-  labs(title = "Strongly oppose", 
-       x = NULL,
-       y = NULL)
-
-p1 | p2 | p3
+p1 | p2
 ```
 
-We can see here that the relationship between these independent variables and an individual's level of support for the war is different based on the choice at hand. Multinomial modelling allows us to measure this. We are essentially developing a different model for each outcome option: strongly support vs. strong oppose, strongly support vs. weakly oppose, and strongly support vs. weakly support. 
+We can see here that the relationship between these independent variables and the student's choice of program is different based on the choice at hand. Multinomial modelling allows us to measure this. We are essentially developing a different model for each outcome option: general vs. academic, and general vs. vocational. 
 
 Let's fit our model using `nnet::multinom()` and display the results using `broom::tidy()`:
 
 ```{r}
-m1 <- multinom(warsup ~ female + pid, data = student_survey)
+m1 <- multinom(prog ~ ses + write, data = df)
 
 tidy(m1)
 ```
 
-Here, we can see that the model has produced different coefficients for each of our independent variables for each outcome option. The first column tells us which outcome option we are  modelling: weak support, weak opposition, and strong opposition.
+Here, we can see that the model has produced different coefficients for each of our independent variables for each outcome option. The first column tells us which outcome option we are  modelling: academic or vocational.
 
 We can more formally present these results using `gtsummary::tbl_regression()`:
 

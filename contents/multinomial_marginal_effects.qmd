@@ -30,34 +30,15 @@ library(ggeffects)
 
 We will use the same data as the previous section: 
 
-```{r, include = FALSE}
-student_survey <- rio::import("/Users/harrietgoers/Downloads/student vote GVPT 729a.dta") |> 
-  transmute(warsup = factor(warsup, 
-                            levels = c(1, 2, 3, 4),
-                            labels = c("Strongly support",
-                                       "Somewhat support",
-                                       "Somewhat oppose",
-                                       "Strongly oppose")), 
-            female = factor(female, 
-                            levels = c(0, 1), 
-                            labels = c("Not female", "Female")), 
-            pid = factor(pid,
-                         levels = c(1, 2, 3, 4, 5, 6, 7),
-                         labels = c("Strong democrat",
-                                    "Weak democrat",
-                                    "Independent democrat",
-                                    "Independent",
-                                    "Independent republican",
-                                    "Weak republican",
-                                    "Strong republican"))) |> 
-  labelled::set_variable_labels(warsup = "Support for the war",
-                                female = "Female",
-                                pid = "Party ID") |> 
-  drop_na()
-```
+```{r, echo = FALSE}
+df <- rio::import("https://stats.idre.ucla.edu/stat/data/hsbdemo.dta") |> 
+  transmute(
+    prog = factor(prog, labels = c("General", "Academic", "Vocational"), ordered = F),
+    ses = factor(ses, labels = c("Low", "Middle", "High"), ordered = F),
+    write
+  )
 
-```{r}
-head(student_survey)
+head(df)
 ```
 
 ## Multinomial logit regression
@@ -67,7 +48,7 @@ head(student_survey)
 Let's take another look at the model we created previously: 
 
 ```{r}
-m1 <- multinom(warsup ~ female + pid, data = student_survey)
+m1 <- multinom(prog ~ ses + write, data = df)
 
 tbl_regression(m1, intercept = T)
 ```
@@ -76,11 +57,11 @@ We have three options for interpreting coefficients in multinomial logistic regr
 
 #### Relative log odds
 
-Similar to log odds ratios in binary logistic regression, these can be interpreted as the effect of a one-unit change in $x_i$ on the log odds of being in category 2 compared to being in category 1. For example, identifying as female is associated with a `r tidy(m1) |> filter(y.level == "Strongly oppose", term == "femaleFemale") |> pull(estimate) |> round(3)` change in the log odds of strongly opposing compared to strongly supporting the war in Iraq.
+Similar to log odds ratios in binary logistic regression, these can be interpreted as the effect of a one-unit change in $x_i$ on the log odds of being in category 2 compared to being in category 1. For example, increasing yoru writing score by one point is associated with a `r tidy(m1) |> filter(y.level == "Academic", term == "write") |> pull(estimate) |> round(2)` change in the log odds ratio of choosing the academic program compared to the general program.
 
 #### Relative risk ratios
 
-Similar to odds ratios in binary logistic regression, these can be interpreted as the effect of a one-unit change in $x_i$ on the probability of being in category 2 compared to being in category 1. For example, identifying as female is associated with a `r tidy(m1, exponentiate = T) |> filter(y.level == "Strongly oppose", term == "femaleFemale") |> pull(estimate) |> percent()` change in the probability of strongly opposing compared to strongly supporting the war in Iraq.
+Similar to odds ratios in binary logistic regression, these can be interpreted as the effect of a one-unit change in $x_i$ on the probability of being in category 2 compared to being in category 1. For example, increasing yoru writing score by one point is associated with a `r tidy(m1, exponentiate = T) |> filter(y.level == "Academic", term == "write") |> pull(estimate) |> round(2)` change in the odds ratio of choosing the academic program compared to the general program.
 
 You can get this using `broom::tidy()`:
 
@@ -91,38 +72,45 @@ tidy(m1, exponentiate = T)
 Or plot your results using `sjPlot::plot_model()`:
 
 ```{r}
-plot_model(m1, show.values = T, value.offset = .3)
+plot_model(m1, show.values = T, value.offset = .3, order.terms = T)
 ```
 
 #### Predicted probabilities
 
-This describes the probability that an observation will be in a category for a given a set of observed values. For example, the predicted probability that a strong democratic female will strongly support the war in Iraq is `r predict(m1, newdata = tibble(female = factor("Female"), pid = factor("Strong democrat")), type = "probs") |> tidy() |> filter(names == "Strongly support") |> pull(x) |> percent()`. The predicted probability that she will strongly oppose the war is `r predict(m1, newdata = tibble(female = factor("Female"), pid = factor("Strong democrat")), type = "probs") |> tidy() |> filter(names == "Strongly oppose") |> pull(x) |> percent()`.
+```{r, include = FALSE}
+pred_prob_high_avg <- predict(
+  m1, newdata = tibble(ses = "High", write = mean(df$write)), type = "probs"
+) |> 
+  tidy()
+```
+
+This describes the probability that an observation will be in a category for a given a set of observed values. For example, the predicted probability that student with a high socio-economic status and the average writing score of `r mean(df$write) |> round(2)` will choose an academic program is `r pred_prob_high_avg |> filter(names == "Academic") |> pull(x) |> percent()`. The predicted probability that they will choose the general program is `r pred_prob_high_avg |> filter(names == "General") |> pull(x) |> percent()`. Finally, the predicted probability that they will choose the vocational program is `r pred_prob_high_avg |> filter(names == "Vocational") |> pull(x) |> percent()`.
 
 `broom::augment()` does not currently support multinomial regression. Instead, we can use base R's `predict()`:
 
 ```{r}
-predict(m1, newdata = tibble(female = factor("Female"), pid = factor("Strong democrat")), type = "probs")
+predict(m1, newdata = tibble(ses = "High", write = mean(df$write)), type = "probs")
 ```
 
 We can plot these predicted probabilities across our outcomes and variable options using `ggeffects::ggeffect()`:
 
 ```{r}
-ggeffect(m1, terms = "female") |> 
+ggeffect(m1, terms = "ses") |> 
   plot()
 ```
 
 ```{r}
-ggeffect(m1, terms = "pid") |> 
+ggeffect(m1, terms = "write") |> 
   plot()
 ```
 
 ### Marginal effects
 
-We can interpret the marginal effects of a one-unit change in $x_i$ on the change in probability that an observation will fall into one category. For example, moving from a strong republican to a strong democrat decreases the probability that an individual will strongly support the war in Iraq by `r marginaleffects(m1, variables = "pid", type = "probs") |> summary() |> filter(group == "Strongly support", contrast == "Strong republican - Strong democrat") |> as_tibble() |> pull(estimate) |> percent()`.
+We can interpret the marginal effects of a one-unit change in $x_i$ on the change in probability that an observation will fall into one category. For example, moving from a high to a low socio-economic status decreases the probability that an individual will select the general program by `r marginaleffects(m1, variables = "ses", type = "probs") |> summary() |> filter(group == "General", contrast == "High - Low") |> as_tibble() |> pull(estimate) |> abs() |> percent()`.
 
 You can calculate the marginal effects of each change using `marginaleffects::marginaleffects()`:
 
 ```{r}
-marginaleffects::marginaleffects(m1, variables = "pid", type = "probs") |> 
+marginaleffects(m1, variables = "ses", type = "probs") |> 
   summary()
 ```
